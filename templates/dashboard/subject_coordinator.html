@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6 animate-fade-in-up">
+    <!-- Welcome Section -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Subject Coordinator Dashboard</h2>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">Manage assessment schemes and question papers.</p>
+        </div>
+        <div class="hidden sm:block">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800 dark:bg-brand-900/30 dark:text-brand-300 border border-brand-200 dark:border-brand-800/50">
+                Academic Year: {{ academic_year }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Main Content Area Placeholder -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl p-8 shadow-sm border border-slate-200 dark:border-slate-800 text-center mt-6">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 mb-4">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        </div>
+        <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">Setup Complete</h3>
+        <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+            Subject Coordinator dashboard ready. Data and metrics will be populated in Phase 8 (Assessment Scheme).
+        </p>
+    </div>
+</div>
+{% endblock %}

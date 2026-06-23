@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}Configure {{ parent_type_display }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6 animate-fade-in-up" x-data="schemeBuilder()">
+
+    <!-- Header & Breadcrumbs -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'assessment:dashboard' %}" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Configure {{ parent_type_display }}</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400">{{ subject.code }} - {{ subject.name }}</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Target Max Marks</p>
+            <p class="text-2xl font-bold text-brand-600 dark:text-brand-400">{{ parent_max_marks }}</p>
+        </div>
+    </div>
+
+    <!-- Alert Container -->
+    <div x-show="alert.show" x-transition class="p-4 rounded-lg border flex items-start gap-3" :class="{'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-900/50 dark:text-emerald-400': alert.type === 'success', 'bg-rose-50 border-rose-200 text-rose-800 dark:bg-rose-900/20 dark:border-rose-900/50 dark:text-rose-400': alert.type === 'error'}" style="display: none;">
+        <svg x-show="alert.type === 'success'" class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <svg x-show="alert.type === 'error'" class="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="text-sm font-medium" x-html="alert.message"></div>
+    </div>
+
+    <!-- Components Builder -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center">
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white">1. Define Components</h2>
+            <button @click="addComponent" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded border border-brand-200 bg-brand-50 text-brand-700 hover:bg-brand-100 dark:border-brand-900/30 dark:bg-brand-900/20 dark:text-brand-400 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Add Component
+            </button>
+        </div>
+        
+        <div class="p-6">
+            <template x-if="components.length === 0">
+                <div class="text-center py-6 text-slate-500 dark:text-slate-400 text-sm">
+                    No components defined yet. Click "Add Component" to start.
+                </div>
+            </template>
+            
+            <div class="space-y-4">
+                <template x-for="(comp, index) in components" :key="index">
+                    <div class="flex items-start gap-4 p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30">
+                        <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Name</label>
+                                <input type="text" x-model="comp.name" placeholder="e.g., Internal 1" class="block w-full border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm dark:bg-slate-700 dark:text-white placeholder-slate-400">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Variable Name</label>
+                                <input type="text" x-model="comp.variable_name" placeholder="e.g., I1" class="block w-full border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm font-mono dark:bg-slate-700 dark:text-white placeholder-slate-400" @input="comp.variable_name = comp.variable_name.replace(/[^a-zA-Z0-9_]/g, '')">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Conducted Marks</label>
+                                <input type="number" x-model="comp.max_marks" placeholder="e.g., 30" class="block w-full border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm dark:bg-slate-700 dark:text-white placeholder-slate-400">
+                            </div>
+                        </div>
+                        <button @click="removeComponent(index)" type="button" class="mt-6 p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition" title="Remove">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formula Builder -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white">2. Define Formula</h2>
+        </div>
+        <div class="p-6">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Mathematical Formula linking variables to Target Max Marks ({{ parent_max_marks }})</label>
+            <div class="relative">
+                <input type="text" x-model="formula" placeholder="e.g., (I1 + I2)/2 + FE" class="block w-full border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 text-base font-mono py-3 px-4 dark:bg-slate-800 dark:text-white placeholder-slate-400">
+            </div>
+            <p class="text-xs text-slate-500 mt-2">Use the <strong>Variable Names</strong> defined above. Supports +, -, *, /, and parentheses ().</p>
+        </div>
+        
+        <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <span class="text-sm text-slate-500">The maximum evaluated score must exactly equal <strong class="text-brand-600">{{ parent_max_marks }}</strong>.</span>
+            <button @click="saveScheme" :disabled="isSaving" type="button" class="inline-flex items-center justify-center px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                <span x-show="!isSaving">Validate & Save</span>
+                <span x-show="isSaving" class="flex items-center gap-2">
+                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Validating...
+                </span>
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<!-- AlpineJS Component Logic -->
+<script>
+function schemeBuilder() {
+    return {
+        components: [
+            {% for c in components %}
+            {
+                name: '{{ c.name|escapejs }}',
+                variable_name: '{{ c.variable_name|escapejs }}',
+                max_marks: {{ c.max_marks }}
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        formula: '{{ formula_string|escapejs }}',
+        isSaving: false,
+        alert: { show: false, type: 'success', message: '' },
+
+        addComponent() {
+            this.components.push({ name: '', variable_name: '', max_marks: '' });
+        },
+
+        removeComponent(index) {
+            this.components.splice(index, 1);
+        },
+
+        showAlert(type, message) {
+            this.alert = { show: true, type, message };
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (type === 'success') {
+                setTimeout(() => { this.alert.show = false; }, 5000);
+            }
+        },
+
+        async saveScheme() {
+            // Basic Frontend Validation
+            if (this.components.length === 0) {
+                this.showAlert('error', 'Please add at least one component.');
+                return;
+            }
+            if (!this.formula.trim()) {
+                this.showAlert('error', 'Please define the formula.');
+                return;
+            }
+
+            for (let i=0; i<this.components.length; i++) {
+                let c = this.components[i];
+                if (!c.name.trim() || !c.variable_name.trim() || !c.max_marks) {
+                    this.showAlert('error', `Component #${i+1} is missing required fields.`);
+                    return;
+                }
+            }
+
+            this.isSaving = true;
+            this.alert.show = false;
+
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        components: this.components,
+                        formula: this.formula
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.showAlert('success', data.message);
+                } else {
+                    this.showAlert('error', data.message);
+                }
+            } catch (error) {
+                this.showAlert('error', 'A network error occurred while saving.');
+            } finally {
+                this.isSaving = false;
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

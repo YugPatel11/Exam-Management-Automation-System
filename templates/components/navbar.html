@@ -1,0 +1,53 @@
+<!-- Top Navbar -->
+<header class="h-16 border-b border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-800 shrink-0 z-30">
+    <div class="h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        
+        <!-- Left Section -->
+        <div class="flex items-center gap-4">
+            <button id="open-sidebar" class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 lg:hidden">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <h1 class="text-xl font-semibold text-slate-800 dark:text-slate-100 hidden sm:block">{{ page_title|default:"Dashboard" }}</h1>
+        </div>
+
+        <!-- Right Section -->
+        <div class="flex items-center gap-4">
+            
+            <!-- Dark Mode Toggle -->
+            <button id="theme-toggle" class="p-2 text-slate-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <!-- Sun Icon (shown in dark mode) -->
+                <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                <!-- Moon Icon (shown in light mode) -->
+                <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+            </button>
+
+            <!-- Notifications (Placeholder) -->
+            <button class="p-2 text-slate-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition relative">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-500 rounded-full"></span>
+            </button>
+
+            <!-- User Menu Dropdown -->
+            <div class="relative" id="user-menu-container">
+                <button id="user-menu-button" class="flex items-center gap-2 focus:outline-none">
+                    <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        {{ user|initials }}
+                    </div>
+                </button>
+                
+                <!-- Dropdown -->
+                <div id="user-menu-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50">
+                    <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-700">
+                        <p class="text-sm font-medium text-slate-900 dark:text-white truncate">{{ user.get_display_name }}</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 truncate">{{ user.get_role_display }}</p>
+                    </div>
+                    <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50">Profile Settings</a>
+                    <a href="{% url 'accounts:change_password' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50">Change Password</a>
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                    <a href="{% url 'accounts:logout' %}" class="block px-4 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20">Log out</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</header>

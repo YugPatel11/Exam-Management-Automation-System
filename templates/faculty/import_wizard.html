@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ import_title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6 animate-fade-in-up">
+
+    <!-- Header & Breadcrumbs -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'faculty:assignment_list' %}" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            </a>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ import_title }} Wizard</h1>
+        </div>
+        <div class="flex items-center gap-2 text-sm font-medium">
+            <span class="{% if step == 1 %}text-brand-600 dark:text-brand-400{% else %}text-slate-500 dark:text-slate-400{% endif %}">Step 1: Upload</span>
+            <svg class="w-4 h-4 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <span class="{% if step == 2 %}text-brand-600 dark:text-brand-400{% else %}text-slate-500 dark:text-slate-400{% endif %}">Step 2: Preview & Import</span>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 rounded-xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-800">
+        
+        {% if step == 1 %}
+        <!-- STEP 1: UPLOAD -->
+        <div class="mb-6">
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white">Upload {{ import_title }} CSV</h2>
+            <p class="text-sm text-slate-500 mt-1">Upload the assignment export to map subjects to users via their email addresses.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div class="p-4 rounded-lg bg-rose-50 border border-rose-200 text-sm text-rose-600 dark:bg-rose-900/20 dark:border-rose-900/50 dark:text-rose-400">
+                    {{ form.errors }}
+                </div>
+            {% endif %}
+
+            <div class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-8 text-center hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                <svg class="mx-auto h-12 w-12 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                <div class="max-w-xs mx-auto">
+                    {{ form.csv_file }}
+                </div>
+                <p class="text-xs text-slate-500 mt-4">
+                    {% if import_type == 'coordinator' %}
+                        Expected Columns: Subject Code, Subject Name, Subject Coordinator (Email)
+                    {% else %}
+                        Expected Columns: Subject Code, Subject Name, Division, Faculty (Email)
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="flex justify-end pt-4">
+                <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-200">
+                    Upload and Preview
+                </button>
+            </div>
+        </form>
+
+        {% elif step == 2 %}
+        <!-- STEP 2: PREVIEW -->
+        <div class="mb-6">
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white">Validation Preview</h2>
+            <p class="text-sm text-slate-500 mt-1">Review the parsed data. Subjects will be created if missing, but User Emails must already exist in the system.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-900/50">
+                <p class="text-sm font-medium text-emerald-800 dark:text-emerald-400">Valid Assignments</p>
+                <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-500 mt-1">{{ summary.total_valid }}</p>
+            </div>
+            <div class="p-4 rounded-xl border {% if summary.total_errors > 0 %}border-rose-200 bg-rose-50 dark:bg-rose-900/20 dark:border-rose-900/50{% else %}border-slate-200 bg-slate-50 dark:bg-slate-800/50 dark:border-slate-700{% endif %}">
+                <p class="text-sm font-medium {% if summary.total_errors > 0 %}text-rose-800 dark:text-rose-400{% else %}text-slate-600 dark:text-slate-400{% endif %}">Errors / Missing Users</p>
+                <p class="text-3xl font-bold {% if summary.total_errors > 0 %}text-rose-600 dark:text-rose-500{% else %}text-slate-900 dark:text-white{% endif %} mt-1">{{ summary.total_errors }}</p>
+            </div>
+        </div>
+
+        {% if summary.total_errors > 0 %}
+        <div class="mb-8">
+            <h3 class="text-sm font-bold text-rose-600 dark:text-rose-500 uppercase tracking-wider mb-3">Error Log</h3>
+            <div class="bg-rose-50 dark:bg-rose-900/10 rounded-lg p-4 max-h-64 overflow-y-auto custom-scrollbar border border-rose-100 dark:border-rose-900/30">
+                <ul class="space-y-2 text-sm text-rose-700 dark:text-rose-400">
+                    {% for error in summary.errors %}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span><strong>Row {{ error.row }}</strong> (ID: {{ error.identifier|default:"N/A" }}): {{ error.message }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if summary.total_valid > 0 %}
+        <div class="mb-8">
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Sample Valid Records</h3>
+            <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-sm">
+                    <thead class="bg-slate-50 dark:bg-slate-800">
+                        <tr>
+                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Subject</th>
+                            {% if import_type == 'faculty' %}
+                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Division</th>
+                            {% endif %}
+                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Assigned User</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-900">
+                        {% for row in summary.valid_sample %}
+                        <tr>
+                            <td class="px-4 py-2 text-slate-900 dark:text-white font-medium">{{ row.course_code }}</td>
+                            {% if import_type == 'faculty' %}
+                            <td class="px-4 py-2 text-slate-600 dark:text-slate-300">{{ row.division_name }}</td>
+                            {% endif %}
+                            <td class="px-4 py-2">
+                                <div class="text-slate-900 dark:text-white font-medium">{{ row.user_name }}</div>
+                                <div class="text-slate-500 dark:text-slate-400 text-xs">{{ row.user_email }}</div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <form method="post" action="{% if import_type == 'coordinator' %}{% url 'faculty:coordinator_import_process' %}{% else %}{% url 'faculty:faculty_import_process' %}{% endif %}">
+            {% csrf_token %}
+            <div class="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
+                <p class="text-sm text-slate-500">Only the <strong class="text-emerald-600 dark:text-emerald-400">{{ summary.total_valid }}</strong> valid assignments will be imported.</p>
+                <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-200">
+                    Confirm and Import
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <div class="text-center py-8">
+            <p class="text-rose-600 font-medium">No valid records found to import.</p>
+            <a href="{% if import_type == 'coordinator' %}{% url 'faculty:coordinator_import_wizard' %}{% else %}{% url 'faculty:faculty_import_wizard' %}{% endif %}" class="mt-4 inline-block px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg transition">Upload Different File</a>
+        </div>
+        {% endif %}
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

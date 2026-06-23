@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6 animate-fade-in-up">
+    
+    <div class="bg-white dark:bg-slate-900 rounded-xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-800">
+        <div class="mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ title }}</h1>
+            <p class="text-sm text-slate-500 mt-1">Fill out the details below to configure the examination event.</p>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-sm text-rose-600 dark:bg-rose-900/20 dark:border-rose-900/50 dark:text-rose-400">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Academic Year -->
+                <div>
+                    <label for="{{ form.academic_year.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        {{ form.academic_year.label }}
+                    </label>
+                    {{ form.academic_year }}
+                    {% if form.academic_year.help_text %}
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ form.academic_year.help_text }}</p>
+                    {% endif %}
+                    {% if form.academic_year.errors %}
+                        <p class="mt-1.5 text-sm text-rose-500">{{ form.academic_year.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Exam Name -->
+                <div>
+                    <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        {{ form.name.label }}
+                    </label>
+                    {{ form.name }}
+                    {% if form.name.help_text %}
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ form.name.help_text }}</p>
+                    {% endif %}
+                    {% if form.name.errors %}
+                        <p class="mt-1.5 text-sm text-rose-500">{{ form.name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Exam Type -->
+                <div>
+                    <label for="{{ form.exam_type.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        {{ form.exam_type.label }}
+                    </label>
+                    {{ form.exam_type }}
+                    {% if form.exam_type.errors %}
+                        <p class="mt-1.5 text-sm text-rose-500">{{ form.exam_type.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        {{ form.status.label }}
+                    </label>
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                        <p class="mt-1.5 text-sm text-rose-500">{{ form.status.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Start Date -->
+                <div>
+                    <label for="{{ form.start_date.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        {{ form.start_date.label }}
+                    </label>
+                    {{ form.start_date }}
+                    {% if form.start_date.errors %}
+                        <p class="mt-1.5 text-sm text-rose-500">{{ form.start_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- End Date -->
+                <div>
+                    <label for="{{ form.end_date.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        {{ form.end_date.label }}
+                    </label>
+                    {{ form.end_date }}
+                    {% if form.end_date.errors %}
+                        <p class="mt-1.5 text-sm text-rose-500">{{ form.end_date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Programs (M2M Checkboxes) -->
+            <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                    {{ form.programs.label }}
+                </label>
+                {% if form.programs.help_text %}
+                    <p class="mb-4 text-xs text-slate-500 dark:text-slate-400">{{ form.programs.help_text }}</p>
+                {% endif %}
+                
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700 max-h-60 overflow-y-auto custom-scrollbar">
+                    {{ form.programs }}
+                </div>
+                {% if form.programs.errors %}
+                    <p class="mt-1.5 text-sm text-rose-500">{{ form.programs.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Archived Flag -->
+            <div class="mt-6 flex items-center gap-3">
+                {{ form.is_archived }}
+                <label for="{{ form.is_archived.id_for_label }}" class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    {{ form.is_archived.label }}
+                </label>
+            </div>
+
+            <div class="pt-6 mt-6 flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
+                <a href="{{ cancel_url }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition">Cancel</a>
+                <button type="submit" class="px-6 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition duration-200">
+                    Save Exam
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

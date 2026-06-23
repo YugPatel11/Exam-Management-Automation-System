@@ -1,0 +1,13 @@
+Django>=4.2,<5.0
+djangorestframework>=3.14,<3.16
+django-cors-headers>=4.3
+python-dotenv>=1.0
+gunicorn>=21.2
+whitenoise>=6.6
+dj-database-url>=2.1
+psycopg2-binary>=2.9
+google-api-python-client>=2.108
+google-auth-httplib2>=0.1
+google-auth-oauthlib>=1.2
+openpyxl>=3.1
+reportlab>=4.0
