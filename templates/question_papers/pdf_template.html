@@ -1,0 +1,38 @@
+<div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; border: 1px solid #ccc; padding: 40px;">
+    <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px;">
+        <h1 style="margin: 0; font-size: 24px;">XYZ Institute of Technology</h1>
+        <h2 style="margin: 5px 0 0 0; font-size: 18px;">{{ paper.exam.name }}</h2>
+        <h3 style="margin: 5px 0 0 0; font-size: 16px; font-weight: normal;">Program: {{ paper.program.code }} | Semester: {{ paper.semester }}</h3>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 30px; font-weight: bold;">
+        <div>Subject Code: {{ paper.subject.code }}</div>
+        <div>Date: {{ paper.date|default:"TBD" }}</div>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; margin-bottom: 40px; font-weight: bold;">
+        <div>Time: {{ paper.start_time|time:"H:i"|default:"-" }} to {{ paper.end_time|time:"H:i"|default:"-" }}</div>
+        <div>Total Marks: {{ paper.total_marks }}</div>
+    </div>
+
+    <div>
+        {% for q in questions %}
+        <div style="display: flex; margin-bottom: 20px;">
+            <div style="width: 50px; font-weight: bold;">{{ q.question_number }}</div>
+            <div style="flex-grow: 1;">
+                {{ q.text|linebreaksbr }}
+            </div>
+            <div style="width: 80px; text-align: right; font-style: italic;">
+                [{{ q.marks }}]
+            </div>
+        </div>
+        <div style="margin-left: 50px; margin-bottom: 25px; font-size: 12px; color: #666;">
+            (CO: {{ q.co_mapping|default:"-" }}, BTL: {{ q.btl_mapping|default:"-" }})
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="text-align: center; margin-top: 50px; font-weight: bold;">
+        *** END OF PAPER ***
+    </div>
+</div>

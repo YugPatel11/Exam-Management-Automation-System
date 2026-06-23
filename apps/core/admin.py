@@ -1,5 +1,5 @@
 from django.contrib import admin
-from apps.core.models_audit import AuditLog, FileUpload
+from apps.core.models_audit import AuditLog, TextContent
 
 
 @admin.register(AuditLog)
@@ -21,9 +21,9 @@ class AuditLogAdmin(admin.ModelAdmin):
         return False
 
 
-@admin.register(FileUpload)
-class FileUploadAdmin(admin.ModelAdmin):
-    list_display = ['file_name', 'file_type', 'module', 'uploaded_by', 'created_at']
-    list_filter = ['file_type', 'module', 'created_at']
-    search_fields = ['file_name', 'google_drive_file_id']
+@admin.register(TextContent)
+class TextContentAdmin(admin.ModelAdmin):
+    list_display = ['title', 'content_type', 'module', 'created_by', 'created_at']
+    list_filter = ['content_type', 'module', 'created_at']
+    search_fields = ['title', 'content']
     readonly_fields = ['created_at', 'updated_at']

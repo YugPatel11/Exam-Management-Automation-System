@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Enter Marks — {{ task.subject.code }}{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Enter Marks</h1>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ task.subject.code }} — {{ task.division.name|default:"All Divisions" }} ({{ task.exam.name }})</p>
+    </div>
+    <div class="flex items-center gap-3">
+        <a href="{% url 'marks:task_list' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+            &larr; Back to Tasks
+        </a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
+    <div class="lg:col-span-3">
+        <form method="post" class="bg-white dark:bg-surface-800 shadow rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+            {% csrf_token %}
+            
+            <div class="px-4 py-5 sm:px-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h3 class="text-lg leading-6 font-medium text-slate-900 dark:text-white">Student List</h3>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                    {% if task.status == 'pending' %}bg-slate-100 text-slate-800
+                    {% elif task.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                    {% elif task.status == 'submitted' %}bg-blue-100 text-blue-800
+                    {% elif task.status == 'locked' %}bg-green-100 text-green-800
+                    {% endif %}">
+                    Status: {{ task.get_status_display }}
+                </span>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                    <thead class="bg-slate-50 dark:bg-slate-800/50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Roll No</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Student Name</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Absent</th>
+                            {% for comp in components %}
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">{{ comp.label }}<br><span class="text-xs text-slate-400">(Max: {{ comp.max_marks }})</span></th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-surface-800">
+                        {% for item in student_forms %}
+                        {% with form=item.form student=item.student %}
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{{ student.roll_no }}</td>
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500 dark:text-slate-400">{{ student.name }}</td>
+                            
+                            <!-- Hidden fields if any -->
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-center">
+                                {% if task.status in 'submitted,locked' %}
+                                    {% if form.instance.is_absent %}<span class="text-red-500 font-bold">A</span>{% else %}-{% endif %}
+                                {% else %}
+                                    {{ form.is_absent }}
+                                {% endif %}
+                            </td>
+                            
+                            {% for comp in components %}
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-center">
+                                {% if task.status in 'submitted,locked' %}
+                                    <span class="font-medium {% if form.instance.is_absent %}text-slate-400 line-through{% else %}text-slate-900 dark:text-white{% endif %}">
+                                        {{ form.instance.component_marks|get_item:comp.key|default:"0" }}
+                                    </span>
+                                {% else %}
+                                    <div class="w-24 mx-auto">
+                                        {{ form|get_form_field:comp.key }}
+                                        {% if form|get_form_field:comp.key|length > 0 %}
+                                            <p class="mt-1 text-xs text-red-600">{{ form|get_form_field:comp.key.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if task.status not in 'submitted,locked' %}
+            <div class="px-4 py-4 sm:px-6 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3 bg-slate-50 dark:bg-slate-800/50">
+                <button type="submit" name="action" value="save_draft" class="inline-flex justify-center rounded-md border border-slate-300 bg-white py-2 px-4 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:border-slate-600 dark:bg-surface-700 dark:text-slate-200 dark:hover:bg-surface-600">
+                    Save Draft
+                </button>
+                <button type="submit" name="action" value="submit" class="inline-flex justify-center rounded-md border border-transparent bg-brand-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2" onclick="return confirm('Are you sure you want to submit these marks? You will not be able to edit them after submission.');">
+                    Submit for Review
+                </button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+    
+    <!-- Sidebar / CSV Upload -->
+    <div class="lg:col-span-1 space-y-6">
+        <div class="bg-white dark:bg-surface-800 shadow rounded-lg p-6 border border-slate-200 dark:border-slate-700">
+            <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-4">Instructions</h3>
+            <ul class="text-sm text-slate-500 dark:text-slate-400 space-y-2 list-disc pl-5">
+                <li>Enter marks for all students present.</li>
+                <li>Check the <strong>Absent</strong> box if a student was not present. Marks will automatically be zero.</li>
+                <li>Ensure all marks entered are within the maximum allowed for each component.</li>
+                <li>Click <strong>Save Draft</strong> to save your progress without submitting.</li>
+                <li>Click <strong>Submit for Review</strong> when you have verified all entries.</li>
+            </ul>
+        </div>
+        
+        {% if task.status not in 'submitted,locked' %}
+        <div class="bg-white dark:bg-surface-800 shadow rounded-lg p-6 border border-slate-200 dark:border-slate-700">
+            <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-4">Bulk Import (CSV)</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Upload marks using a CSV file. The file must contain headers: RollNo, Absent, {% for c in components %}{{ c.key }}{% if not forloop.last %}, {% endif %}{% endfor %}.</p>
+            
+            <form action="{% url 'marks:csv_upload' task.pk %}" method="post" enctype="multipart/form-data" class="space-y-4">
+                {% csrf_token %}
+                <input type="file" name="file" accept=".csv" required class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:file:bg-brand-900/50 dark:file:text-brand-300 dark:hover:file:bg-brand-900">
+                <button type="submit" class="w-full inline-flex justify-center rounded-md border border-slate-300 bg-white py-2 px-4 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:border-slate-600 dark:bg-surface-700 dark:text-slate-200 dark:hover:bg-surface-600">
+                    Upload CSV
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

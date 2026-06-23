@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block title %}Question Paper Detail{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Question Paper Details</h1>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ paper.subject.code }} — {{ paper.exam.name }}</p>
+    </div>
+    <div class="flex items-center gap-3">
+        <a href="{% url 'question_papers:list' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+            &larr; Back to List
+        </a>
+        {% if paper.status == 'draft' %}
+        <a href="{% url 'question_papers:edit' paper.pk %}" class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:border-slate-600 dark:bg-surface-700 dark:text-slate-200 dark:hover:bg-surface-600">
+            Edit
+        </a>
+        <form action="{% url 'question_papers:submit' paper.pk %}" method="post" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="inline-flex items-center justify-center rounded-md border border-transparent bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
+                {% if not coverage.is_valid %}disabled title="Total marks mismatch"{% endif %}>
+                Submit for Approval
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <!-- Left Column: Paper Info & Coverage -->
+    <div class="space-y-6 lg:col-span-1">
+        <!-- Paper Info -->
+        <div class="bg-white dark:bg-surface-800 shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-slate-900 dark:text-white mb-4">Paper Info</h2>
+            <dl class="space-y-4">
+                <div>
+                    <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Status</dt>
+                    <dd class="mt-1 text-sm text-slate-900 dark:text-white font-semibold">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                            {% if paper.status == 'draft' %}bg-slate-100 text-slate-800
+                            {% elif paper.status == 'submitted' %}bg-blue-100 text-blue-800
+                            {% elif paper.status == 'approved' %}bg-green-100 text-green-800
+                            {% endif %}">
+                            {{ paper.get_status_display }}
+                        </span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Program</dt>
+                    <dd class="mt-1 text-sm text-slate-900 dark:text-white">{{ paper.program.code }} - Sem {{ paper.semester }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Date & Time</dt>
+                    <dd class="mt-1 text-sm text-slate-900 dark:text-white">
+                        {{ paper.date|default:"TBD" }} <br>
+                        {{ paper.start_time|time:"H:i"|default:"TBD" }} to {{ paper.end_time|time:"H:i"|default:"TBD" }}
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Total Marks Expected</dt>
+                    <dd class="mt-1 text-sm text-slate-900 dark:text-white">{{ paper.total_marks }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Coverage Stats -->
+        <div class="bg-white dark:bg-surface-800 shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-slate-900 dark:text-white mb-4">Coverage Analysis</h2>
+            
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Marks Allocated</span>
+                    <span class="text-sm font-medium {% if coverage.is_valid %}text-green-600 dark:text-green-400{% else %}text-red-600 dark:text-red-400{% endif %}">
+                        {{ coverage.total_marks }} / {{ paper.total_marks }}
+                    </span>
+                </div>
+                {% if not coverage.is_valid %}
+                <p class="text-xs text-red-500">Total allocated marks must exactly match the expected total marks before submission.</p>
+                {% endif %}
+            </div>
+
+            <h3 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 mt-4 border-b pb-1">CO Distribution</h3>
+            <ul class="space-y-2">
+                {% for co, marks in coverage.co_distribution.items %}
+                <li class="flex justify-between text-sm">
+                    <span class="text-slate-600 dark:text-slate-400">{{ co }}</span>
+                    <span class="font-medium text-slate-900 dark:text-white">{{ marks }} marks</span>
+                </li>
+                {% empty %}
+                <li class="text-sm text-slate-500">No CO mappings defined.</li>
+                {% endfor %}
+            </ul>
+
+            <h3 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 mt-6 border-b pb-1">BTL Distribution</h3>
+            <ul class="space-y-2">
+                {% for btl, marks in coverage.btl_distribution.items %}
+                <li class="flex justify-between text-sm">
+                    <span class="text-slate-600 dark:text-slate-400">{{ btl }}</span>
+                    <span class="font-medium text-slate-900 dark:text-white">{{ marks }} marks</span>
+                </li>
+                {% empty %}
+                <li class="text-sm text-slate-500">No BTL mappings defined.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Right Column: Questions List -->
+    <div class="space-y-6 lg:col-span-2">
+        <div class="bg-white dark:bg-surface-800 shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-slate-900 dark:text-white mb-4">Questions</h2>
+            
+            <div class="space-y-6">
+                {% for q in questions %}
+                <div class="border-b border-slate-200 dark:border-slate-700 pb-4 last:border-0 last:pb-0">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-md font-semibold text-slate-900 dark:text-white">{{ q.question_number }}</h3>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-200">
+                            {{ q.marks }} Marks
+                        </span>
+                    </div>
+                    <p class="text-sm text-slate-700 dark:text-slate-300 mb-3">{{ q.text|linebreaksbr }}</p>
+                    <div class="flex gap-4 text-xs">
+                        <span class="text-brand-600 dark:text-brand-400 font-medium">CO: {{ q.co_mapping|default:"-" }}</span>
+                        <span class="text-indigo-600 dark:text-indigo-400 font-medium">BTL: {{ q.btl_mapping|default:"-" }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-sm text-slate-500">No questions added yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if generated_content %}
+        <div class="bg-white dark:bg-surface-800 shadow rounded-lg p-6">
+            <h2 class="text-lg font-medium text-slate-900 dark:text-white mb-4">Generated Content Preview</h2>
+            <div class="prose max-w-none text-sm border p-4 rounded bg-slate-50 dark:bg-slate-900 overflow-x-auto">
+                {{ generated_content.content|safe }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

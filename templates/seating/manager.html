@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% block title %}Manage Seating — {{ exam.name }}{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Manage Seating</h1>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ exam.name }}</p>
+    </div>
+    <div class="flex items-center gap-3">
+        <a href="{% url 'seating:dashboard' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+            &larr; Back to Dashboard
+        </a>
+        
+        <form method="post" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="tab" value="{{ active_tab }}">
+            
+            {% if not plan.is_locked %}
+            <button type="submit" name="action" value="auto_generate" class="inline-flex items-center justify-center rounded-md border border-transparent bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
+                Auto Generate
+            </button>
+            {% endif %}
+            
+            {% if total_allocated > 0 %}
+            <button type="submit" name="action" value="toggle_lock" class="inline-flex items-center justify-center rounded-md border {% if plan.is_locked %}border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-surface-700 dark:text-slate-200 dark:hover:bg-surface-600{% else %}border-transparent bg-amber-600 text-white hover:bg-amber-700{% endif %} px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2">
+                {% if plan.is_locked %}Unlock Seating{% else %}Lock Seating{% endif %}
+            </button>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="bg-white dark:bg-surface-800 shadow rounded-lg overflow-hidden">
+    <!-- Tabs -->
+    <div class="border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <a href="?tab=date" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {% if active_tab == 'date' %}border-brand-500 text-brand-600 dark:text-brand-400{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300{% endif %}">
+                Date-wise View
+            </a>
+            <a href="?tab=room" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {% if active_tab == 'room' %}border-brand-500 text-brand-600 dark:text-brand-400{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300{% endif %}">
+                Room-wise View
+            </a>
+        </nav>
+    </div>
+
+    <!-- Content -->
+    <div class="p-4 sm:p-6">
+        {% if total_allocated == 0 %}
+        <div class="text-center py-10">
+            <p class="text-sm text-slate-500 dark:text-slate-400">No seating arrangement generated yet.</p>
+        </div>
+        {% else %}
+        
+        {% if active_tab == 'date' %}
+            <div class="space-y-8">
+                {% for session_key, classrooms in date_wise.items %}
+                <div>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-4 bg-slate-50 dark:bg-slate-800/50 p-3 rounded">
+                        {{ session_key.0 }} | {{ session_key.1|time:"H:i" }} - {{ session_key.2|time:"H:i" }}
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {% for classroom, allocations in classrooms.items %}
+                        <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                            <div class="bg-slate-100 dark:bg-slate-800 px-4 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between">
+                                <span class="font-medium text-slate-900 dark:text-white">{{ classroom.room_number }}</span>
+                                <span class="text-sm text-slate-500">{{ allocations|length }} / {{ classroom.capacity }}</span>
+                            </div>
+                            <div class="p-4">
+                                <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+                                    {% for alloc in allocations %}
+                                    <li class="py-2 flex justify-between text-sm">
+                                        <span class="text-slate-600 dark:text-slate-400">Seat {{ alloc.seat_number }}</span>
+                                        <span class="font-medium text-slate-900 dark:text-white" title="{{ alloc.student.name }}">{{ alloc.student.roll_no }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+        {% elif active_tab == 'room' %}
+            <div class="space-y-8">
+                {% for classroom, sessions in room_wise.items %}
+                <div>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-4 bg-slate-50 dark:bg-slate-800/50 p-3 rounded">
+                        Classroom: {{ classroom.room_number }} (Capacity: {{ classroom.capacity }})
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {% for session_key, allocations in sessions.items %}
+                        <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                            <div class="bg-slate-100 dark:bg-slate-800 px-4 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between text-sm">
+                                <span class="font-medium text-slate-900 dark:text-white">{{ session_key.0 }}</span>
+                                <span class="text-slate-500">{{ session_key.1|time:"H:i" }}</span>
+                            </div>
+                            <div class="p-4">
+                                <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+                                    {% for alloc in allocations %}
+                                    <li class="py-2 flex justify-between text-sm">
+                                        <span class="text-slate-600 dark:text-slate-400">Seat {{ alloc.seat_number }}</span>
+                                        <span class="font-medium text-slate-900 dark:text-white" title="{{ alloc.student.name }}">{{ alloc.student.roll_no }}</span>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

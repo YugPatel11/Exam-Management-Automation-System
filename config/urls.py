@@ -41,6 +41,24 @@ urlpatterns = [
     # Scheduling
     path('scheduling/', include('apps.scheduling.urls', namespace='scheduling')),
 
+    # Question Papers
+    path('question-papers/', include('apps.question_papers.urls', namespace='question_papers')),
+
+    # Seating
+    path('seating/', include('apps.seating.urls', namespace='seating')),
+
+    # Duty Chart
+    path('duty-chart/', include('apps.duty_chart.urls', namespace='duty_chart')),
+
+    # Marks
+    path('marks/', include('apps.marks.urls', namespace='marks')),
+
+    # Analysis
+    path('analysis/', include('apps.analysis.urls', namespace='analysis')),
+
+    # Reports
+    path('reports/', include('apps.reports.urls', namespace='reports')),
+
     # API v1
     path('api/v1/', include([
         path('accounts/', include('apps.accounts.api_urls', namespace='api-accounts')),

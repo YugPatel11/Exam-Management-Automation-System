@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% block title %}Manage Duty Chart — {{ exam.name }}{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Manage Duty Chart</h1>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ exam.name }}</p>
+    </div>
+    <div class="flex items-center gap-3">
+        <a href="{% url 'duty_chart:dashboard' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+            &larr; Back to Dashboard
+        </a>
+        
+        <form method="post" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="tab" value="{{ active_tab }}">
+            
+            {% if not chart.is_locked %}
+            <button type="submit" name="action" value="auto_generate" class="inline-flex items-center justify-center rounded-md border border-transparent bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
+                Auto Generate
+            </button>
+            {% endif %}
+            
+            {% if total_assigned > 0 %}
+            <button type="submit" name="action" value="toggle_lock" class="inline-flex items-center justify-center rounded-md border {% if chart.is_locked %}border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-surface-700 dark:text-slate-200 dark:hover:bg-surface-600{% else %}border-transparent bg-amber-600 text-white hover:bg-amber-700{% endif %} px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2">
+                {% if chart.is_locked %}Unlock Duty Chart{% else %}Lock Duty Chart{% endif %}
+            </button>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="bg-white dark:bg-surface-800 shadow rounded-lg overflow-hidden">
+    <!-- Tabs -->
+    <div class="border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <a href="?tab=date" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {% if active_tab == 'date' %}border-brand-500 text-brand-600 dark:text-brand-400{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300{% endif %}">
+                Date-wise View
+            </a>
+            <a href="?tab=room" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {% if active_tab == 'room' %}border-brand-500 text-brand-600 dark:text-brand-400{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300{% endif %}">
+                Room-wise View
+            </a>
+            <a href="?tab=faculty" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {% if active_tab == 'faculty' %}border-brand-500 text-brand-600 dark:text-brand-400{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300{% endif %}">
+                Faculty-wise View
+            </a>
+        </nav>
+    </div>
+
+    <!-- Content -->
+    <div class="p-4 sm:p-6">
+        {% if total_assigned == 0 %}
+        <div class="text-center py-10">
+            <p class="text-sm text-slate-500 dark:text-slate-400">No duty chart generated yet.</p>
+        </div>
+        {% else %}
+        
+        {% if active_tab == 'date' %}
+            <div class="space-y-8">
+                {% for session_key, assignments in date_wise.items %}
+                <div>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-4 bg-slate-50 dark:bg-slate-800/50 p-3 rounded">
+                        {{ session_key.0 }} | {{ session_key.1|time:"H:i" }} - {{ session_key.2|time:"H:i" }}
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {% for a in assignments %}
+                        <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden flex items-center p-4 gap-4 bg-white dark:bg-surface-800">
+                            <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-lg font-bold text-slate-600 dark:text-slate-300">
+                                {{ a.classroom.room_number }}
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-slate-900 dark:text-white">{{ a.faculty.get_display_name }}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">{{ a.faculty.get_role_display }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+        {% elif active_tab == 'room' %}
+            <div class="space-y-8">
+                {% for classroom, assignments in room_wise.items %}
+                <div>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-4 bg-slate-50 dark:bg-slate-800/50 p-3 rounded">
+                        Classroom: {{ classroom.room_number }}
+                    </h3>
+                    
+                    <div class="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                            <thead class="bg-slate-50 dark:bg-slate-800/50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Time</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Faculty Assigned</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-surface-800">
+                                {% for a in assignments %}
+                                <tr>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{{ a.date }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500 dark:text-slate-400">{{ a.start_time|time:"H:i" }} - {{ a.end_time|time:"H:i" }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-900 dark:text-white">{{ a.faculty.get_display_name }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+        {% elif active_tab == 'faculty' %}
+            <div class="space-y-8">
+                {% for faculty, assignments in faculty_wise.items %}
+                <div>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-4 bg-slate-50 dark:bg-slate-800/50 p-3 rounded flex justify-between">
+                        <span>{{ faculty.get_display_name }}</span>
+                        <span class="text-sm font-normal text-slate-500 bg-white dark:bg-slate-700 px-2 py-1 rounded">{{ assignments|length }} Duties</span>
+                    </h3>
+                    
+                    <div class="overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                            <thead class="bg-slate-50 dark:bg-slate-800/50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Time</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Room</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-surface-800">
+                                {% for a in assignments %}
+                                <tr>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{{ a.date }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500 dark:text-slate-400">{{ a.start_time|time:"H:i" }} - {{ a.end_time|time:"H:i" }}</td>
+                                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-brand-600 dark:text-brand-400">{{ a.classroom.room_number }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

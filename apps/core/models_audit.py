@@ -1,6 +1,6 @@
 """
 Audit and file tracking models.
-Centralized audit trail and Google Drive file metadata storage.
+Centralized audit trail and database text content storage.
 """
 from django.db import models
 from django.conf import settings
@@ -65,10 +65,10 @@ class AuditLog(TimeStampedModel):
         return f"{user_str} — {self.get_action_display()} — {self.model_name} — {self.created_at:%Y-%m-%d %H:%M}"
 
 
-class FileUpload(TimeStampedModel):
+class TextContent(TimeStampedModel):
     """
-    Stores metadata for files uploaded to Google Drive.
-    Actual files live in Drive; only links and metadata are stored here.
+    Stores all generated content (question papers, reports, seating plans, etc.)
+    as text directly in the database. No external file storage needed.
     """
     MODULE_CHOICES = [
         ('question_paper', 'Question Paper'),
@@ -80,25 +80,67 @@ class FileUpload(TimeStampedModel):
         ('general', 'General'),
     ]
 
-    file_name = models.CharField(max_length=255)
-    file_type = models.CharField(max_length=50, help_text='e.g., pdf, xlsx')
-    google_drive_file_id = models.CharField(max_length=255, blank=True)
-    google_drive_link = models.URLField(max_length=500, blank=True)
+    title = models.CharField(max_length=255, verbose_name="Title")
+    content_type = models.CharField(
+        max_length=50,
+        default='text',
+        help_text='Content format: text, html, csv, json'
+    )
+    content = models.TextField(
+        verbose_name="Content",
+        help_text="The full text content stored in the database."
+    )
     module = models.CharField(max_length=30, choices=MODULE_CHOICES, db_index=True)
-    related_object_id = models.CharField(max_length=100, blank=True, help_text='ID of the related entity')
+    related_object_id = models.CharField(
+        max_length=100, blank=True,
+        help_text='ID of the related entity (exam, subject, etc.)'
+    )
     related_model = models.CharField(max_length=100, blank=True)
-    file_size = models.PositiveIntegerField(default=0, help_text='Size in bytes')
-    uploaded_by = models.ForeignKey(
+    created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
-        related_name='uploaded_files',
+        related_name='created_contents',
     )
 
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'File Upload'
-        verbose_name_plural = 'File Uploads'
+        verbose_name = 'Text Content'
+        verbose_name_plural = 'Text Contents'
 
     def __str__(self):
-        return f"{self.file_name} ({self.get_module_display()})"
+        return f"{self.module} - {self.identifier}"
+
+
+class NotificationLog(models.Model):
+    """
+    Logs all system notifications sent to users via Email or SMS.
+    """
+    NOTIFICATION_TYPES = [
+        ('email', 'Email'),
+        ('sms', 'SMS'),
+        ('system', 'System/In-App'),
+    ]
+    STATUS_CHOICES = [
+        ('sent', 'Sent'),
+        ('failed', 'Failed'),
+        ('pending', 'Pending'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, default='system')
+    subject = models.CharField(max_length=255)
+    message = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    error_message = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Notification Log"
+        verbose_name_plural = "Notification Logs"
+
+    def __str__(self):
+        return f"[{self.get_notification_type_display()}] {self.user.get_display_name()} - {self.subject}"

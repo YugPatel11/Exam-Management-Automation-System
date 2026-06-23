@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Reports Dashboard{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Reports & Export</h1>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Generate and download data for exams.</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {% for exam in exams %}
+    <div class="bg-white dark:bg-surface-800 shadow rounded-lg p-6 border border-slate-200 dark:border-slate-700 flex flex-col">
+        <div class="flex-1">
+            <h3 class="text-lg font-medium text-slate-900 dark:text-white">{{ exam.name }}</h3>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ exam.start_date }} to {{ exam.end_date }}</p>
+            <div class="mt-4 flex items-center justify-between text-sm">
+                <span class="text-slate-500 dark:text-slate-400">Generated Reports:</span>
+                <span class="font-medium text-slate-900 dark:text-white">{{ exam.reports.count }}</span>
+            </div>
+        </div>
+        <div class="mt-6 flex flex-col gap-2">
+            <a href="{% url 'reports:manager' exam.id %}" class="w-full inline-flex justify-center items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 dark:border-slate-600 dark:bg-surface-700 dark:text-slate-200 dark:hover:bg-surface-600">
+                Manage Reports
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full bg-white dark:bg-surface-800 shadow rounded-lg p-6 text-center border border-slate-200 dark:border-slate-700">
+        <p class="text-sm text-slate-500 dark:text-slate-400">No exams found.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
