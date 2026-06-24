@@ -11,6 +11,11 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('change-password/', views.change_password_view, name='change_password'),
     path('forgot-password/', views.forgot_password_view, name='forgot_password'),
-    path('reset-password/<uidb64>/<token>/', views.reset_password_view, name='reset_password'),
+    path('forgot-password/verify-otp/', views.verify_otp_view, name='verify_otp'),
+    path('forgot-password/set-new-password/', views.reset_password_with_otp_view, name='reset_password_with_otp'),
     path('profile/', views.profile_view, name='profile'),
+    
+    # User Management for Exam Coordinators
+    path('users/', views.UserListView.as_view(), name='user_list'),
+    path('users/create/', views.UserCreateView.as_view(), name='user_create'),
 ]

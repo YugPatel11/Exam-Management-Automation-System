@@ -16,7 +16,7 @@ class RoleMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated:
             request.user_role = request.user.role
-            request.is_admin = request.user.role == 'admin'
+            request.is_admin = request.user.role == 'admin' or request.user.is_superuser
             request.is_coordinator = request.user.role == 'exam_coordinator'
             request.is_subject_coordinator = request.user.role == 'subject_coordinator'
             request.is_faculty = request.user.role == 'subject_faculty'
@@ -50,7 +50,8 @@ class LastActivityMiddleware:
             # Update only if last activity was more than 5 minutes ago
             if not last or (now - last).seconds > 300:
                 # Use update() to avoid triggering signals
-                type(request.user).objects.filter(
+                from django.contrib.auth import get_user_model
+                get_user_model().objects.filter(
                     pk=request.user.pk
                 ).update(last_activity=now)
 

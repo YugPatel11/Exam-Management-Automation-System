@@ -4,6 +4,7 @@ Supports role-based access control with four distinct roles.
 """
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
 
 
 class User(AbstractUser):
@@ -93,6 +94,9 @@ class User(AbstractUser):
 
     def get_dashboard_url(self):
         """Return the appropriate dashboard URL for this user's role."""
+        if self.is_superuser:
+            return '/dashboard/admin/'
+            
         role_urls = {
             self.ROLE_ADMIN: '/dashboard/admin/',
             self.ROLE_EXAM_COORDINATOR: '/dashboard/coordinator/',
@@ -100,3 +104,19 @@ class User(AbstractUser):
             self.ROLE_SUBJECT_FACULTY: '/dashboard/faculty/',
         }
         return role_urls.get(self.role, '/dashboard/')
+
+class PasswordResetOTP(models.Model):
+    """
+    Model to store OTPs for password reset.
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='password_reset_otps')
+    otp_code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"OTP for {self.user.email} (used: {self.is_used})"

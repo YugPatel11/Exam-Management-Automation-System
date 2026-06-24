@@ -118,10 +118,18 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Login/Logout URLs
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/dashboard/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+# Authentication
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'dashboard:home'
+LOGOUT_REDIRECT_URL = 'accounts:login'
+
+AUTHENTICATION_BACKENDS = [
+    'apps.accounts.backends.EmailAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Custom User Model
+AUTH_USER_MODEL = 'accounts.User'
 
 # Session settings
 SESSION_COOKIE_AGE = 28800  # 8 hours

@@ -12,13 +12,20 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.conf import settings
+from django.utils.crypto import get_random_string
+from datetime import timedelta
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 from apps.accounts.forms import (
     LoginForm, ChangePasswordForm, ForgotPasswordForm,
-    ResetPasswordForm, UserProfileForm,
+    ResetPasswordForm, UserProfileForm, AdminUserCreateForm
 )
+from apps.accounts.models import PasswordResetOTP
 from apps.core.services.audit import log_action
+from apps.core.mixins import ExamCoordinatorRequiredMixin
+from django.views.generic import ListView, CreateView
+from django.urls import reverse_lazy
 
 User = None  # Lazy import to avoid circular imports
 
@@ -113,7 +120,7 @@ def change_password_view(request):
 
 @require_http_methods(["GET", "POST"])
 def forgot_password_view(request):
-    """Handle password reset request — sends reset email."""
+    """Handle password reset request — sends OTP email."""
     if request.user.is_authenticated:
         return redirect('dashboard:home')
 
@@ -124,24 +131,21 @@ def forgot_password_view(request):
             UserModel = _get_user_model()
             users = UserModel.objects.filter(email=email, is_active=True)
 
-            for user in users:
-                # Generate reset token
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-                token = default_token_generator.make_token(user)
-
-                # Build reset URL
-                reset_url = request.build_absolute_uri(
-                    f'/accounts/reset-password/{uid}/{token}/'
+            if users.exists():
+                user = users.first()
+                # Generate 6 digit OTP
+                otp_code = get_random_string(length=6, allowed_chars='0123456789')
+                expires_at = timezone.now() + timedelta(minutes=10)
+                
+                PasswordResetOTP.objects.create(
+                    user=user,
+                    otp_code=otp_code,
+                    expires_at=expires_at
                 )
 
                 # Send email
-                subject = 'EMS — Password Reset Request'
-                message = render_to_string('accounts/email/password_reset.html', {
-                    'user': user,
-                    'reset_url': reset_url,
-                    'app_name': 'EMS',
-                })
-
+                subject = 'EMS — Password Reset OTP'
+                message = f"Your OTP for password reset is: {otp_code}. It will expire in 10 minutes."
                 try:
                     send_mail(
                         subject,
@@ -151,28 +155,108 @@ def forgot_password_view(request):
                         fail_silently=False,
                     )
                 except Exception:
-                    pass  # Don't reveal email sending status for security
+                    pass
 
                 log_action(
                     request=request,
                     user=user,
-                    action='password_reset',
+                    action='password_reset_otp_requested',
                     model_name='User',
                     object_id=user.pk,
                     object_repr=str(user),
                     details={'email': email},
                 )
+                
+                request.session['reset_email'] = email
+                return redirect('accounts:verify_otp')
 
-            # Always show success (don't reveal if email exists)
             messages.success(
                 request,
-                'If an account with that email exists, a password reset link has been sent.'
+                'If an account with that email exists, a password reset OTP has been sent.'
             )
-            return redirect('accounts:login')
+            # Even if email is not found, we redirect them to verify_otp to prevent email enumeration
+            request.session['reset_email'] = email
+            return redirect('accounts:verify_otp')
     else:
         form = ForgotPasswordForm()
 
     return render(request, 'accounts/forgot_password.html', {'form': form})
+
+@require_http_methods(["GET", "POST"])
+def verify_otp_view(request):
+    """Verify the OTP sent to email."""
+    if request.user.is_authenticated:
+        return redirect('dashboard:home')
+        
+    email = request.session.get('reset_email')
+    if not email:
+        return redirect('accounts:forgot_password')
+
+    if request.method == 'POST':
+        otp_code = request.POST.get('otp_code')
+        UserModel = _get_user_model()
+        user = UserModel.objects.filter(email=email, is_active=True).first()
+        
+        if user:
+            otp_obj = PasswordResetOTP.objects.filter(
+                user=user, 
+                otp_code=otp_code, 
+                is_used=False,
+                expires_at__gt=timezone.now()
+            ).order_by('-created_at').first()
+            
+            if otp_obj:
+                otp_obj.is_used = True
+                otp_obj.save()
+                request.session['otp_verified'] = True
+                return redirect('accounts:reset_password_with_otp')
+                
+        messages.error(request, 'Invalid or expired OTP. Please try again.')
+    
+    return render(request, 'accounts/verify_otp.html', {'email': email})
+
+@require_http_methods(["GET", "POST"])
+def reset_password_with_otp_view(request):
+    """Set new password after OTP verification."""
+    if request.user.is_authenticated:
+        return redirect('dashboard:home')
+        
+    if not request.session.get('otp_verified'):
+        return redirect('accounts:verify_otp')
+        
+    email = request.session.get('reset_email')
+    UserModel = _get_user_model()
+    user = UserModel.objects.filter(email=email, is_active=True).first()
+    
+    if not user:
+        return redirect('accounts:forgot_password')
+        
+    if request.method == 'POST':
+        form = ResetPasswordForm(user, request.POST)
+        if form.is_valid():
+            form.save()
+            log_action(
+                request=request,
+                user=user,
+                action='password_change',
+                model_name='User',
+                object_id=user.pk,
+                object_repr=str(user),
+                details={'via': 'otp_reset'},
+            )
+            # Clear session
+            del request.session['reset_email']
+            del request.session['otp_verified']
+            
+            messages.success(request, 'Your password has been reset. You can now log in.')
+            return redirect('accounts:login')
+    else:
+        form = ResetPasswordForm(user)
+
+    return render(request, 'accounts/reset_password.html', {
+        'form': form,
+        'valid_link': True,
+    })
 
 
 @require_http_methods(["GET", "POST"])
@@ -239,3 +323,39 @@ def profile_view(request):
         form = UserProfileForm(instance=request.user)
 
     return render(request, 'accounts/profile.html', {'form': form})
+
+class UserListView(ExamCoordinatorRequiredMixin, ListView):
+    """View for Exam Coordinators to list faculty and coordinators."""
+    template_name = 'accounts/user_list.html'
+    context_object_name = 'users'
+    paginate_by = 50
+
+    def get_queryset(self):
+        UserModel = _get_user_model()
+        return UserModel.objects.exclude(is_superuser=True).order_by('first_name', 'last_name')
+
+class UserCreateView(ExamCoordinatorRequiredMixin, CreateView):
+    """View for Exam Coordinators to create new faculty members."""
+    template_name = 'accounts/user_form.html'
+    form_class = AdminUserCreateForm
+    success_url = reverse_lazy('accounts:user_list')
+
+    def form_valid(self, form):
+        user = form.save(commit=False)
+        # Auto-generate username from email
+        user.username = user.email
+        # Auto-generate password
+        raw_password = get_random_string(length=12)
+        user.set_password(raw_password)
+        user.save()
+        
+        # Email the password to the user
+        subject = 'Welcome to EMS - Your Account Details'
+        message = f"Hello {user.get_display_name()},\n\nYour account has been created.\nLogin Email: {user.email}\nPassword: {raw_password}\n\nPlease log in and change your password immediately."
+        try:
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], fail_silently=False)
+        except Exception:
+            messages.warning(self.request, "User created but failed to send welcome email.")
+            
+        messages.success(self.request, f"User {user.email} created successfully. Password emailed to user.")
+        return super().form_valid(form)

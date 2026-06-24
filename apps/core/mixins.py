@@ -19,6 +19,8 @@ class RoleRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated:
             return False
+        if self.request.user.is_superuser:
+            return True
         if not self.allowed_roles:
             return True
         return self.request.user.role in self.allowed_roles

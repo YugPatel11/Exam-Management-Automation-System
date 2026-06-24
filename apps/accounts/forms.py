@@ -30,11 +30,11 @@ class LoginForm(AuthenticationForm):
     username = forms.CharField(
         widget=forms.TextInput(attrs={
             'class': INPUT_CLASSES,
-            'placeholder': 'Enter your username',
+            'placeholder': 'Enter your email or username',
             'autocomplete': 'username',
             'id': 'login-username',
         }),
-        label='Username',
+        label='Email or Username',
     )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
@@ -202,3 +202,20 @@ class UserCreateForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+class AdminUserCreateForm(forms.ModelForm):
+    """Form for Exam Coordinators/Admins to create faculty/coordinators."""
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'role', 'phone', 'department', 'designation', 'employee_id']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': INPUT_CLASSES, 'placeholder': 'First name', 'required': True}),
+            'last_name': forms.TextInput(attrs={'class': INPUT_CLASSES, 'placeholder': 'Last name', 'required': True}),
+            'email': forms.EmailInput(attrs={'class': INPUT_CLASSES, 'placeholder': 'Email (used for login)', 'required': True}),
+            'role': forms.Select(attrs={'class': SELECT_CLASSES}),
+            'phone': forms.TextInput(attrs={'class': INPUT_CLASSES, 'placeholder': 'Phone'}),
+            'department': forms.TextInput(attrs={'class': INPUT_CLASSES, 'placeholder': 'Department'}),
+            'designation': forms.TextInput(attrs={'class': INPUT_CLASSES, 'placeholder': 'Designation'}),
+            'employee_id': forms.TextInput(attrs={'class': INPUT_CLASSES, 'placeholder': 'Employee ID'}),
+        }
+

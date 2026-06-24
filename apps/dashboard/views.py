@@ -14,7 +14,7 @@ def dashboard_home(request):
 @login_required
 def admin_dashboard(request):
     """Admin dashboard with institute-wide overview."""
-    if request.user.role not in ('admin',):
+    if not (request.user.role in ('admin',) or request.user.is_superuser):
         return redirect(request.user.get_dashboard_url())
 
     context = {
@@ -27,7 +27,7 @@ def admin_dashboard(request):
 @login_required
 def coordinator_dashboard(request):
     """Exam Coordinator dashboard with exam workflow overview."""
-    if request.user.role not in ('admin', 'exam_coordinator'):
+    if not (request.user.role in ('admin', 'exam_coordinator') or request.user.is_superuser):
         return redirect(request.user.get_dashboard_url())
 
     context = {
@@ -40,7 +40,7 @@ def coordinator_dashboard(request):
 @login_required
 def subject_coordinator_dashboard(request):
     """Subject Coordinator dashboard with assigned subjects overview."""
-    if request.user.role not in ('admin', 'exam_coordinator', 'subject_coordinator'):
+    if not (request.user.role in ('admin', 'exam_coordinator', 'subject_coordinator') or request.user.is_superuser):
         return redirect(request.user.get_dashboard_url())
 
     context = {
