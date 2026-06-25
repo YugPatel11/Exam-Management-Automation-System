@@ -72,8 +72,71 @@ class ReportDownloadView(ExamCoordinatorRequiredMixin, View):
         report = get_object_or_404(Report, id=report_id)
         
         response = HttpResponse(
-            report.content.text,
+            report.content.content,
             content_type='text/csv'
         )
         response['Content-Disposition'] = f'attachment; filename="{report.exam.name}_{report.report_type}.csv"'
         return response
+
+
+class ReportPdfDownloadView(ExamCoordinatorRequiredMixin, View):
+    """
+    Downloads a report as a PDF file using reportlab.
+    """
+    GENERATOR_MAP = {
+        'seating_arrangement': 'generate_seating_pdf',
+        'duty_chart': 'generate_duty_chart_pdf',
+        'marks_summary': 'generate_marks_pdf',
+        'result_analysis': 'generate_analysis_pdf',
+    }
+
+    def get(self, request, exam_id, report_type):
+        exam = get_object_or_404(Exam, id=exam_id)
+        method_name = self.GENERATOR_MAP.get(report_type)
+
+        if not method_name:
+            messages.error(request, 'PDF not available for this report type.')
+            return redirect('reports:manager', exam_id=exam.id)
+
+        service = ReportGeneratorService(exam, request.user)
+        try:
+            buf = getattr(service, method_name)()
+            response = HttpResponse(buf.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="{exam.name}_{report_type}.pdf"'
+            return response
+        except Exception as e:
+            messages.error(request, f'Error generating PDF: {str(e)}')
+            return redirect('reports:manager', exam_id=exam.id)
+
+
+class ReportExcelDownloadView(ExamCoordinatorRequiredMixin, View):
+    """
+    Downloads a report as an Excel (.xlsx) file using openpyxl.
+    """
+    GENERATOR_MAP = {
+        'seating_arrangement': 'generate_seating_excel',
+        'duty_chart': 'generate_duty_chart_excel',
+        'marks_summary': 'generate_marks_excel',
+        'result_analysis': 'generate_analysis_excel',
+    }
+
+    def get(self, request, exam_id, report_type):
+        exam = get_object_or_404(Exam, id=exam_id)
+        method_name = self.GENERATOR_MAP.get(report_type)
+
+        if not method_name:
+            messages.error(request, 'Excel not available for this report type.')
+            return redirect('reports:manager', exam_id=exam.id)
+
+        service = ReportGeneratorService(exam, request.user)
+        try:
+            buf = getattr(service, method_name)()
+            response = HttpResponse(
+                buf.read(),
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            response['Content-Disposition'] = f'attachment; filename="{exam.name}_{report_type}.xlsx"'
+            return response
+        except Exception as e:
+            messages.error(request, f'Error generating Excel: {str(e)}')
+            return redirect('reports:manager', exam_id=exam.id)

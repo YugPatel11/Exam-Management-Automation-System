@@ -14,7 +14,8 @@ class ExamForm(forms.ModelForm):
         model = Exam
         fields = [
             'academic_year', 'name', 'exam_type', 'status', 
-            'start_date', 'end_date', 'programs', 'is_archived'
+            'start_date', 'end_date', 'marks_entry_start', 'marks_entry_end',
+            'programs', 'is_archived'
         ]
         widgets = {
             'academic_year': forms.TextInput(attrs={
@@ -28,6 +29,12 @@ class ExamForm(forms.ModelForm):
             }),
             'end_date': forms.DateInput(attrs={
                 'type': 'date'
+            }),
+            'marks_entry_start': forms.DateTimeInput(attrs={
+                'type': 'datetime-local'
+            }),
+            'marks_entry_end': forms.DateTimeInput(attrs={
+                'type': 'datetime-local'
             }),
             'programs': forms.CheckboxSelectMultiple(),
         }

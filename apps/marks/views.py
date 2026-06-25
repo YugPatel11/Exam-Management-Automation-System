@@ -165,6 +165,17 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
         if task.status in ['submitted', 'locked']:
             messages.warning(request, "You cannot edit marks for a submitted or locked task.")
             return redirect('marks:task_list')
+
+        # Check marks entry window
+        from django.utils import timezone
+        now = timezone.now()
+        exam = task.exam
+        if exam.marks_entry_start and now < exam.marks_entry_start:
+            messages.error(request, f"Marks entry has not started yet. It opens on {exam.marks_entry_start.strftime('%d %b %Y, %I:%M %p')}.")
+            return redirect('marks:task_list')
+        if exam.marks_entry_end and now > exam.marks_entry_end:
+            messages.error(request, f"Marks entry window has closed. It ended on {exam.marks_entry_end.strftime('%d %b %Y, %I:%M %p')}.")
+            return redirect('marks:task_list')
             
         components = self._get_components(task.subject)
         
@@ -205,7 +216,17 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
         if task.status in ['submitted', 'locked']:
             messages.error(request, "Task is already submitted or locked.")
             return redirect('marks:task_list')
-            
+
+        # Check marks entry window
+        from django.utils import timezone
+        now = timezone.now()
+        exam = task.exam
+        if exam.marks_entry_start and now < exam.marks_entry_start:
+            messages.error(request, "Marks entry has not started yet.")
+            return redirect('marks:task_list')
+        if exam.marks_entry_end and now > exam.marks_entry_end:
+            messages.error(request, "Marks entry window has closed.")
+            return redirect('marks:task_list')
         components = self._get_components(task.subject)
         
         action = request.POST.get('action')

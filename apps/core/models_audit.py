@@ -78,6 +78,12 @@ class TextContent(TimeStampedModel):
         ('schedule', 'Schedule'),
         ('analysis', 'Analysis Report'),
         ('general', 'General'),
+        ('reports_seating_arrangement', 'Report: Seating Arrangement'),
+        ('reports_duty_chart', 'Report: Duty Chart'),
+        ('reports_marks_summary', 'Report: Marks Summary'),
+        ('reports_result_analysis', 'Report: Result Analysis'),
+        ('reports_exam_schedule', 'Report: Exam Schedule'),
+        ('reports_question_paper', 'Report: Question Paper'),
     ]
 
     title = models.CharField(max_length=255, verbose_name="Title")
@@ -109,7 +115,7 @@ class TextContent(TimeStampedModel):
         verbose_name_plural = 'Text Contents'
 
     def __str__(self):
-        return f"{self.module} - {self.identifier}"
+        return f"{self.module} - {self.title}"
 
 
 class NotificationLog(models.Model):

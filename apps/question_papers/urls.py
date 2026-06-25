@@ -12,4 +12,6 @@ urlpatterns = [
     path('<int:pk>/', views.QuestionPaperDetailView.as_view(), name='detail'),
     path('<int:pk>/edit/', views.QuestionPaperUpdateView.as_view(), name='edit'),
     path('<int:pk>/submit/', views.QuestionPaperSubmitView.as_view(), name='submit'),
+    path('<int:pk>/pdf/', views.QuestionPaperPdfView.as_view(), name='pdf'),
+    path('<int:pk>/co-btl/', views.COBTLReportView.as_view(), name='co_btl_report'),
 ]

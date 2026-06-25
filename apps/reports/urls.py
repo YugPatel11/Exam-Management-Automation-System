@@ -10,4 +10,6 @@ urlpatterns = [
     path('', views.ReportsDashboardView.as_view(), name='dashboard'),
     path('manager/<int:exam_id>/', views.ReportManagerView.as_view(), name='manager'),
     path('download/<int:report_id>/', views.ReportDownloadView.as_view(), name='download'),
+    path('pdf/<int:exam_id>/<str:report_type>/', views.ReportPdfDownloadView.as_view(), name='download_pdf'),
+    path('excel/<int:exam_id>/<str:report_type>/', views.ReportExcelDownloadView.as_view(), name='download_excel'),
 ]

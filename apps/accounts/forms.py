@@ -204,7 +204,10 @@ class UserCreateForm(forms.ModelForm):
         return user
 
 class AdminUserCreateForm(forms.ModelForm):
-    """Form for Exam Coordinators/Admins to create faculty/coordinators."""
+    """Form for Admins/Exam Coordinators to create users.
+    Admin can create all roles including exam_coordinator.
+    Exam Coordinator can only create subject_coordinator and subject_faculty.
+    """
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email', 'role', 'phone', 'department', 'designation', 'employee_id']
@@ -218,4 +221,22 @@ class AdminUserCreateForm(forms.ModelForm):
             'designation': forms.TextInput(attrs={'class': INPUT_CLASSES, 'placeholder': 'Designation'}),
             'employee_id': forms.TextInput(attrs={'class': INPUT_CLASSES, 'placeholder': 'Employee ID'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        self.creator = kwargs.pop('creator', None)
+        super().__init__(*args, **kwargs)
+        if self.creator:
+            if self.creator.role == 'admin' or self.creator.is_superuser:
+                # Admin can create all roles except admin
+                self.fields['role'].choices = [
+                    ('exam_coordinator', 'Exam Coordinator'),
+                    ('subject_coordinator', 'Subject Coordinator'),
+                    ('subject_faculty', 'Subject Faculty'),
+                ]
+            else:
+                # Exam Coordinator can only create faculty roles
+                self.fields['role'].choices = [
+                    ('subject_coordinator', 'Subject Coordinator'),
+                    ('subject_faculty', 'Subject Faculty'),
+                ]
 

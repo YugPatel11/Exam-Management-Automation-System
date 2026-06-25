@@ -68,6 +68,18 @@ class Exam(BaseModel):
     start_date = models.DateField(verbose_name="Start Date")
     end_date = models.DateField(verbose_name="End Date")
 
+    # Marks entry window — faculty can only enter marks during this period
+    marks_entry_start = models.DateTimeField(
+        null=True, blank=True,
+        verbose_name="Marks Entry Start",
+        help_text="Faculty can begin entering marks from this date/time."
+    )
+    marks_entry_end = models.DateTimeField(
+        null=True, blank=True,
+        verbose_name="Marks Entry End",
+        help_text="Faculty must finish entering marks by this date/time."
+    )
+
     class Meta:
         ordering = ['-academic_year', '-start_date']
         verbose_name = "Exam"

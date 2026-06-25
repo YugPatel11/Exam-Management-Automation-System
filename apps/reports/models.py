@@ -18,6 +18,8 @@ class Report(BaseModel):
         ('duty_chart', 'Duty Chart'),
         ('marks_summary', 'Marks Summary'),
         ('result_analysis', 'Result Analysis'),
+        ('exam_schedule', 'Exam Schedule'),
+        ('question_paper', 'Question Paper'),
     ]
 
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name='reports')

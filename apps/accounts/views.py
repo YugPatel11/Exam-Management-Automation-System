@@ -325,20 +325,29 @@ def profile_view(request):
     return render(request, 'accounts/profile.html', {'form': form})
 
 class UserListView(ExamCoordinatorRequiredMixin, ListView):
-    """View for Exam Coordinators to list faculty and coordinators."""
+    """View for Admin and Exam Coordinators to list users."""
     template_name = 'accounts/user_list.html'
     context_object_name = 'users'
     paginate_by = 50
 
     def get_queryset(self):
         UserModel = _get_user_model()
-        return UserModel.objects.exclude(is_superuser=True).order_by('first_name', 'last_name')
+        qs = UserModel.objects.exclude(is_superuser=True).order_by('first_name', 'last_name')
+        # Exam Coordinators only see faculty; Admin sees everyone
+        if not (self.request.user.is_admin_role or self.request.user.is_superuser):
+            qs = qs.filter(role__in=['subject_coordinator', 'subject_faculty'])
+        return qs
 
 class UserCreateView(ExamCoordinatorRequiredMixin, CreateView):
-    """View for Exam Coordinators to create new faculty members."""
+    """View for Admin and Exam Coordinators to create new user accounts."""
     template_name = 'accounts/user_form.html'
     form_class = AdminUserCreateForm
     success_url = reverse_lazy('accounts:user_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['creator'] = self.request.user
+        return kwargs
 
     def form_valid(self, form):
         user = form.save(commit=False)
@@ -359,3 +368,4 @@ class UserCreateView(ExamCoordinatorRequiredMixin, CreateView):
             
         messages.success(self.request, f"User {user.email} created successfully. Password emailed to user.")
         return super().form_valid(form)
+

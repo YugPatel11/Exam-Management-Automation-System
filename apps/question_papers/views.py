@@ -119,12 +119,13 @@ class QuestionPaperDetailView(SubjectCoordinatorRequiredMixin, DetailView):
         
         # Try to find generated TextContent
         try:
-            content = TextContent.objects.get(
-                module='question_paper', 
+            from apps.core.services.text_content import text_content_service
+            contents = text_content_service.get_by_module(
+                'question_paper', 
                 related_object_id=str(self.object.id)
             )
-            context['generated_content'] = content
-        except TextContent.DoesNotExist:
+            context['generated_content'] = contents.first()
+        except Exception:
             context['generated_content'] = None
             
         return context
@@ -146,3 +147,91 @@ class QuestionPaperSubmitView(SubjectCoordinatorRequiredMixin, View):
         
         messages.success(request, f"Question Paper for {paper.subject.code} submitted successfully.")
         return redirect('question_papers:detail', pk=paper.pk)
+
+
+class QuestionPaperPdfView(SubjectCoordinatorRequiredMixin, View):
+    """
+    Generate and download a Question Paper as a PDF using reportlab.
+    """
+    def get(self, request, pk):
+        import io
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import inch
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, HRFlowable
+
+        paper = get_object_or_404(QuestionPaper, pk=pk)
+        questions = paper.questions.all().order_by('order', 'created_at')
+
+        buf = io.BytesIO()
+        doc = SimpleDocTemplate(buf, pagesize=A4, title=f'Question Paper - {paper.subject.code}')
+        styles = getSampleStyleSheet()
+        elements = []
+
+        # Header
+        header_style = ParagraphStyle('QPHeader', parent=styles['Title'], fontSize=14, alignment=1)
+        sub_style = ParagraphStyle('QPSub', parent=styles['Normal'], fontSize=10, alignment=1, textColor=colors.grey)
+        q_style = ParagraphStyle('QPQuestion', parent=styles['Normal'], fontSize=10, spaceAfter=4)
+
+        elements.append(Paragraph(f'{paper.exam.name}', header_style))
+        elements.append(Paragraph(f'{paper.subject.code} — {paper.subject.name}', sub_style))
+        elements.append(Paragraph(f'Program: {paper.program.code} | Semester: {paper.semester} | Total Marks: {paper.total_marks}', sub_style))
+        if paper.date:
+            elements.append(Paragraph(f'Date: {paper.date} | Time: {paper.start_time} — {paper.end_time}', sub_style))
+        elements.append(Spacer(1, 0.2 * inch))
+        elements.append(HRFlowable(width='100%', thickness=1, color=colors.grey))
+        elements.append(Spacer(1, 0.2 * inch))
+
+        # Questions table
+        table_data = [['Q.No', 'Question', 'Marks', 'CO', 'BTL']]
+        for q in questions:
+            table_data.append([q.question_number, q.text[:120], str(q.marks), q.co_mapping, q.btl_mapping])
+
+        table = Table(table_data, colWidths=[0.6*inch, 3.5*inch, 0.6*inch, 0.6*inch, 0.6*inch], repeatRows=1)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0d9488')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (1, 1), (1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.white]),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+        elements.append(table)
+        doc.build(elements)
+        buf.seek(0)
+
+        from django.http import HttpResponse as HR
+        response = HR(buf.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="QP_{paper.subject.code}_{paper.exam.name}.pdf"'
+        return response
+
+
+class COBTLReportView(SubjectCoordinatorRequiredMixin, View):
+    """
+    Shows CO & BTL coverage report for a question paper as a summary page with charts.
+    """
+    def get(self, request, pk):
+        import json
+        paper = get_object_or_404(QuestionPaper, pk=pk)
+        coverage = question_paper_service.validate_co_btl_coverage(paper)
+
+        co_labels = list(coverage['co_distribution'].keys())
+        co_values = list(coverage['co_distribution'].values())
+        btl_labels = list(coverage['btl_distribution'].keys())
+        btl_values = list(coverage['btl_distribution'].values())
+
+        context = {
+            'paper': paper,
+            'coverage': coverage,
+            'co_labels': json.dumps(co_labels),
+            'co_values': json.dumps(co_values),
+            'btl_labels': json.dumps(btl_labels),
+            'btl_values': json.dumps(btl_values),
+        }
+        return render(request, 'question_papers/co_btl_report.html', context)
+

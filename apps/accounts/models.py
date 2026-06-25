@@ -78,6 +78,11 @@ class User(AbstractUser):
         return self.role == self.ROLE_SUBJECT_FACULTY
 
     @property
+    def is_faculty_role(self):
+        """Returns True for any faculty-type role (Subject Coordinator or Subject Faculty)."""
+        return self.role in (self.ROLE_SUBJECT_COORDINATOR, self.ROLE_SUBJECT_FACULTY)
+
+    @property
     def can_manage_master_data(self):
         """Admin and Exam Coordinator can manage master data."""
         return self.role in (self.ROLE_ADMIN, self.ROLE_EXAM_COORDINATOR)

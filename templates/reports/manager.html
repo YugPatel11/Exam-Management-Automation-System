@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load ems_tags %}
 {% block title %}Manage Reports — {{ exam.name }}{% endblock %}
 
 {% block content %}
@@ -50,23 +51,41 @@
                         -
                         {% endif %}
                     </td>
-                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-right flex justify-end gap-2">
-                        <form method="post" class="inline">
-                            {% csrf_token %}
-                            <input type="hidden" name="report_type" value="{{ key }}">
-                            <button type="submit" name="action" value="generate" class="text-brand-600 hover:text-brand-900 dark:text-brand-400 dark:hover:text-brand-300">
-                                {% if key in reports %}Regenerate{% else %}Generate{% endif %}
-                            </button>
-                        </form>
-                        
-                        {% if key in reports %}
-                        {% with r=reports|get_item:key %}
-                        <span class="text-slate-300 mx-1">|</span>
-                        <a href="{% url 'reports:download' r.id %}" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
-                            Download CSV
-                        </a>
-                        {% endwith %}
-                        {% endif %}
+                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-right">
+                        <div class="flex items-center justify-end gap-2 flex-wrap">
+                            {# Generate / Regenerate button #}
+                            <form method="post" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="report_type" value="{{ key }}">
+                                <button type="submit" name="action" value="generate" class="text-brand-600 hover:text-brand-900 dark:text-brand-400 dark:hover:text-brand-300 text-xs font-semibold">
+                                    {% if key in reports %}Regenerate{% else %}Generate{% endif %}
+                                </button>
+                            </form>
+                            
+                            {% if key in reports %}
+                            {% with r=reports|get_item:key %}
+                            <span class="text-slate-300 mx-0.5">|</span>
+                            <a href="{% url 'reports:download' r.id %}" class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 text-xs font-semibold" title="Download CSV">
+                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                CSV
+                            </a>
+                            {% endwith %}
+                            {% endif %}
+
+                            {# PDF download (always available) #}
+                            <span class="text-slate-300 mx-0.5">|</span>
+                            <a href="{% url 'reports:download_pdf' exam.id key %}" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-xs font-semibold" title="Download PDF">
+                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                                PDF
+                            </a>
+
+                            {# Excel download (always available) #}
+                            <span class="text-slate-300 mx-0.5">|</span>
+                            <a href="{% url 'reports:download_excel' exam.id key %}" class="text-emerald-600 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300 text-xs font-semibold" title="Download Excel">
+                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                Excel
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}

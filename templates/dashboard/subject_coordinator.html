@@ -6,24 +6,57 @@
     <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-between">
         <div>
             <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Subject Coordinator Dashboard</h2>
-            <p class="text-slate-500 dark:text-slate-400 mt-1">Manage assessment schemes and question papers.</p>
-        </div>
-        <div class="hidden sm:block">
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800 dark:bg-brand-900/30 dark:text-brand-300 border border-brand-200 dark:border-brand-800/50">
-                Academic Year: {{ academic_year }}
-            </span>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">Manage assigned subjects, assessment schemes, and question papers.</p>
         </div>
     </div>
 
-    <!-- Main Content Area Placeholder -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-8 shadow-sm border border-slate-200 dark:border-slate-800 text-center mt-6">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 mb-4">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800">
+            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Coordinated Subjects</p>
+            <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">{{ total_coordinated }}</p>
         </div>
-        <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">Setup Complete</h3>
-        <p class="text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-            Subject Coordinator dashboard ready. Data and metrics will be populated in Phase 8 (Assessment Scheme).
-        </p>
+        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800">
+            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Question Papers Created</p>
+            <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">{{ qp_count }}</p>
+        </div>
+        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800">
+            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">QPs Submitted</p>
+            <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">{{ qp_submitted }}</p>
+        </div>
     </div>
+
+    <!-- Assigned Subjects by Exam -->
+    {% if exam_subjects %}
+    <div class="space-y-4">
+        {% for exam, subjects in exam_subjects.items %}
+        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <h3 class="text-base font-semibold text-slate-900 dark:text-white">{{ exam.name }}</h3>
+                <span class="text-sm text-slate-500">{{ subjects|length }} subject{{ subjects|length|pluralize }}</span>
+            </div>
+            <div class="p-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {% for subject in subjects %}
+                    <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+                        <div class="w-10 h-10 rounded-lg bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-700 dark:text-brand-300 font-bold text-sm">
+                            {{ subject.code|truncatechars:4 }}
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-900 dark:text-white">{{ subject.code }}</p>
+                            <p class="text-xs text-slate-500 truncate max-w-[150px]">{{ subject.name }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white dark:bg-slate-900 rounded-xl p-10 shadow-sm border border-slate-200 dark:border-slate-800 text-center">
+        <p class="text-slate-500 dark:text-slate-400">No subjects assigned yet.</p>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -86,8 +86,51 @@ class SeatingManagerView(ExamCoordinatorRequiredMixin, View):
         elif action == 'toggle_lock':
             plan = get_object_or_404(SeatingPlan, exam=exam)
             plan.is_locked = not plan.is_locked
+            plan.status = 'locked' if plan.is_locked else 'generated'
             plan.save()
             messages.success(request, f"Seating plan {'locked' if plan.is_locked else 'unlocked'}.")
+
+        elif action == 'delete_allocation':
+            plan = get_object_or_404(SeatingPlan, exam=exam)
+            if plan.is_locked:
+                messages.error(request, "Cannot edit a locked seating plan.")
+            else:
+                alloc_id = request.POST.get('allocation_id')
+                alloc = get_object_or_404(SeatingAllocation, id=alloc_id, plan=plan)
+                alloc.delete()
+                messages.success(request, "Seat allocation removed.")
+
+        elif action == 'swap':
+            plan = get_object_or_404(SeatingPlan, exam=exam)
+            if plan.is_locked:
+                messages.error(request, "Cannot edit a locked seating plan.")
+            else:
+                alloc_id_1 = request.POST.get('allocation_id_1')
+                alloc_id_2 = request.POST.get('allocation_id_2')
+                alloc1 = get_object_or_404(SeatingAllocation, id=alloc_id_1, plan=plan)
+                alloc2 = get_object_or_404(SeatingAllocation, id=alloc_id_2, plan=plan)
+                # Swap seat assignments
+                alloc1.classroom, alloc2.classroom = alloc2.classroom, alloc1.classroom
+                alloc1.seat_number, alloc2.seat_number = alloc2.seat_number, alloc1.seat_number
+                alloc1.save()
+                alloc2.save()
+                messages.success(request, f"Swapped seats for {alloc1.student.roll_no} and {alloc2.student.roll_no}.")
+
+        elif action == 'edit_allocation':
+            plan = get_object_or_404(SeatingPlan, exam=exam)
+            if plan.is_locked:
+                messages.error(request, "Cannot edit a locked seating plan.")
+            else:
+                alloc_id = request.POST.get('allocation_id')
+                alloc = get_object_or_404(SeatingAllocation, id=alloc_id, plan=plan)
+                new_classroom_id = request.POST.get('classroom_id')
+                new_seat = request.POST.get('seat_number')
+                if new_classroom_id:
+                    alloc.classroom_id = new_classroom_id
+                if new_seat:
+                    alloc.seat_number = int(new_seat)
+                alloc.save()
+                messages.success(request, f"Allocation updated for {alloc.student.roll_no}.")
             
         active_tab = request.POST.get('tab', 'date')
         return redirect(f"{request.path}?tab={active_tab}")
