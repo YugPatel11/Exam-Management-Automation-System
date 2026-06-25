@@ -56,6 +56,10 @@
                 <svg class="w-5 h-5 shrink-0 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 <span class="sidebar-text truncate">Students Database</span>
             </a>
+            <a href="{% url 'accounts:user_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition duration-200 hover:bg-slate-800 hover:text-white {% active_nav_group '/accounts/users/' %}">
+                <svg class="w-5 h-5 shrink-0 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                <span class="sidebar-text truncate">Manage Users</span>
+            </a>
             {% endif %}
 
             {% if user|has_any_role:"admin,exam_coordinator" %}
