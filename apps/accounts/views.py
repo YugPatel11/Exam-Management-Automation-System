@@ -25,6 +25,7 @@ from apps.accounts.models import PasswordResetOTP
 from apps.core.services.audit import log_action
 from apps.core.mixins import ExamCoordinatorRequiredMixin
 from django.views.generic import ListView, CreateView
+from django.views import View
 from django.urls import reverse_lazy
 
 User = None  # Lazy import to avoid circular imports
@@ -369,3 +370,41 @@ class UserCreateView(ExamCoordinatorRequiredMixin, CreateView):
         messages.success(self.request, f"User {user.email} created successfully. Password emailed to user.")
         return super().form_valid(form)
 
+
+class UserDeleteView(ExamCoordinatorRequiredMixin, View):
+    """View for Admin and Exam Coordinators to delete user accounts."""
+
+    def post(self, request, pk):
+        UserModel = _get_user_model()
+        user = UserModel.objects.filter(pk=pk).first()
+
+        if not user:
+            messages.error(request, "User not found.")
+            return redirect('accounts:user_list')
+
+        # Prevent deleting yourself or superusers
+        if user == request.user:
+            messages.error(request, "You cannot delete your own account.")
+            return redirect('accounts:user_list')
+
+        if user.is_superuser:
+            messages.error(request, "Cannot delete a superuser account.")
+            return redirect('accounts:user_list')
+
+        # Exam coordinators can only delete faculty roles
+        if not (request.user.is_admin_role or request.user.is_superuser):
+            if user.role not in ('subject_coordinator', 'subject_faculty'):
+                messages.error(request, "You don't have permission to delete this user.")
+                return redirect('accounts:user_list')
+
+        user_email = user.email
+        log_action(
+            request=request,
+            action='delete',
+            model_name='User',
+            object_id=user.pk,
+            object_repr=str(user),
+        )
+        user.delete()
+        messages.success(request, f"User {user_email} has been deleted.")
+        return redirect('accounts:user_list')

@@ -18,8 +18,8 @@ DATABASES = {
 # Use simple static file storage in development
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
-# Console email backend for development (prints to terminal)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Email backend — uses value from .env (SMTP when configured, else console)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # CORS — allow all in development
 CORS_ALLOW_ALL_ORIGINS = True
