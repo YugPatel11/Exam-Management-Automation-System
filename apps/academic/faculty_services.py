@@ -718,7 +718,10 @@ class TeachingAllocationImportService:
                 'identifier': code_val,
                 'message': "No class name found. Using 'Unknown'."
             })
-            class_val = 'Unknown'
+            classes = ['Unknown']
+        else:
+            import re
+            classes = [c.strip() for c in re.split(r'[/+]', class_val) if c.strip()]
 
         # Build assignment entries for each faculty column
         assignments = []
@@ -774,21 +777,22 @@ class TeachingAllocationImportService:
             })
 
         for assign in assignments:
-            self.valid_rows.append({
-                'row': excel_row,
-                'semester_num': semester_num,
-                'semester_id': semester.id,
-                'semester_subject_id': sem_subject.id,
-                'course_code': code_upper,
-                'course_title': title_val,
-                'class_name': class_val.strip(),
-                'teaching_type': assign['teaching_type'],
-                'faculty_id': assign['faculty'].id if assign['faculty'] else None,
-                'faculty_name': assign['faculty'].faculty_name if assign['faculty'] else '',
-                'faculty_email': assign['faculty'].email if assign['faculty'] else '',
-                'alias_raw': assign['alias_raw'],
-                'is_coordinator': assign['is_coordinator'],
-            })
+            for cls in classes:
+                self.valid_rows.append({
+                    'row': excel_row,
+                    'semester_num': semester_num,
+                    'semester_id': semester.id,
+                    'semester_subject_id': sem_subject.id,
+                    'course_code': code_upper,
+                    'course_title': title_val,
+                    'class_name': cls,
+                    'teaching_type': assign['teaching_type'],
+                    'faculty_id': assign['faculty'].id if assign['faculty'] else None,
+                    'faculty_name': assign['faculty'].faculty_name if assign['faculty'] else '',
+                    'faculty_email': assign['faculty'].email if assign['faculty'] else '',
+                    'alias_raw': assign['alias_raw'],
+                    'is_coordinator': assign['is_coordinator'],
+                })
 
     def _resolve_faculty(self, alias_raw, excel_row):
         """

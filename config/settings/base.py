@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'apps.exams',
     'apps.students',
     'apps.curriculum',
-    'apps.faculty',
     'apps.assessment',
     'apps.scheduling',
     'apps.question_papers',

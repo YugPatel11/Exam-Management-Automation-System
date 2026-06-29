@@ -16,14 +16,24 @@ class Student(BaseModel):
         FEMALE = 'F', 'Female'
         OTHER = 'O', 'Other'
 
+    academic_year = models.ForeignKey(
+        'academic.AcademicYear',
+        on_delete=models.CASCADE,
+        related_name='students',
+        null=True,
+        blank=True
+    )
+    class_name = models.CharField(max_length=100, blank=True, verbose_name="Class Name")
+    batch = models.CharField(max_length=10, blank=True, verbose_name="Batch")
+
     roll_no = models.CharField(
         max_length=50, 
-        unique=True,
+        null=True,
+        blank=True,
         verbose_name="Roll Number"
     )
     enrollment_no = models.CharField(
         max_length=50, 
-        unique=True,
         verbose_name="Enrollment Number"
     )
     name = models.CharField(max_length=255, verbose_name="Student Name")
@@ -31,9 +41,11 @@ class Student(BaseModel):
     program = models.ForeignKey(
         Program, 
         on_delete=models.PROTECT,
-        related_name='students'
+        related_name='students',
+        null=True,
+        blank=True
     )
-    semester = models.PositiveIntegerField()
+    semester = models.PositiveIntegerField(null=True, blank=True)
     
     division = models.ForeignKey(
         Division, 
@@ -44,7 +56,7 @@ class Student(BaseModel):
     )
     
     lab_batch_no = models.CharField(max_length=50, blank=True, verbose_name="Lab Batch No")
-    gender = models.CharField(max_length=1, choices=GenderChoices.choices)
+    gender = models.CharField(max_length=1, choices=GenderChoices.choices, null=True, blank=True)
     
     display_no = models.CharField(max_length=50, blank=True, verbose_name="Display No")
     admission_application_no = models.CharField(max_length=100, blank=True, verbose_name="Admission Application No")
@@ -54,7 +66,8 @@ class Student(BaseModel):
     email = models.EmailField(blank=True)
 
     class Meta:
-        ordering = ['program', 'semester', 'roll_no']
+        unique_together = ('academic_year', 'enrollment_no')
+        ordering = ['academic_year', 'class_name', 'name']
         verbose_name = "Student"
         verbose_name_plural = "Students"
 

@@ -162,16 +162,32 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
         components = self._get_components(task)
         
         # Get students for this task
-        # Must match program/semester from curriculum mapping and division if specified
-        mappings = CurriculumMapping.objects.filter(subject=task.subject)
-        students_qs = Student.objects.none()
-        for m in mappings:
-            qs = Student.objects.filter(program=m.program, semester=m.semester)
-            if task.division:
-                qs = qs.filter(division=task.division)
-            students_qs = students_qs | qs
+        if task.teaching_assignment:
+            qs = Student.objects.filter(
+                academic_year=task.teaching_assignment.academic_year,
+                class_name=task.teaching_assignment.class_name
+            )
+            # Filter by batch if it's a practical batch
+            t_type = task.teaching_assignment.teaching_type
+            if t_type == 'practical_batch_a':
+                qs = qs.filter(batch='A')
+            elif t_type == 'practical_batch_b':
+                qs = qs.filter(batch='B')
+            elif t_type == 'practical_batch_c':
+                qs = qs.filter(batch='C')
             
-        students = list(students_qs.distinct().order_by('roll_no'))
+            students = list(qs.order_by('enrollment_no'))
+        else:
+            # Legacy fallback
+            mappings = CurriculumMapping.objects.filter(subject=task.subject)
+            students_qs = Student.objects.none()
+            for m in mappings:
+                qs = Student.objects.filter(program=m.program, semester=m.semester)
+                if task.division:
+                    qs = qs.filter(division=task.division)
+                students_qs = students_qs | qs
+                
+            students = list(students_qs.distinct().order_by('roll_no'))
         
         # Prepare forms
         student_forms = []

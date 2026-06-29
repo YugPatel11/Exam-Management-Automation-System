@@ -20,38 +20,45 @@ class MarksAllocationService:
 
     def allocate(self):
         """
-        Auto-allocates marks entry tasks to faculty based on Faculty Assignments.
+        Auto-allocates marks entry tasks to faculty based on FacultyTeachingAssignments.
         """
+        if not self.exam.academic_year_ref or not self.exam.semester_ref:
+            self.errors.append("Exam must have an Academic Year and Semester selected to auto-allocate marks.")
+            return False
+
+        from apps.academic.models import FacultyTeachingAssignment
+        
         with transaction.atomic():
-            # Get all faculty assignments for subjects in this exam
-            exam_subjects = self.exam.programs.values_list('curriculum_mappings__subject', flat=True).distinct()
-            
-            assignments = SubjectFacultyAssignment.objects.filter(subject__in=exam_subjects).select_related('faculty', 'subject')
+            # Get teaching assignments for the exam's semester
+            assignments = FacultyTeachingAssignment.objects.filter(
+                academic_year=self.exam.academic_year_ref,
+                semester=self.exam.semester_ref
+            ).select_related('faculty', 'semester_subject__subject')
             
             if not assignments.exists():
-                self.errors.append("No faculty assignments found for subjects in this exam.")
+                self.errors.append("No faculty teaching assignments found for this exam's semester.")
                 return False
                 
             tasks_to_create = []
-            existing_tasks = set(MarksEntryTask.objects.filter(exam=self.exam).values_list('subject_id', 'division_id', 'faculty_id'))
+            # Existing tasks keyed by (exam_id, teaching_assignment_id)
+            existing_tasks = set(MarksEntryTask.objects.filter(exam=self.exam).values_list('teaching_assignment_id', flat=True))
             
             for a in assignments:
-                # Try to find a division that matches the name
-                division = Division.objects.filter(name=a.division_name).first()
-                # Key: (subject_id, division_name, faculty_id)
-                key = (a.subject.id, a.division_name, a.faculty.id)
-                
-                if key not in existing_tasks:
+                if not a.faculty or not a.faculty.user:
+                    continue # Skip if faculty has no linked user account
+                    
+                if a.id not in existing_tasks:
                     tasks_to_create.append(
                         MarksEntryTask(
                             exam=self.exam,
-                            subject=a.subject,
-                            division=division,
-                            faculty=a.faculty,
+                            subject=a.semester_subject.subject,
+                            semester_subject=a.semester_subject,
+                            teaching_assignment=a,
+                            faculty=a.faculty.user,
                             status='pending'
                         )
                     )
-                    existing_tasks.add(key)
+                    existing_tasks.add(a.id)
                     self.allocated_count += 1
                     
             if tasks_to_create:

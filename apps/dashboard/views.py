@@ -137,7 +137,7 @@ def faculty_dashboard(request):
     # Marks entry tasks assigned to this faculty
     tasks = MarksEntryTask.objects.filter(
         faculty=request.user
-    ).select_related('exam', 'subject', 'division').order_by('-exam__start_date')
+    ).select_related('exam', 'subject', 'teaching_assignment').order_by('-exam__start_date')
 
     pending_tasks = tasks.filter(status='pending')
     submitted_tasks = tasks.filter(status__in=['submitted', 'locked'])

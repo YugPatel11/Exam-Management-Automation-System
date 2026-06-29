@@ -35,14 +35,26 @@ class MarksEntryTask(BaseModel):
         help_text="Links this task to the academic structure for dynamic marks components."
     )
     
+    teaching_assignment = models.ForeignKey(
+        'academic.FacultyTeachingAssignment',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='marks_tasks',
+        verbose_name="Teaching Assignment",
+        help_text="Links this task to the specific class and batch assignment."
+    )
+    
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
     class Meta:
-        unique_together = ('exam', 'subject', 'division', 'faculty')
+        unique_together = ('exam', 'subject', 'division', 'teaching_assignment', 'faculty')
         verbose_name = "Marks Entry Task"
         verbose_name_plural = "Marks Entry Tasks"
 
     def __str__(self):
+        if self.teaching_assignment:
+            return f"{self.subject.code} - {self.teaching_assignment.class_name} ({self.faculty.get_display_name()})"
         div_code = self.division.name if self.division else "All"
         return f"{self.subject.code} - {div_code} ({self.faculty.get_display_name()})"
 

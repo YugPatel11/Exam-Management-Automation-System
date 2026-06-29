@@ -40,10 +40,17 @@
 
             <div class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-8 text-center hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
                 <svg class="mx-auto h-12 w-12 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                <div class="max-w-xs mx-auto">
-                    {{ form.csv_file }}
+                <div class="max-w-xs mx-auto space-y-4 text-left">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Academic Year</label>
+                        {{ form.academic_year }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">CSV File</label>
+                        {{ form.csv_file }}
+                    </div>
                 </div>
-                <p class="text-xs text-slate-500 mt-4">Expected Columns: RollNo, EnrollmentNo, StudentName, ProgramName, Semester, DivisionCode, LabBatchNo, Gender, etc.</p>
+                <p class="text-xs text-slate-500 mt-4">Expected Columns: student_name, enrollment_number, division, batch.</p>
             </div>
 
             <div class="flex justify-end pt-4">
@@ -79,7 +86,7 @@
                     {% for error in summary.errors %}
                     <li class="flex items-start gap-2">
                         <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span><strong>Row {{ error.row }}</strong> (Roll No: {{ error.roll_no|default:"N/A" }}): {{ error.message }}</span>
+                        <span><strong>Row {{ error.row }}</strong> (Enrollment No: {{ error.enrollment_no|default:"N/A" }}): {{ error.message }}</span>
                     </li>
                     {% endfor %}
                 </ul>
@@ -94,17 +101,19 @@
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-sm">
                     <thead class="bg-slate-50 dark:bg-slate-800">
                         <tr>
-                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Roll No</th>
+                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Enrollment No</th>
                             <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Name</th>
-                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Sem</th>
+                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Class</th>
+                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Batch</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-900">
                         {% for row in summary.valid_sample %}
                         <tr>
-                            <td class="px-4 py-2 text-slate-900 dark:text-white">{{ row.roll_no }}</td>
+                            <td class="px-4 py-2 text-slate-900 dark:text-white">{{ row.enrollment_no }}</td>
                             <td class="px-4 py-2 text-slate-600 dark:text-slate-300">{{ row.name }}</td>
-                            <td class="px-4 py-2 text-slate-600 dark:text-slate-300">{{ row.semester }}</td>
+                            <td class="px-4 py-2 text-slate-600 dark:text-slate-300">{{ row.class_name }}</td>
+                            <td class="px-4 py-2 text-slate-600 dark:text-slate-300">{{ row.batch }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -115,7 +124,7 @@
         <form method="post" action="{% url 'students:import_process' %}">
             {% csrf_token %}
             <div class="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
-                <p class="text-sm text-slate-500">Only the <strong class="text-emerald-600 dark:text-emerald-400">{{ summary.total_valid }}</strong> valid records will be imported. Existing records with matching Roll Nos will be updated.</p>
+                <p class="text-sm text-slate-500">Only the <strong class="text-emerald-600 dark:text-emerald-400">{{ summary.total_valid }}</strong> valid records will be imported. Existing records with matching Enrollment Nos will be updated.</p>
                 <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-200">
                     Confirm and Import
                 </button>

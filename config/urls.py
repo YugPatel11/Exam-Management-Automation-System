@@ -35,8 +35,7 @@ urlpatterns = [
     # Curriculum
     path('curriculum/', include('apps.curriculum.urls', namespace='curriculum')),
 
-    # Faculty
-    path('faculty/', include('apps.faculty.urls', namespace='faculty')),
+
 
     # Assessment Schemes
     path('assessment/', include('apps.assessment.urls', namespace='assessment')),

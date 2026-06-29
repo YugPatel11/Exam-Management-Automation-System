@@ -27,22 +27,21 @@ class StudentListView(ExamCoordinatorRequiredMixin, ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        qs = super().get_queryset().select_related('program', 'division')
+        qs = super().get_queryset().select_related('academic_year')
         query = self.request.GET.get('q')
         if query:
             qs = qs.filter(
-                Q(roll_no__icontains=query) | 
                 Q(enrollment_no__icontains=query) | 
                 Q(name__icontains=query)
             )
             
-        program_id = self.request.GET.get('program')
-        if program_id:
-            qs = qs.filter(program_id=program_id)
+        academic_year_id = self.request.GET.get('academic_year')
+        if academic_year_id:
+            qs = qs.filter(academic_year_id=academic_year_id)
             
-        semester = self.request.GET.get('semester')
-        if semester:
-            qs = qs.filter(semester=semester)
+        class_name = self.request.GET.get('class_name')
+        if class_name:
+            qs = qs.filter(class_name__icontains=class_name)
             
         return qs
 
@@ -62,6 +61,7 @@ class ImportWizardView(ExamCoordinatorRequiredMixin, FormView):
 
     def form_valid(self, form):
         csv_file = form.cleaned_data['csv_file']
+        academic_year = form.cleaned_data['academic_year']
         
         # Save file temporarily
         fs = FileSystemStorage(location=os.path.join(settings.MEDIA_ROOT, 'temp_imports'))
@@ -69,6 +69,7 @@ class ImportWizardView(ExamCoordinatorRequiredMixin, FormView):
         
         # Store filename in session
         self.request.session['import_file'] = filename
+        self.request.session['import_academic_year_id'] = academic_year.id
         
         return redirect('students:import_preview')
 
@@ -90,8 +91,9 @@ class ImportPreviewView(ExamCoordinatorRequiredMixin, View):
             return redirect('students:import_wizard')
 
         # Read and validate
+        academic_year_id = request.session.get('import_academic_year_id')
         with fs.open(filename, 'rb') as f:
-            service = StudentImportService(f)
+            service = StudentImportService(f, academic_year_id=academic_year_id)
             summary = service.validate_file()
 
         context = {
@@ -118,8 +120,9 @@ class ImportProcessView(ExamCoordinatorRequiredMixin, View):
             return redirect('students:import_wizard')
 
         try:
+            academic_year_id = request.session.get('import_academic_year_id')
             with fs.open(filename, 'rb') as f:
-                service = StudentImportService(f)
+                service = StudentImportService(f, academic_year_id=academic_year_id)
                 # Must run validate to populate valid_rows
                 service.validate_file()
                 created, updated = service.process_import()
@@ -134,5 +137,7 @@ class ImportProcessView(ExamCoordinatorRequiredMixin, View):
                 fs.delete(filename)
             if 'import_file' in request.session:
                 del request.session['import_file']
+            if 'import_academic_year_id' in request.session:
+                del request.session['import_academic_year_id']
 
         return redirect('students:student_list')
