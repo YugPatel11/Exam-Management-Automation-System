@@ -284,3 +284,231 @@ class AcademicStructureImport(BaseModel):
 
     def __str__(self):
         return f"Import for {self.academic_year.name} — {self.original_filename} ({self.status})"
+
+
+# ═══════════════════════════════════════════════════════
+# FACULTY MASTER & TEACHING ALLOCATION
+# ═══════════════════════════════════════════════════════
+
+class FacultyMaster(BaseModel):
+    """
+    Faculty identity record, scoped to an Academic Year.
+    Email ID is the primary identity key for authentication,
+    notifications, and cross-module references.
+
+    The same faculty may appear across multiple Academic Years —
+    each year gets its own record so that name/department changes
+    are tracked year-over-year.
+    """
+    academic_year = models.ForeignKey(
+        AcademicYear,
+        on_delete=models.CASCADE,
+        related_name='faculty_members',
+        verbose_name="Academic Year"
+    )
+    faculty_name = models.CharField(
+        max_length=255,
+        verbose_name="Faculty Name",
+        help_text="Full name as it appears in official records."
+    )
+    short_form = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name="Short Form / Alias",
+        help_text="e.g., BBB, SJS, PSM — used for matching in allocation files."
+    )
+    email = models.EmailField(
+        verbose_name="Official Email ID",
+        help_text="Primary identity for login, notifications, and audit."
+    )
+    employee_code = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="Employee Code",
+        help_text="HR employee ID, if available."
+    )
+    department = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Department"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Active",
+        help_text="Whether this faculty is currently active for this academic year."
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='faculty_master_records',
+        verbose_name="Linked User Account",
+        help_text="Auto-linked if a User with the same email exists."
+    )
+
+    class Meta:
+        unique_together = ('academic_year', 'email')
+        ordering = ['faculty_name']
+        verbose_name = "Faculty Master"
+        verbose_name_plural = "Faculty Master Records"
+
+    def __str__(self):
+        alias = f" ({self.short_form})" if self.short_form else ""
+        return f"{self.faculty_name}{alias}"
+
+
+class FacultyTeachingAssignment(BaseModel):
+    """
+    Maps a faculty member to a subject and class within an Academic Year.
+
+    Teaching type distinguishes:
+        - 'Theory' → faculty teaches ALL students of the class
+        - 'Practical-Batch-A', 'Practical-Batch-B', etc. → batch-specific
+
+    The is_coordinator flag marks the Course Coordinator for this
+    subject-class combination.
+    """
+    class TeachingType(models.TextChoices):
+        COORDINATOR = 'coordinator', 'Course Coordinator'
+        THEORY = 'theory', 'Theory (All Students)'
+        PRACTICAL_BATCH_A = 'practical_batch_a', 'Practical / Tutorial — Batch A'
+        PRACTICAL_BATCH_B = 'practical_batch_b', 'Practical / Tutorial — Batch B'
+        PRACTICAL_BATCH_C = 'practical_batch_c', 'Practical / Tutorial — Batch C'
+
+    academic_year = models.ForeignKey(
+        AcademicYear,
+        on_delete=models.CASCADE,
+        related_name='teaching_assignments',
+        verbose_name="Academic Year"
+    )
+    semester = models.ForeignKey(
+        Semester,
+        on_delete=models.CASCADE,
+        related_name='teaching_assignments',
+        verbose_name="Semester"
+    )
+    semester_subject = models.ForeignKey(
+        SemesterSubject,
+        on_delete=models.PROTECT,
+        related_name='teaching_assignments',
+        verbose_name="Subject"
+    )
+    faculty = models.ForeignKey(
+        FacultyMaster,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='teaching_assignments',
+        verbose_name="Faculty",
+        help_text="Null for External / unresolved faculty."
+    )
+    class_name = models.CharField(
+        max_length=100,
+        verbose_name="Class",
+        help_text="e.g., CV3, ME3, CE3+CSE3D, MLAI5B"
+    )
+    is_coordinator = models.BooleanField(
+        default=False,
+        verbose_name="Course Coordinator",
+        help_text="Whether this faculty is the Course Coordinator for this subject."
+    )
+    teaching_type = models.CharField(
+        max_length=30,
+        choices=TeachingType.choices,
+        default=TeachingType.THEORY,
+        verbose_name="Teaching Type"
+    )
+    faculty_alias_raw = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="Original Alias",
+        help_text="The raw alias from the import file, kept for audit/debugging."
+    )
+
+    class Meta:
+        ordering = ['semester', 'class_name', 'semester_subject']
+        verbose_name = "Faculty Teaching Assignment"
+        verbose_name_plural = "Faculty Teaching Assignments"
+
+    def __str__(self):
+        fac = self.faculty.short_form if self.faculty else self.faculty_alias_raw
+        return (
+            f"{self.class_name} → {self.semester_subject.subject_code} "
+            f"({self.get_teaching_type_display()}) — {fac}"
+        )
+
+
+class FacultyImportLog(BaseModel):
+    """
+    Audit trail for Faculty Master and Teaching Allocation imports.
+    """
+    class ImportType(models.TextChoices):
+        FACULTY_MASTER = 'faculty_master', 'Faculty Master'
+        TEACHING_ALLOCATION = 'teaching_allocation', 'Teaching Allocation'
+
+    class ImportStatus(models.TextChoices):
+        SUCCESS = 'success', 'Success'
+        FAILED = 'failed', 'Failed'
+        PARTIAL = 'partial', 'Partial'
+
+    class FileFormat(models.TextChoices):
+        CSV = 'csv', 'CSV'
+        XLSX = 'xlsx', 'Excel (XLSX)'
+
+    academic_year = models.ForeignKey(
+        AcademicYear,
+        on_delete=models.CASCADE,
+        related_name='faculty_imports',
+        verbose_name="Academic Year"
+    )
+    import_type = models.CharField(
+        max_length=25,
+        choices=ImportType.choices,
+        verbose_name="Import Type"
+    )
+    original_filename = models.CharField(
+        max_length=255,
+        verbose_name="Original Filename"
+    )
+    file_format = models.CharField(
+        max_length=4,
+        choices=FileFormat.choices,
+        verbose_name="File Format"
+    )
+    imported_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='faculty_imports',
+        verbose_name="Imported By"
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=ImportStatus.choices,
+        default=ImportStatus.SUCCESS,
+        verbose_name="Import Status"
+    )
+    summary = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="Import Summary",
+        help_text="Statistics: records_created, records_updated, etc."
+    )
+    error_log = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Error Log",
+        help_text="List of row-level errors encountered during import."
+    )
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Faculty Import Log"
+        verbose_name_plural = "Faculty Import Logs"
+
+    def __str__(self):
+        return (
+            f"{self.get_import_type_display()} for {self.academic_year.name} "
+            f"— {self.original_filename} ({self.status})"
+        )

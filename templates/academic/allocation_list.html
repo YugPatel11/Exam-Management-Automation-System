@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Teaching Allocation — {{ academic_year.name }}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Breadcrumbs & Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <nav class="flex text-sm text-slate-500 mb-2">
+                {% for crumb in breadcrumbs %}
+                    {% if crumb.url %}
+                        <a href="{{ crumb.url }}" class="hover:text-brand-600 transition">{{ crumb.label }}</a>
+                        <span class="mx-2">/</span>
+                    {% else %}
+                        <span class="text-slate-900 dark:text-white font-medium">{{ crumb.label }}</span>
+                    {% endif %}
+                {% endfor %}
+            </nav>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Teaching Allocation</h1>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+            {% if has_faculty_master %}
+            <a href="{% url 'academic:allocation_import_upload' pk=academic_year.pk %}"
+               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 shadow-lg shadow-brand-500/25 transition-all hover:shadow-brand-500/40 hover:-translate-y-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
+                Import Allocation
+            </a>
+            {% else %}
+            <span class="text-sm text-rose-500 flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                Import Faculty Master first
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="md:col-span-2">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search subject code, class, faculty..."
+                           class="block w-full pl-10 rounded-lg border-slate-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+                </div>
+            </div>
+            <div>
+                <select name="semester" class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+                    <option value="">All Semesters</option>
+                    {% for sem in semesters %}
+                    <option value="{{ sem.id }}" {% if current_semester == sem.id|stringformat:"s" %}selected{% endif %}>{{ sem.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <select name="class_name" class="block w-full rounded-lg border-slate-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm dark:bg-slate-800 dark:border-slate-700 dark:text-white">
+                    <option value="">All Classes</option>
+                    {% for cls in classes %}
+                    <option value="{{ cls }}" {% if current_class == cls %}selected{% endif %}>{{ cls }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="submit" class="px-4 py-2 w-full justify-center rounded-lg text-sm font-medium text-white bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 transition">
+                    Filter
+                </button>
+                {% if search_query or current_semester or current_class %}
+                <a href="{% url 'academic:allocation_list' pk=academic_year.pk %}" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition" title="Clear Filters">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <div class="px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center">
+            <h3 class="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                {{ total_assignments }} Assignment{{ total_assignments|pluralize }}
+            </h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                <thead class="bg-slate-50 dark:bg-slate-800/50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Subject & Class</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Faculty</th>
+                        <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                    {% for a in assignments %}
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-start">
+                                <div class="mt-1 h-6 w-6 rounded flex-shrink-0 bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-700 dark:text-brand-400 font-bold text-xs mr-3">
+                                    {{ a.semester.number }}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-slate-900 dark:text-white">
+                                        {{ a.semester_subject.subject_code }} — {{ a.semester_subject.subject_name|truncatechars:40 }}
+                                    </div>
+                                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                                            Class: {{ a.class_name }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if a.is_coordinator %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 mb-1">
+                                Coordinator
+                            </span>
+                            <br>
+                            {% endif %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-400">
+                                {{ a.get_teaching_type_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if a.faculty %}
+                            <div class="text-sm font-medium text-slate-900 dark:text-white">{{ a.faculty.faculty_name }}</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">{{ a.faculty.email }}</div>
+                            {% else %}
+                            <div class="text-sm font-medium text-rose-600 dark:text-rose-400">Unresolved / External</div>
+                            <div class="text-xs text-slate-500 dark:text-slate-400">Alias: {{ a.faculty_alias_raw }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="{% url 'academic:allocation_delete' pk=academic_year.pk alloc_pk=a.pk %}" class="text-rose-600 dark:text-rose-400 hover:text-rose-900 dark:hover:text-rose-300">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-12 text-center">
+                            <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                            </svg>
+                            <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">No teaching assignments found.</p>
+                            {% if not search_query %}
+                            <div class="mt-4">
+                                <a href="{% url 'academic:allocation_import_upload' pk=academic_year.pk %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 dark:text-brand-400 dark:bg-brand-900/20 dark:hover:bg-brand-900/40 transition">
+                                    Import Course Allocation Now
+                                </a>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

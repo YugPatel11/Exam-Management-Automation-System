@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Edit Faculty — {{ academic_year.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+    <nav class="flex text-sm text-slate-500 mb-2">
+        {% for crumb in breadcrumbs %}
+            {% if crumb.url %}
+                <a href="{{ crumb.url }}" class="hover:text-brand-600 transition">{{ crumb.label }}</a>
+                <span class="mx-2">/</span>
+            {% else %}
+                <span class="text-slate-900 dark:text-white font-medium">{{ crumb.label }}</span>
+            {% endif %}
+        {% endfor %}
+    </nav>
+    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-200 dark:border-slate-800">
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-white">{{ title }}</h2>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Update faculty details for this academic year.</p>
+        </div>
+        
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+            <div class="rounded-md bg-rose-50 p-4 mb-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-rose-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-rose-800">Please correct the errors below.</h3>
+                        <div class="mt-2 text-sm text-rose-700">
+                            {{ form.non_field_errors }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Faculty Name -->
+                <div class="col-span-2">
+                    <label for="{{ form.faculty_name.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {{ form.faculty_name.label }}
+                    </label>
+                    {{ form.faculty_name }}
+                    {% if form.faculty_name.help_text %}
+                    <p class="mt-1 text-sm text-slate-500">{{ form.faculty_name.help_text }}</p>
+                    {% endif %}
+                    {% if form.faculty_name.errors %}
+                    <p class="mt-1 text-sm text-rose-600">{{ form.faculty_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Short Form / Alias -->
+                <div>
+                    <label for="{{ form.short_form.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {{ form.short_form.label }}
+                    </label>
+                    {{ form.short_form }}
+                    {% if form.short_form.help_text %}
+                    <p class="mt-1 text-sm text-slate-500">{{ form.short_form.help_text }}</p>
+                    {% endif %}
+                    {% if form.short_form.errors %}
+                    <p class="mt-1 text-sm text-rose-600">{{ form.short_form.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {{ form.email.label }}
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.help_text %}
+                    <p class="mt-1 text-sm text-slate-500">{{ form.email.help_text }}</p>
+                    {% endif %}
+                    {% if form.email.errors %}
+                    <p class="mt-1 text-sm text-rose-600">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Employee Code -->
+                <div>
+                    <label for="{{ form.employee_code.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {{ form.employee_code.label }}
+                    </label>
+                    {{ form.employee_code }}
+                    {% if form.employee_code.help_text %}
+                    <p class="mt-1 text-sm text-slate-500">{{ form.employee_code.help_text }}</p>
+                    {% endif %}
+                    {% if form.employee_code.errors %}
+                    <p class="mt-1 text-sm text-rose-600">{{ form.employee_code.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Department -->
+                <div>
+                    <label for="{{ form.department.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {{ form.department.label }}
+                    </label>
+                    {{ form.department }}
+                    {% if form.department.help_text %}
+                    <p class="mt-1 text-sm text-slate-500">{{ form.department.help_text }}</p>
+                    {% endif %}
+                    {% if form.department.errors %}
+                    <p class="mt-1 text-sm text-rose-600">{{ form.department.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Active -->
+                <div class="col-span-2">
+                    <div class="flex items-start">
+                        <div class="flex h-5 items-center">
+                            {{ form.is_active }}
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="{{ form.is_active.id_for_label }}" class="font-medium text-slate-700 dark:text-slate-300">
+                                {{ form.is_active.label }}
+                            </label>
+                            {% if form.is_active.help_text %}
+                            <p class="text-slate-500">{{ form.is_active.help_text }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-5 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-3">
+                <a href="{% url 'academic:faculty_list' pk=academic_year.pk %}" class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+                    Cancel
+                </a>
+                <button type="submit" class="px-4 py-2 bg-brand-600 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

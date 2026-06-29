@@ -5,6 +5,7 @@ from django.contrib import admin
 from apps.academic.models import (
     AcademicYear, Semester, SemesterSubject,
     MarksComponent, AcademicStructureImport,
+    FacultyMaster, FacultyTeachingAssignment, FacultyImportLog,
 )
 
 
@@ -32,6 +33,7 @@ class SemesterSubjectInline(admin.TabularInline):
 class SemesterAdmin(admin.ModelAdmin):
     list_display = ('name', 'academic_year', 'number', 'total_subjects')
     list_filter = ('academic_year',)
+    search_fields = ('name', 'number')
     inlines = [SemesterSubjectInline]
 
 
@@ -59,4 +61,27 @@ class MarksComponentAdmin(admin.ModelAdmin):
 class AcademicStructureImportAdmin(admin.ModelAdmin):
     list_display = ('academic_year', 'original_filename', 'status', 'imported_by', 'created_at')
     list_filter = ('status', 'academic_year')
+    readonly_fields = ('summary', 'error_log')
+
+
+@admin.register(FacultyMaster)
+class FacultyMasterAdmin(admin.ModelAdmin):
+    list_display = ('faculty_name', 'short_form', 'email', 'department', 'is_active', 'academic_year')
+    list_filter = ('is_active', 'academic_year', 'department')
+    search_fields = ('faculty_name', 'short_form', 'email', 'employee_code')
+    autocomplete_fields = ('user',)
+
+
+@admin.register(FacultyTeachingAssignment)
+class FacultyTeachingAssignmentAdmin(admin.ModelAdmin):
+    list_display = ('academic_year', 'semester', 'class_name', 'semester_subject', 'teaching_type', 'faculty', 'is_coordinator')
+    list_filter = ('academic_year', 'semester', 'teaching_type', 'is_coordinator')
+    search_fields = ('class_name', 'semester_subject__subject_code', 'semester_subject__subject_name', 'faculty__faculty_name', 'faculty_alias_raw')
+    autocomplete_fields = ('faculty', 'semester', 'semester_subject')
+
+
+@admin.register(FacultyImportLog)
+class FacultyImportLogAdmin(admin.ModelAdmin):
+    list_display = ('academic_year', 'import_type', 'original_filename', 'status', 'imported_by', 'created_at')
+    list_filter = ('import_type', 'status', 'academic_year')
     readonly_fields = ('summary', 'error_log')
