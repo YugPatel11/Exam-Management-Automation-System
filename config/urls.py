@@ -14,6 +14,9 @@ urlpatterns = [
     # Root redirects to login
     path('', RedirectView.as_view(url='/accounts/login/', permanent=False), name='root'),
 
+    # Academic Year Management (new primary workflow)
+    path('academic/', include('apps.academic.urls', namespace='academic')),
+
     # Authentication
     path('accounts/', include('apps.accounts.urls', namespace='accounts')),
 

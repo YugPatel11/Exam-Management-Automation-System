@@ -6,7 +6,6 @@ from django.conf import settings
 from apps.core.models import BaseModel
 from apps.exams.models import Exam
 from apps.master_data.models import Subject, Division
-from apps.students.models import Student
 
 
 class MarksEntryTask(BaseModel):
@@ -24,6 +23,17 @@ class MarksEntryTask(BaseModel):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='marks_tasks')
     division = models.ForeignKey(Division, on_delete=models.CASCADE, related_name='marks_tasks', null=True, blank=True)
     faculty = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='marks_tasks')
+
+    # ──── New: Link to SemesterSubject for dynamic marks components ────
+    semester_subject = models.ForeignKey(
+        'academic.SemesterSubject',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='marks_tasks',
+        verbose_name="Semester Subject",
+        help_text="Links this task to the academic structure for dynamic marks components."
+    )
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
@@ -36,6 +46,45 @@ class MarksEntryTask(BaseModel):
         div_code = self.division.name if self.division else "All"
         return f"{self.subject.code} - {div_code} ({self.faculty.get_display_name()})"
 
+    def get_marks_components(self):
+        """
+        Returns the marks components for this task.
+        Tries the new SemesterSubject first, falls back to legacy AssessmentScheme.
+        """
+        if self.semester_subject:
+            from apps.academic.models import MarksComponent
+            return [
+                {
+                    'key': mc.slug,
+                    'label': mc.name,
+                    'max_marks': mc.max_marks,
+                }
+                for mc in MarksComponent.objects.filter(
+                    semester_subject=self.semester_subject,
+                    max_marks__gt=0,
+                ).order_by('display_order')
+            ]
+        else:
+            # Legacy fallback: use AssessmentScheme
+            try:
+                scheme = self.subject.assessment_scheme
+                components = []
+                if scheme.theory_ce > 0:
+                    components.append({'key': 'theory_ce', 'label': 'Theory CE', 'max_marks': scheme.theory_ce})
+                if scheme.theory_ese > 0:
+                    components.append({'key': 'theory_ese', 'label': 'Theory ESE', 'max_marks': scheme.theory_ese})
+                if scheme.practical_ce > 0:
+                    components.append({'key': 'practical_ce', 'label': 'Practical CE', 'max_marks': scheme.practical_ce})
+                if scheme.practical_ese > 0:
+                    components.append({'key': 'practical_ese', 'label': 'Practical ESE', 'max_marks': scheme.practical_ese})
+                if scheme.tutorial_ce > 0:
+                    components.append({'key': 'tutorial_ce', 'label': 'Tutorial CE', 'max_marks': scheme.tutorial_ce})
+                if scheme.tutorial_ese > 0:
+                    components.append({'key': 'tutorial_ese', 'label': 'Tutorial ESE', 'max_marks': scheme.tutorial_ese})
+                return components
+            except Exception:
+                return []
+
 
 class StudentMark(BaseModel):
     """
@@ -43,9 +92,9 @@ class StudentMark(BaseModel):
     Component marks are stored dynamically in a JSONField based on the Assessment Scheme.
     """
     task = models.ForeignKey(MarksEntryTask, on_delete=models.CASCADE, related_name='student_marks')
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='marks')
+    student = models.ForeignKey('students.Student', on_delete=models.CASCADE, related_name='marks')
     
-    # Store dynamic marks like {"internal_1": 25, "internal_2": 30, "practical": 40}
+    # Store dynamic marks like {"theory_ce": 25, "theory_ese": 30, "practical_ce": 40}
     component_marks = models.JSONField(default=dict, blank=True)
     
     STATUS_CHOICES = [

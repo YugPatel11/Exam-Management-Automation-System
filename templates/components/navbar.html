@@ -18,6 +18,13 @@
                     </a>
                     
                     {% if user|has_any_role:"admin,exam_coordinator" %}
+                    <!-- Academic Years — Primary Workflow -->
+                    <a href="{% url 'academic:year_list' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 {% active_nav_group '/academic/' %}">
+                        <svg class="w-4 h-4 mr-1.5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Academic Years
+                    </a>
                     <!-- Master Data Dropdown -->
                     <div x-data="{ open: false }" @click.away="open = false" class="relative flex">
                         <button @click="open = !open" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 {% active_nav_group '/master-data/' %}">
@@ -131,6 +138,8 @@
             <a href="{% url 'dashboard:home' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800">Dashboard</a>
             
             {% if user|has_any_role:"admin,exam_coordinator" %}
+            <a href="{% url 'academic:year_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-brand-600 dark:text-brand-400 hover:bg-slate-50 dark:hover:bg-slate-800">📅 Academic Years</a>
+
             <div class="pt-4 pb-2">
                 <div class="flex items-center px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Master Data</div>
                 <a href="{% url 'master_data:program_list' %}" class="block px-3 py-2 mt-1 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Programs</a>

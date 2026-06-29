@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     # Core app (must be first — base models, templatetags)
     'apps.core',
 
+    # Academic Year Management (new — parent of all academic structure)
+    'apps.academic',
+
     # EMS apps
     'apps.accounts',
     'apps.dashboard',

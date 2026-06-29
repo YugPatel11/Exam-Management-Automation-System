@@ -25,15 +25,29 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <!-- Academic Year -->
                 <div>
-                    <label for="{{ form.academic_year.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                        {{ form.academic_year.label }}
+                    <label for="{{ form.academic_year_ref.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        {{ form.academic_year_ref.label }}
                     </label>
-                    {{ form.academic_year }}
-                    {% if form.academic_year.help_text %}
-                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ form.academic_year.help_text }}</p>
+                    {{ form.academic_year_ref }}
+                    {% if form.academic_year_ref.help_text %}
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ form.academic_year_ref.help_text }}</p>
                     {% endif %}
-                    {% if form.academic_year.errors %}
-                        <p class="mt-1.5 text-sm text-rose-500">{{ form.academic_year.errors.0 }}</p>
+                    {% if form.academic_year_ref.errors %}
+                        <p class="mt-1.5 text-sm text-rose-500">{{ form.academic_year_ref.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Semester -->
+                <div>
+                    <label for="{{ form.semester_ref.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        {{ form.semester_ref.label }}
+                    </label>
+                    {{ form.semester_ref }}
+                    {% if form.semester_ref.help_text %}
+                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ form.semester_ref.help_text }}</p>
+                    {% endif %}
+                    {% if form.semester_ref.errors %}
+                        <p class="mt-1.5 text-sm text-rose-500">{{ form.semester_ref.errors.0 }}</p>
                     {% endif %}
                 </div>
 
@@ -161,4 +175,37 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const aySelect = document.getElementById('id_academic_year_ref');
+        const semSelect = document.getElementById('id_semester_ref');
+
+        if (aySelect && semSelect) {
+            aySelect.addEventListener('change', function() {
+                const ayId = this.value;
+                
+                // Clear existing options
+                semSelect.innerHTML = '<option value="">— Select Semester —</option>';
+                
+                if (ayId) {
+                    // Fetch semesters for selected AY
+                    fetch(`/academic/api/${ayId}/semesters/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.semesters.forEach(sem => {
+                                const option = document.createElement('option');
+                                option.value = sem.id;
+                                option.textContent = sem.name;
+                                semSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => console.error('Error fetching semesters:', error));
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

@@ -13,17 +13,21 @@ class Exam(BaseModel):
     """
     Core entity representing an examination event (e.g., Mid Semester 1).
     Acts as the parent container for schedules, seating, and marks.
+
+    Now linked to AcademicYear and Semester via ForeignKeys for the
+    new academic-year-first workflow.
     """
     class ExamType(models.TextChoices):
+        THEORY_CE = 'THEORY_CE', 'Theory CE'
+        THEORY_ESE = 'THEORY_ESE', 'Theory ESE'
+        PRACTICAL_CE = 'PRACTICAL_CE', 'Practical CE'
+        PRACTICAL_ESE = 'PRACTICAL_ESE', 'Practical ESE'
+        TUTORIAL_CE = 'TUTORIAL_CE', 'Tutorial CE'
+        TUTORIAL_ESE = 'TUTORIAL_ESE', 'Tutorial ESE'
         I1 = 'I1', 'I1 Examination'
         I2 = 'I2', 'I2 Examination'
         IMPROVEMENT = 'Improvement', 'Improvement Examination'
         FE = 'FE', 'FE Examination'
-        PRACTICAL_CE = 'PRACTICAL_CE', 'Practical CE'
-        THEORY_ESE = 'THEORY_ESE', 'Theory ESE'
-        PRACTICAL_ESE = 'PRACTICAL_ESE', 'Practical ESE'
-        TUTORIAL_CE = 'TUTORIAL_CE', 'Tutorial CE'
-        TUTORIAL_ESE = 'TUTORIAL_ESE', 'Tutorial ESE'
 
     class ExamStatus(models.TextChoices):
         DRAFT = 'draft', 'Draft'
@@ -31,6 +35,27 @@ class Exam(BaseModel):
         ONGOING = 'ongoing', 'Ongoing'
         COMPLETED = 'completed', 'Completed'
 
+    # ──── New: FK-based Academic Year & Semester ────
+    academic_year_ref = models.ForeignKey(
+        'academic.AcademicYear',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='exams',
+        verbose_name="Academic Year",
+        help_text="Select the Academic Year this exam belongs to."
+    )
+    semester_ref = models.ForeignKey(
+        'academic.Semester',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='exams',
+        verbose_name="Semester",
+        help_text="Select the semester for this exam."
+    )
+
+    # ──── Legacy: kept for backward compatibility ────
     academic_year = models.CharField(
         max_length=7,
         validators=[
@@ -40,7 +65,9 @@ class Exam(BaseModel):
             )
         ],
         help_text="Format: YYYY-YY (e.g., 2023-24)",
-        verbose_name="Academic Year"
+        verbose_name="Academic Year (Legacy)",
+        blank=True,
+        default='',
     )
     
     name = models.CharField(
@@ -52,7 +79,7 @@ class Exam(BaseModel):
     exam_type = models.CharField(
         max_length=20,
         choices=ExamType.choices,
-        default=ExamType.I1,
+        default=ExamType.THEORY_CE,
         verbose_name="Exam Type"
     )
     
@@ -67,7 +94,8 @@ class Exam(BaseModel):
         Program,
         related_name='exams',
         verbose_name="Applicable Programs",
-        help_text="Select the programs participating in this exam."
+        help_text="Select the programs participating in this exam.",
+        blank=True,
     )
     
     start_date = models.DateField(verbose_name="Start Date")
@@ -86,12 +114,19 @@ class Exam(BaseModel):
     )
 
     class Meta:
-        ordering = ['-academic_year', '-start_date']
+        ordering = ['-start_date']
         verbose_name = "Exam"
         verbose_name_plural = "Exams"
 
     def __str__(self):
-        return f"{self.name} ({self.academic_year})"
+        ay = self.academic_year_ref.name if self.academic_year_ref else self.academic_year
+        return f"{self.name} ({ay})"
+
+    def save(self, *args, **kwargs):
+        # Sync legacy field from FK
+        if self.academic_year_ref and not self.academic_year:
+            self.academic_year = self.academic_year_ref.name
+        super().save(*args, **kwargs)
 
     def clean(self):
         super().clean()
@@ -99,4 +134,10 @@ class Exam(BaseModel):
             if self.end_date < self.start_date:
                 raise ValidationError({
                     'end_date': 'End date cannot be earlier than start date.'
+                })
+        # Validate semester belongs to the selected academic year
+        if self.academic_year_ref and self.semester_ref:
+            if self.semester_ref.academic_year != self.academic_year_ref:
+                raise ValidationError({
+                    'semester_ref': 'Selected semester does not belong to the selected academic year.'
                 })

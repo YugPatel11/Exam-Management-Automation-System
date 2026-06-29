@@ -80,17 +80,8 @@ class MarksReviewDetailView(ExamCoordinatorRequiredMixin, View):
         task = get_object_or_404(MarksEntryTask, pk=pk)
         marks = StudentMark.objects.filter(task=task).select_related('student')
         
-        # Get components from assessment scheme
-        components = []
-        scheme = task.subject.assessment_scheme
-        if scheme.theory_ce > 0:
-            components.append({'key': 'theory_ce', 'label': 'Theory CE', 'max_marks': scheme.theory_ce})
-        if scheme.theory_ese > 0:
-            components.append({'key': 'theory_ese', 'label': 'Theory ESE', 'max_marks': scheme.theory_ese})
-        if scheme.practical_ce > 0:
-            components.append({'key': 'practical_ce', 'label': 'Practical CE', 'max_marks': scheme.practical_ce})
-        if scheme.practical_ese > 0:
-            components.append({'key': 'practical_ese', 'label': 'Practical ESE', 'max_marks': scheme.practical_ese})
+        # Get components dynamically from the task
+        components = task.get_marks_components()
             
         context = {
             'task': task,
@@ -147,16 +138,8 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
     Dynamic form to enter marks for a specific task.
     """
     def _get_components(self, task):
-        components = []
-        exam_type = task.exam.exam_type
-        
-        if exam_type in ['I1', 'I2', 'Improvement']:
-            for i in range(1, 7):
-                components.append({'key': f'Q{i}', 'label': f'Q{i}'})
-        else:
-            components.append({'key': 'total', 'label': 'Total Marks'})
-            
-        return components
+        """Get marks components dynamically from the academic structure."""
+        return task.get_marks_components()
         
     def get(self, request, pk):
         task = get_object_or_404(MarksEntryTask, pk=pk, faculty=request.user)
@@ -273,13 +256,8 @@ class MarksCsvUploadView(FacultyRequiredMixin, View):
         if form.is_valid():
             csv_file = form.cleaned_data['file']
             
-            # Re-implement getting components (should be a util, but fine here)
-            components = []
-            scheme = task.subject.assessment_scheme
-            if scheme.theory_ce > 0: components.append({'key': 'theory_ce', 'max_marks': scheme.theory_ce})
-            if scheme.theory_ese > 0: components.append({'key': 'theory_ese', 'max_marks': scheme.theory_ese})
-            if scheme.practical_ce > 0: components.append({'key': 'practical_ce', 'max_marks': scheme.practical_ce})
-            if scheme.practical_ese > 0: components.append({'key': 'practical_ese', 'max_marks': scheme.practical_ese})
+            # Get components dynamically from the task
+            components = task.get_marks_components()
             
             service = MarksCsvImportService(task=task, components=components)
             success = service.process(csv_file)

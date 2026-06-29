@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Academic Years{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Academic Years</h1>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Manage academic years and import teaching & examination schemes.
+            </p>
+        </div>
+        <a href="{% url 'academic:year_create' %}"
+           class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 shadow-lg shadow-brand-500/25 transition-all hover:shadow-brand-500/40 hover:-translate-y-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            New Academic Year
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" class="flex flex-wrap gap-3">
+        <div class="flex-1 min-w-[200px]">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search academic years..."
+                   class="w-full rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:ring-brand-500 focus:border-brand-500 shadow-sm">
+        </div>
+        <select name="status"
+                class="rounded-lg border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white text-sm focus:ring-brand-500 focus:border-brand-500 shadow-sm">
+            <option value="">All Statuses</option>
+            <option value="active" {% if request.GET.status == "active" %}selected{% endif %}>Active</option>
+            <option value="closed" {% if request.GET.status == "closed" %}selected{% endif %}>Closed</option>
+            <option value="archived" {% if request.GET.status == "archived" %}selected{% endif %}>Archived</option>
+        </select>
+        <button type="submit"
+                class="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+            Search
+        </button>
+    </form>
+
+    <!-- Academic Year Cards -->
+    {% if academic_years %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for ay in academic_years %}
+        <a href="{% url 'academic:year_detail' pk=ay.pk %}"
+           class="group block bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-lg hover:border-brand-300 dark:hover:border-brand-700 transition-all duration-200 hover:-translate-y-1 overflow-hidden">
+            
+            <!-- Card Header -->
+            <div class="p-5 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-brand-500/20">
+                            {{ ay.name|truncatechars:4 }}
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+                                {{ ay.name }}
+                            </h3>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                                {% if ay.status == 'active' %}bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400
+                                {% elif ay.status == 'closed' %}bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400
+                                {% else %}bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400{% endif %}">
+                                {{ ay.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Card Stats -->
+            <div class="p-5 grid grid-cols-3 gap-4">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ ay.semester_count }}</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">Semesters</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ ay.subject_count }}</div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">Subjects</div>
+                </div>
+                <div class="text-center">
+                    {% with latest=ay.latest_import %}
+                    {% if latest %}
+                    <div class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                        <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">Imported</div>
+                    {% else %}
+                    <div class="text-2xl font-bold text-amber-500">
+                        <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">Pending</div>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="flex justify-center mt-8">
+        <nav class="flex items-center gap-1">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">← Previous</a>
+            {% endif %}
+            <span class="px-3 py-2 text-sm text-slate-500">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">Next →</a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+        <div class="w-20 h-20 mx-auto rounded-full bg-brand-50 dark:bg-brand-900/20 flex items-center justify-center mb-6">
+            <svg class="w-10 h-10 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">No Academic Years Yet</h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-6 max-w-sm mx-auto">
+            Create your first academic year and import the teaching scheme to get started.
+        </p>
+        <a href="{% url 'academic:year_create' %}"
+           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 shadow-lg shadow-brand-500/25 transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Create Academic Year
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
