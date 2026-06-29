@@ -55,29 +55,3 @@ class AssessmentComponent(BaseModel):
         return f"{self.subject.code} - {self.get_parent_type_display()} - {self.name} ({self.variable_name})"
 
 
-class ComponentFormula(BaseModel):
-    """
-    The formula connecting the child components to their parent type's maximum marks.
-    """
-    subject = models.ForeignKey(
-        Subject,
-        on_delete=models.CASCADE,
-        related_name='assessment_formulas'
-    )
-    parent_type = models.CharField(
-        max_length=20,
-        choices=AssessmentComponent.PARENT_TYPE_CHOICES,
-        verbose_name="Parent Component Type"
-    )
-    formula_string = models.TextField(
-        verbose_name="Formula",
-        help_text="Mathematical expression using variable names (e.g., (I1 + I2)/2 + FE)"
-    )
-
-    class Meta:
-        unique_together = ('subject', 'parent_type')
-        verbose_name = "Component Formula"
-        verbose_name_plural = "Component Formulas"
-
-    def __str__(self):
-        return f"Formula for {self.subject.code} - {self.get_parent_type_display()}"

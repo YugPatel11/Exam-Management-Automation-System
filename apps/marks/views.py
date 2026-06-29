@@ -146,17 +146,16 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
     """
     Dynamic form to enter marks for a specific task.
     """
-    def _get_components(self, subject):
+    def _get_components(self, task):
         components = []
-        scheme = subject.assessment_scheme
-        if scheme.theory_ce > 0:
-            components.append({'key': 'theory_ce', 'label': 'Theory CE', 'max_marks': scheme.theory_ce})
-        if scheme.theory_ese > 0:
-            components.append({'key': 'theory_ese', 'label': 'Theory ESE', 'max_marks': scheme.theory_ese})
-        if scheme.practical_ce > 0:
-            components.append({'key': 'practical_ce', 'label': 'Practical CE', 'max_marks': scheme.practical_ce})
-        if scheme.practical_ese > 0:
-            components.append({'key': 'practical_ese', 'label': 'Practical ESE', 'max_marks': scheme.practical_ese})
+        exam_type = task.exam.exam_type
+        
+        if exam_type in ['I1', 'I2', 'Improvement']:
+            for i in range(1, 7):
+                components.append({'key': f'Q{i}', 'label': f'Q{i}'})
+        else:
+            components.append({'key': 'total', 'label': 'Total Marks'})
+            
         return components
         
     def get(self, request, pk):
@@ -177,7 +176,7 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
             messages.error(request, f"Marks entry window has closed. It ended on {exam.marks_entry_end.strftime('%d %b %Y, %I:%M %p')}.")
             return redirect('marks:task_list')
             
-        components = self._get_components(task.subject)
+        components = self._get_components(task)
         
         # Get students for this task
         # Must match program/semester from curriculum mapping and division if specified
@@ -227,7 +226,7 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
         if exam.marks_entry_end and now > exam.marks_entry_end:
             messages.error(request, "Marks entry window has closed.")
             return redirect('marks:task_list')
-        components = self._get_components(task.subject)
+        components = self._get_components(task)
         
         action = request.POST.get('action')
         

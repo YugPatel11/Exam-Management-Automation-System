@@ -19,7 +19,8 @@ from django.views.decorators.http import require_http_methods
 
 from apps.accounts.forms import (
     LoginForm, ChangePasswordForm, ForgotPasswordForm,
-    ResetPasswordForm, UserProfileForm, AdminUserCreateForm
+    ResetPasswordForm, UserProfileForm, AdminUserCreateForm,
+    UserCsvUploadForm
 )
 from apps.accounts.models import PasswordResetOTP
 from apps.core.services.audit import log_action
@@ -408,3 +409,32 @@ class UserDeleteView(ExamCoordinatorRequiredMixin, View):
         user.delete()
         messages.success(request, f"User {user_email} has been deleted.")
         return redirect('accounts:user_list')
+
+
+class UserCsvUploadView(ExamCoordinatorRequiredMixin, View):
+    """View to handle bulk user creation via CSV."""
+    template_name = 'accounts/user_csv_import.html'
+    
+    def get(self, request):
+        form = UserCsvUploadForm()
+        return render(request, self.template_name, {'form': form})
+        
+    def post(self, request):
+        form = UserCsvUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            from apps.accounts.services import UserCsvImportService
+            csv_file = form.cleaned_data['csv_file']
+            
+            service = UserCsvImportService(creator=request.user)
+            success = service.process(csv_file)
+            
+            if success:
+                messages.success(request, f"Successfully imported {service.success_count} users. Welcome emails with credentials have been sent.")
+                return redirect('accounts:user_list')
+            else:
+                for error in service.errors:
+                    messages.error(request, error)
+        else:
+            messages.error(request, "Invalid file upload.")
+            
+        return render(request, self.template_name, {'form': form})

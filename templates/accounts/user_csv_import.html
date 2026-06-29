@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Import Users via CSV{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+    <div class="flex items-center gap-4">
+        <a href="{% url 'accounts:user_list' %}" class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </a>
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Import Users</h1>
+            <p class="text-slate-500 dark:text-slate-400 mt-1">Upload a CSV file to bulk create user accounts.</p>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+        <div class="p-6">
+            <div class="mb-8">
+                <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">Instructions</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                    Please prepare your CSV file with the following exact headers (case-sensitive). 
+                    Passwords will be auto-generated and emailed to the new users.
+                </p>
+                
+                <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 font-mono text-xs text-slate-700 dark:text-slate-300 overflow-x-auto">
+                    FirstName,LastName,Email,Role,Phone,Department,Designation,EmployeeId
+                </div>
+                
+                <div class="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                    <p><strong>Required Fields:</strong> FirstName, LastName, Email, Role.</p>
+                    <p><strong>Valid Roles:</strong> <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">subject_faculty</code>, <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">subject_coordinator</code>{% if user.is_admin_role or user.is_superuser %}, <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">exam_coordinator</code>, <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">admin</code>{% endif %}.</p>
+                </div>
+                
+                <div class="mt-6">
+                    <a href="{% static 'samples/users_import_template.csv' %}" download class="inline-flex items-center text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Download Sample Template
+                    </a>
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <div>
+                    {{ form.csv_file.label_tag }}
+                    <div class="mt-2">
+                        {{ form.csv_file }}
+                    </div>
+                    {% if form.csv_file.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.csv_file.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3">
+                    <a href="{% url 'accounts:user_list' %}" class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 focus:ring-4 focus:ring-brand-500/20 transition-colors shadow-sm">
+                        Upload & Import
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

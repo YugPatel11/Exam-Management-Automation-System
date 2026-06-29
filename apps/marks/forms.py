@@ -24,13 +24,13 @@ class DynamicMarksEntryForm(forms.ModelForm):
     """
     class Meta:
         model = StudentMark
-        fields = ['is_absent']
+        fields = ['status']
 
     def __init__(self, *args, **kwargs):
         self.components = kwargs.pop('components', [])
         super().__init__(*args, **kwargs)
         
-        self.fields['is_absent'].widget.attrs.update({'class': 'h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500'})
+        self.fields['status'].widget.attrs.update({'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm'})
         
         # Add dynamic fields for each component
         for comp in self.components:
@@ -42,24 +42,21 @@ class DynamicMarksEntryForm(forms.ModelForm):
             if self.instance.pk and self.instance.component_marks:
                 initial_val = self.instance.component_marks.get(field_name)
                 
-            self.fields[field_name] = forms.DecimalField(
-                max_value=max_marks,
+            self.fields[field_name] = forms.IntegerField(
                 min_value=0,
-                required=False, # Not required if absent
+                required=False, # Not required if absent/ufm
                 initial=initial_val,
                 widget=forms.NumberInput(attrs={
-                    'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm',
-                    'placeholder': f'Max {max_marks}',
-                    'step': '0.5'
+                    'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm marks-input',
+                    'placeholder': 'Marks'
                 })
             )
 
     def clean(self):
         cleaned_data = super().clean()
-        is_absent = cleaned_data.get('is_absent', False)
+        status = cleaned_data.get('status', 'Present')
         
-        if is_absent:
-            # If absent, marks should be 0
+        if status in ['AB', 'UFM']:
             for comp in self.components:
                 cleaned_data[comp['key']] = 0
         else:
@@ -67,7 +64,7 @@ class DynamicMarksEntryForm(forms.ModelForm):
             for comp in self.components:
                 val = cleaned_data.get(comp['key'])
                 if val is None:
-                    self.add_error(comp['key'], "This field is required if student is not absent.")
+                    self.add_error(comp['key'], "This field is required if student is present.")
                     
         return cleaned_data
         

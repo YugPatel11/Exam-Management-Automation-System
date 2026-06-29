@@ -48,9 +48,15 @@ class StudentMark(BaseModel):
     # Store dynamic marks like {"internal_1": 25, "internal_2": 30, "practical": 40}
     component_marks = models.JSONField(default=dict, blank=True)
     
+    STATUS_CHOICES = [
+        ('Present', 'Present'),
+        ('AB', 'Absent'),
+        ('UFM', 'Unfair Means'),
+    ]
+    
     # Computed totals
     total_marks = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
-    is_absent = models.BooleanField(default=False)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Present')
 
     class Meta:
         unique_together = ('task', 'student')

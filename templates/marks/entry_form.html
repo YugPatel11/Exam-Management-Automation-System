@@ -37,9 +37,9 @@
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Roll No</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Student Name</th>
-                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Absent</th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
                             {% for comp in components %}
-                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">{{ comp.label }}<br><span class="text-xs text-slate-400">(Max: {{ comp.max_marks }})</span></th>
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">{{ comp.label }}{% if comp.max_marks %}<br><span class="text-xs text-slate-400">(Max: {{ comp.max_marks }})</span>{% endif %}</th>
                             {% endfor %}
                         </tr>
                     </thead>
@@ -57,16 +57,16 @@
                             
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-center">
                                 {% if task.status in 'submitted,locked' %}
-                                    {% if form.instance.is_absent %}<span class="text-red-500 font-bold">A</span>{% else %}-{% endif %}
+                                    {% if form.instance.status != 'Present' %}<span class="text-red-500 font-bold">{{ form.instance.status }}</span>{% else %}Present{% endif %}
                                 {% else %}
-                                    {{ form.is_absent }}
+                                    {{ form.status }}
                                 {% endif %}
                             </td>
                             
                             {% for comp in components %}
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-center">
                                 {% if task.status in 'submitted,locked' %}
-                                    <span class="font-medium {% if form.instance.is_absent %}text-slate-400 line-through{% else %}text-slate-900 dark:text-white{% endif %}">
+                                    <span class="font-medium {% if form.instance.status != 'Present' %}text-slate-400 line-through{% else %}text-slate-900 dark:text-white{% endif %}">
                                         {{ form.instance.component_marks|get_item:comp.key|default:"0" }}
                                     </span>
                                 {% else %}
@@ -105,12 +105,46 @@
             <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-4">Instructions</h3>
             <ul class="text-sm text-slate-500 dark:text-slate-400 space-y-2 list-disc pl-5">
                 <li>Enter marks for all students present.</li>
-                <li>Check the <strong>Absent</strong> box if a student was not present. Marks will automatically be zero.</li>
-                <li>Ensure all marks entered are within the maximum allowed for each component.</li>
+                <li>Select <strong>AB (Absent)</strong> or <strong>UFM (Unfair Means)</strong> from the status dropdown if applicable. Marks will be disabled and saved as zero.</li>
+                <li>Ensure all marks entered are integers. No decimal values allowed.</li>
                 <li>Click <strong>Save Draft</strong> to save your progress without submitting.</li>
                 <li>Click <strong>Submit for Review</strong> when you have verified all entries.</li>
             </ul>
         </div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const statusSelects = document.querySelectorAll('select[name$="-status"]');
+                statusSelects.forEach(select => {
+                    // Initialize state
+                    toggleRowInputs(select);
+                    
+                    // Listen for changes
+                    select.addEventListener('change', function() {
+                        toggleRowInputs(this);
+                    });
+                });
+                
+                function toggleRowInputs(selectElement) {
+                    const status = selectElement.value;
+                    const tr = selectElement.closest('tr');
+                    const inputs = tr.querySelectorAll('.marks-input');
+                    
+                    if (status !== 'Present') {
+                        inputs.forEach(input => {
+                            input.disabled = true;
+                            input.value = '';
+                            input.classList.add('bg-slate-100', 'dark:bg-slate-800', 'cursor-not-allowed');
+                        });
+                    } else {
+                        inputs.forEach(input => {
+                            input.disabled = false;
+                            input.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'cursor-not-allowed');
+                        });
+                    }
+                }
+            });
+        </script>
         
         {% if task.status not in 'submitted,locked' %}
         <div class="bg-white dark:bg-surface-800 shadow rounded-lg p-6 border border-slate-200 dark:border-slate-700">

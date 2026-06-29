@@ -240,3 +240,22 @@ class AdminUserCreateForm(forms.ModelForm):
                     ('subject_faculty', 'Subject Faculty'),
                 ]
 
+
+class UserCsvUploadForm(forms.Form):
+    """Form for uploading User creation CSV."""
+    csv_file = forms.FileField(
+        label='Select CSV File',
+        help_text='Only .csv files are allowed.',
+        widget=forms.FileInput(attrs={
+            'class': 'block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 dark:text-slate-400 dark:file:bg-brand-900/30 dark:file:text-brand-400 dark:hover:file:bg-brand-900/50 transition-colors',
+            'accept': '.csv'
+        })
+    )
+
+    def clean_csv_file(self):
+        file = self.cleaned_data.get('csv_file')
+        if file:
+            if not file.name.endswith('.csv'):
+                raise forms.ValidationError("Please upload a valid CSV file.")
+        return file
+

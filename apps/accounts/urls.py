@@ -18,5 +18,6 @@ urlpatterns = [
     # User Management for Exam Coordinators
     path('users/', views.UserListView.as_view(), name='user_list'),
     path('users/create/', views.UserCreateView.as_view(), name='user_create'),
+    path('users/import/', views.UserCsvUploadView.as_view(), name='user_import'),
     path('users/<int:pk>/delete/', views.UserDeleteView.as_view(), name='user_delete'),
 ]

@@ -1,0 +1,4 @@
+FirstName,LastName,Email,Role,Phone,Department,Designation,EmployeeId
+John,Doe,johndoe@university.edu,subject_faculty,1234567890,Computer Science,Assistant Professor,EMP1001
+Jane,Smith,janesmith@university.edu,subject_coordinator,0987654321,Information Technology,Associate Professor,EMP1002
+Robert,Brown,robertb@university.edu,exam_coordinator,1122334455,Mechanical Engineering,HOD,EMP1003

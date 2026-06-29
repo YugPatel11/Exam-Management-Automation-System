@@ -51,6 +51,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- AlpineJS -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 
@@ -60,19 +63,13 @@
 
     {% if user.is_authenticated %}
     <!-- ═══════════ AUTHENTICATED LAYOUT ═══════════ -->
-    <div class="flex h-screen overflow-hidden" id="app-layout">
+    <div class="flex min-h-screen flex-col bg-surface-50 dark:bg-surface-950" id="app-layout">
 
-        <!-- Sidebar -->
-        {% include 'components/sidebar.html' %}
+        <!-- Top Navbar -->
+        {% include 'components/navbar.html' %}
 
-        <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-
-            <!-- Top Navbar -->
-            {% include 'components/navbar.html' %}
-
-            <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto" id="main-content">
+        <!-- Page Content -->
+        <main class="flex-1 w-full max-w-7xl mx-auto" id="main-content">
                 <!-- Messages / Alerts -->
                 {% if messages %}
                 <div class="px-4 sm:px-6 lg:px-8 pt-4 space-y-2" id="message-container">
@@ -120,7 +117,7 @@
                     {% block content %}{% endblock %}
                 </div>
             </main>
-        </div>
+        
     </div>
 
     {% else %}
@@ -145,9 +142,6 @@
 
     <!-- Core JS -->
     <script src="{% static 'js/main.js' %}"></script>
-    {% if user.is_authenticated %}
-    <script src="{% static 'js/sidebar.js' %}"></script>
-    {% endif %}
     <script src="{% static 'js/dark_mode.js' %}"></script>
 
     {% block extra_js %}{% endblock %}

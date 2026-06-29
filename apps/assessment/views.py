@@ -9,8 +9,7 @@ import json
 
 from apps.master_data.models import Subject
 from apps.curriculum.models import AssessmentScheme
-from apps.assessment.models import AssessmentComponent, ComponentFormula
-from apps.assessment.services import FormulaValidator
+from apps.assessment.models import AssessmentComponent
 
 class SubjectCoordinatorRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -63,15 +62,12 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
             return redirect('assessment:dashboard')
 
         components = AssessmentComponent.objects.filter(subject=subject, parent_type=parent_type)
-        formula_obj = ComponentFormula.objects.filter(subject=subject, parent_type=parent_type).first()
-
         context = {
             'subject': subject,
             'parent_type': parent_type,
             'parent_type_display': dict(AssessmentComponent.PARENT_TYPE_CHOICES).get(parent_type, parent_type),
             'parent_max_marks': max_marks,
-            'components': components,
-            'formula_string': formula_obj.formula_string if formula_obj else ""
+            'components': components
         }
         return render(request, 'assessment/builder.html', context)
 
@@ -93,15 +89,11 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
         try:
             raw_data = json.loads(request.body)
             components_data = raw_data.get('components', [])
-            formula_string = raw_data.get('formula', '').strip()
         except json.JSONDecodeError:
             return self._json_response(False, "Invalid JSON data.")
 
         if not components_data:
             return self._json_response(False, "At least one component is required.")
-
-        if not formula_string:
-            return self._json_response(False, "Formula is required.")
 
         # Build variables dict for validation
         variables_dict = {}
@@ -125,13 +117,10 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
             variables_dict[v_name] = v_marks
             variable_names_seen.add(v_name)
 
-        # Validate Formula Math
-        validator = FormulaValidator(formula_string, variables_dict)
-        is_valid = validator.validate(parent_max_marks)
-
-        if not is_valid:
-            error_msg = "Formula Validation Failed:<br>" + "<br>".join(validator.errors)
-            return self._json_response(False, error_msg)
+        # Validate that the sum of components does not exceed the parent max marks
+        total_component_marks = sum(variables_dict.values())
+        if total_component_marks > parent_max_marks:
+            return self._json_response(False, f"Total component marks ({total_component_marks}) cannot exceed the parent max marks ({parent_max_marks}).")
 
         # Save to DB
         AssessmentComponent.objects.filter(subject=subject, parent_type=parent_type).delete()
@@ -146,14 +135,6 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
                 max_marks=int(c.get('max_marks'))
             ))
         AssessmentComponent.objects.bulk_create(new_components)
-
-        formula_obj, _ = ComponentFormula.objects.get_or_create(
-            subject=subject,
-            parent_type=parent_type,
-            defaults={'formula_string': formula_string}
-        )
-        formula_obj.formula_string = formula_string
-        formula_obj.save()
 
         return self._json_response(True, "Assessment Scheme configured successfully!")
 

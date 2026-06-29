@@ -15,10 +15,15 @@ class Exam(BaseModel):
     Acts as the parent container for schedules, seating, and marks.
     """
     class ExamType(models.TextChoices):
-        INTERNAL_1 = 'internal_1', 'Internal 1'
-        INTERNAL_2 = 'internal_2', 'Internal 2'
-        CONTINUOUS = 'continuous', 'Continuous Evaluation'
-        OTHER = 'other', 'Other'
+        I1 = 'I1', 'I1 Examination'
+        I2 = 'I2', 'I2 Examination'
+        IMPROVEMENT = 'Improvement', 'Improvement Examination'
+        FE = 'FE', 'FE Examination'
+        PRACTICAL_CE = 'PRACTICAL_CE', 'Practical CE'
+        THEORY_ESE = 'THEORY_ESE', 'Theory ESE'
+        PRACTICAL_ESE = 'PRACTICAL_ESE', 'Practical ESE'
+        TUTORIAL_CE = 'TUTORIAL_CE', 'Tutorial CE'
+        TUTORIAL_ESE = 'TUTORIAL_ESE', 'Tutorial ESE'
 
     class ExamStatus(models.TextChoices):
         DRAFT = 'draft', 'Draft'
@@ -47,7 +52,7 @@ class Exam(BaseModel):
     exam_type = models.CharField(
         max_length=20,
         choices=ExamType.choices,
-        default=ExamType.INTERNAL_1,
+        default=ExamType.I1,
         verbose_name="Exam Type"
     )
     

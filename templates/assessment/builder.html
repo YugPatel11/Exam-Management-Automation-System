@@ -72,26 +72,14 @@
         </div>
     </div>
 
-    <!-- Formula Builder -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white">2. Define Formula</h2>
-        </div>
-        <div class="p-6">
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Mathematical Formula linking variables to Target Max Marks ({{ parent_max_marks }})</label>
-            <div class="relative">
-                <input type="text" x-model="formula" placeholder="e.g., (I1 + I2)/2 + FE" class="block w-full border-slate-300 dark:border-slate-600 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 text-base font-mono py-3 px-4 dark:bg-slate-800 dark:text-white placeholder-slate-400">
-            </div>
-            <p class="text-xs text-slate-500 mt-2">Use the <strong>Variable Names</strong> defined above. Supports +, -, *, /, and parentheses ().</p>
-        </div>
-        
+
         <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-sm text-slate-500">The maximum evaluated score must exactly equal <strong class="text-brand-600">{{ parent_max_marks }}</strong>.</span>
+            <span class="text-sm text-slate-500">The sum of conducted marks must not exceed <strong class="text-brand-600">{{ parent_max_marks }}</strong>.</span>
             <button @click="saveScheme" :disabled="isSaving" type="button" class="inline-flex items-center justify-center px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                <span x-show="!isSaving">Validate & Save</span>
+                <span x-show="!isSaving">Save Components</span>
                 <span x-show="isSaving" class="flex items-center gap-2">
                     <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    Validating...
+                    Saving...
                 </span>
             </button>
         </div>
@@ -112,7 +100,6 @@ function schemeBuilder() {
             }{% if not forloop.last %},{% endif %}
             {% endfor %}
         ],
-        formula: '{{ formula_string|escapejs }}',
         isSaving: false,
         alert: { show: false, type: 'success', message: '' },
 
@@ -138,10 +125,6 @@ function schemeBuilder() {
                 this.showAlert('error', 'Please add at least one component.');
                 return;
             }
-            if (!this.formula.trim()) {
-                this.showAlert('error', 'Please define the formula.');
-                return;
-            }
 
             for (let i=0; i<this.components.length; i++) {
                 let c = this.components[i];
@@ -162,8 +145,7 @@ function schemeBuilder() {
                         'X-CSRFToken': '{{ csrf_token }}'
                     },
                     body: JSON.stringify({
-                        components: this.components,
-                        formula: this.formula
+                        components: this.components
                     })
                 });
 

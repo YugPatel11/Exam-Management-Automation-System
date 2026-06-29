@@ -84,8 +84,8 @@ class MarksCsvImportService:
                 self.errors.append("CSV must contain a 'RollNo' column.")
                 return False
                 
-            if 'Absent' not in headers:
-                self.errors.append("CSV must contain an 'Absent' column (0 or 1).")
+            if 'Status' not in headers:
+                self.errors.append("CSV must contain a 'Status' column (Present, AB, or UFM).")
                 return False
                 
             for comp in self.components:
@@ -113,28 +113,37 @@ class MarksCsvImportService:
                         self.errors.append(f"Row {row_num}: Student with RollNo {roll_no} not found.")
                         continue
                         
-                    is_absent = str(row.get('Absent', '0')).strip() == '1'
+                    status = str(row.get('Status', 'Present')).strip()
+                    if status not in ['Present', 'AB', 'UFM']:
+                        self.errors.append(f"Row {row_num}: Invalid status '{status}'. Must be Present, AB, or UFM.")
+                        row_has_error = True
+                        continue
                     
                     marks_dict = {}
                     total = 0
-                    row_has_error = False
                     
-                    if is_absent:
+                    if status in ['AB', 'UFM']:
                         for comp in self.components:
                             marks_dict[comp['key']] = 0
                     else:
                         for comp in self.components:
                             val_str = row.get(comp['key'], '0').strip()
                             try:
-                                val = float(val_str)
-                                if val > comp['max_marks'] or val < 0:
-                                    self.errors.append(f"Row {row_num}: Marks {val} for {comp['key']} out of range (max {comp['max_marks']}).")
+                                val = int(val_str)
+                                if val < 0:
+                                    self.errors.append(f"Row {row_num}: Marks cannot be negative.")
                                     row_has_error = True
                                     break
+                                # If max_marks is known, validate it
+                                if 'max_marks' in comp and comp['max_marks']:
+                                    if val > comp['max_marks']:
+                                        self.errors.append(f"Row {row_num}: Marks {val} for {comp['key']} out of range (max {comp['max_marks']}).")
+                                        row_has_error = True
+                                        break
                                 marks_dict[comp['key']] = val
                                 total += val
                             except ValueError:
-                                self.errors.append(f"Row {row_num}: Invalid number format for {comp['key']}.")
+                                self.errors.append(f"Row {row_num}: Invalid integer format for {comp['key']}.")
                                 row_has_error = True
                                 break
                                 
@@ -145,7 +154,7 @@ class MarksCsvImportService:
                                 student=student,
                                 component_marks=marks_dict,
                                 total_marks=total,
-                                is_absent=is_absent
+                                status=status
                             )
                         )
                         self.success_count += 1
