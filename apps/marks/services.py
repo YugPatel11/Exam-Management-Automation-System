@@ -7,7 +7,7 @@ from django.db import transaction
 from collections import defaultdict
 
 from apps.marks.models import MarksEntryTask, StudentMark
-from apps.faculty.models import SubjectFacultyAssignment
+
 from apps.students.models import Student
 from apps.master_data.models import Division
 
