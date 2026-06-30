@@ -130,6 +130,7 @@ class StudentImportService:
                 student.name = data['name']
                 student.class_name = data['class_name']
                 student.batch = data['batch']
+                student.roll_no = data['enrollment_no']
                 students_to_update.append(student)
                 updated_count += 1
             else:
@@ -137,6 +138,7 @@ class StudentImportService:
                 student = Student(
                     academic_year_id=self.academic_year_id,
                     enrollment_no=data['enrollment_no'],
+                    roll_no=data['enrollment_no'],
                     name=data['name'],
                     class_name=data['class_name'],
                     batch=data['batch']
@@ -149,7 +151,7 @@ class StudentImportService:
             Student.objects.bulk_create(students_to_create, batch_size=500)
             
         if students_to_update:
-            update_fields = ['name', 'class_name', 'batch']
+            update_fields = ['name', 'class_name', 'batch', 'roll_no']
             Student.objects.bulk_update(students_to_update, update_fields, batch_size=500)
             
         return created_count, updated_count

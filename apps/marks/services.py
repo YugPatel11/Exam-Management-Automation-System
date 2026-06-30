@@ -112,6 +112,7 @@ class MarksCsvImportService:
                 marks_to_create = []
                 
                 for row_num, row in enumerate(reader, start=2):
+                    row_has_error = False
                     roll_no = row.get('RollNo', '').strip()
                     
                     try:

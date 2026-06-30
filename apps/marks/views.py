@@ -144,9 +144,10 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
     def get(self, request, pk):
         task = get_object_or_404(MarksEntryTask, pk=pk, faculty=request.user)
         
+        is_read_only = False
         if task.status in ['submitted', 'locked']:
-            messages.warning(request, "You cannot edit marks for a submitted or locked task.")
-            return redirect('marks:task_list')
+            messages.info(request, f"This task is {task.status}. Marks are view-only.")
+            is_read_only = True
 
         # Check marks entry window
         from django.utils import timezone
@@ -155,9 +156,10 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
         if exam.marks_entry_start and now < exam.marks_entry_start:
             messages.error(request, f"Marks entry has not started yet. It opens on {exam.marks_entry_start.strftime('%d %b %Y, %I:%M %p')}.")
             return redirect('marks:task_list')
-        if exam.marks_entry_end and now > exam.marks_entry_end:
-            messages.error(request, f"Marks entry window has closed. It ended on {exam.marks_entry_end.strftime('%d %b %Y, %I:%M %p')}.")
-            return redirect('marks:task_list')
+            
+        if not is_read_only and exam.marks_entry_end and now > exam.marks_entry_end:
+            messages.warning(request, f"Marks entry window has closed. Marks are view-only.")
+            is_read_only = True
             
         components = self._get_components(task)
         
@@ -205,6 +207,7 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
             'task': task,
             'components': components,
             'student_forms': student_forms,
+            'is_read_only': is_read_only,
         }
         return render(request, 'marks/entry_form.html', context)
         

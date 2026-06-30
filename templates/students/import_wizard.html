@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Import Students{% endblock %}
 
@@ -24,9 +25,15 @@
         
         {% if step == 1 %}
         <!-- STEP 1: UPLOAD -->
-        <div class="mb-6">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white">Upload CSV File</h2>
-            <p class="text-sm text-slate-500 mt-1">Upload the student export from the ERP system. The file must be a .csv.</p>
+        <div class="mb-6 flex justify-between items-start">
+            <div>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Upload CSV File</h2>
+                <p class="text-sm text-slate-500 mt-1">Upload the student export from the ERP system. The file must be a .csv.</p>
+            </div>
+            <a href="{% static 'samples/sample_student_import.csv' %}" download class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg dark:text-brand-400 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                Sample CSV
+            </a>
         </div>
 
         <form method="post" enctype="multipart/form-data" class="space-y-6">

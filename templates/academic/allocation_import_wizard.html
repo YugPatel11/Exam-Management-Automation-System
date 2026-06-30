@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}Import Teaching Allocation — {{ academic_year.name }}{% endblock %}
 
 {% block content %}
@@ -75,9 +75,15 @@
                         <form method="post" enctype="multipart/form-data" class="space-y-6">
                             {% csrf_token %}
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
                                     Upload Allocation File
                                 </label>
+                                <a href="{% static 'samples/sample_course_allocation_import.csv' %}" download class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-md dark:text-brand-400 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 transition">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    Sample CSV
+                                </a>
+                            </div>
                                 <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-xl {% if has_faculty_master and has_academic_structure %}hover:border-brand-500 dark:hover:border-brand-500 transition cursor-pointer{% endif %} bg-slate-50 dark:bg-slate-800/50">
                                     <div class="space-y-2 text-center">
                                         <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">

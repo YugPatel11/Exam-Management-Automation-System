@@ -16,6 +16,8 @@ def has_role(user, role):
     """
     if not user or not user.is_authenticated:
         return False
+    if user.is_superuser:
+        return True
     return user.role == role
 
 
@@ -27,6 +29,8 @@ def has_any_role(user, roles_str):
     """
     if not user or not user.is_authenticated:
         return False
+    if user.is_superuser:
+        return True
     roles = [r.strip() for r in roles_str.split(',')]
     return user.role in roles
 

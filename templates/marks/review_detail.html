@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load ems_tags %}
 {% block title %}Review Marks — {{ task.subject.code }}{% endblock %}
 
 {% block content %}
@@ -63,11 +64,11 @@
                     <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">{{ mark.student.roll_no }}</td>
                     <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500 dark:text-slate-400">{{ mark.student.name }}</td>
                     <td class="whitespace-nowrap px-6 py-4 text-sm text-center">
-                        {% if mark.is_absent %}<span class="text-red-500 font-bold">A</span>{% else %}-{% endif %}
+                        {% if mark.status != 'Present' %}<span class="text-red-500 font-bold">{{ mark.status }}</span>{% else %}-{% endif %}
                     </td>
                     {% for comp in components %}
                     <td class="whitespace-nowrap px-6 py-4 text-sm text-center">
-                        <span class="font-medium {% if mark.is_absent %}text-slate-400 line-through{% else %}text-slate-900 dark:text-white{% endif %}">
+                        <span class="font-medium {% if mark.status != 'Present' %}text-slate-400 line-through{% else %}text-slate-900 dark:text-white{% endif %}">
                             {{ mark.component_marks|get_item:comp.key|default:"0" }}
                         </span>
                     </td>
