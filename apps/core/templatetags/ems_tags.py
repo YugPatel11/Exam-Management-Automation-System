@@ -94,3 +94,14 @@ def initials(user):
     if first and last:
         return f"{first}{last}"
     return user.username[:2].upper()
+
+
+@register.filter(name='get_item')
+def get_item(dictionary, key):
+    """
+    Get a dictionary item by key.
+    Usage: {{ dict|get_item:key }}
+    """
+    if isinstance(dictionary, dict):
+        return dictionary.get(key)
+    return None

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load ems_tags %}
 
 {% block title %}{{ semester.name }} — {{ academic_year.name }}{% endblock %}
 
@@ -55,9 +56,11 @@
                         <td class="px-4 py-4 text-center text-sm">
                             {% with val=row.components %}
                             {% if comp_name in val %}
-                            <span class="{% if val|length > 0 %}text-slate-900 dark:text-white font-medium{% else %}text-slate-400{% endif %}">
-                                {{ val|dictsort:comp_name }}
+                            {% with score=val|get_item:comp_name %}
+                            <span class="{% if score %}text-slate-900 dark:text-white font-medium{% else %}text-slate-400{% endif %}">
+                                {{ score }}
                             </span>
+                            {% endwith %}
                             {% else %}
                             <span class="text-slate-300 dark:text-slate-700">—</span>
                             {% endif %}
