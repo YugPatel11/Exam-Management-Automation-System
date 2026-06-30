@@ -65,6 +65,10 @@ class MarksEntryTask(BaseModel):
         """
         if self.semester_subject:
             from apps.academic.models import MarksComponent
+            
+            # The exam_type field on the Exam model stores the MarksComponent name dynamically
+            exam_component_name = self.exam.exam_type
+            
             return [
                 {
                     'key': mc.slug,
@@ -74,6 +78,7 @@ class MarksEntryTask(BaseModel):
                 for mc in MarksComponent.objects.filter(
                     semester_subject=self.semester_subject,
                     max_marks__gt=0,
+                    name=exam_component_name
                 ).order_by('display_order')
             ]
         else:

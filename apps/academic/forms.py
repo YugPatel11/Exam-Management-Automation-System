@@ -11,7 +11,7 @@ class AcademicYearForm(forms.ModelForm):
 
     class Meta:
         model = AcademicYear
-        fields = ['name', 'description', 'status']
+        fields = ['name', 'description', 'status', 'start_date', 'end_date']
         widgets = {
             'name': forms.TextInput(attrs={
                 'placeholder': 'e.g., 2023-24',
@@ -19,6 +19,12 @@ class AcademicYearForm(forms.ModelForm):
             'description': forms.Textarea(attrs={
                 'rows': 3,
                 'placeholder': 'Optional description or notes...',
+            }),
+            'start_date': forms.DateInput(attrs={
+                'type': 'date',
+            }),
+            'end_date': forms.DateInput(attrs={
+                'type': 'date',
             }),
         }
 

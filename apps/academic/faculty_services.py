@@ -411,6 +411,9 @@ class FacultyMasterImportService:
             error_log=self.errors,
         )
 
+        # Trigger automatic exam creation check
+        self.academic_year.check_and_trigger_exam_creation()
+
         return import_log
 
 
@@ -981,5 +984,8 @@ class TeachingAllocationImportService:
             },
             error_log=self.errors,
         )
+
+        # Trigger automatic exam creation check
+        self.academic_year.check_and_trigger_exam_creation()
 
         return import_log

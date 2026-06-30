@@ -46,6 +46,16 @@ class AcademicYear(BaseModel):
         default=Status.ACTIVE,
         verbose_name="Status"
     )
+    start_date = models.DateField(
+        null=True, blank=True,
+        verbose_name="Start Date",
+        help_text="Start date of the academic year."
+    )
+    end_date = models.DateField(
+        null=True, blank=True,
+        verbose_name="End Date",
+        help_text="End date of the academic year."
+    )
 
     class Meta:
         ordering = ['-name']
@@ -72,6 +82,21 @@ class AcademicYear(BaseModel):
     @property
     def latest_import(self):
         return self.imports.order_by('-created_at').first()
+
+    def check_and_trigger_exam_creation(self):
+        """
+        Check if all three required imports are complete for this Academic Year.
+        If so, trigger automatic exam creation.
+        The three required imports are:
+        1. Academic Structure (semesters exist)
+        2. Faculty Master (faculty_members exist)
+        3. Teaching Allocation (teaching_assignments exist)
+        """
+        if (self.semesters.exists() and 
+            self.faculty_members.exists() and 
+            self.teaching_assignments.exists()):
+            from apps.exams.services import ExamAutoGenerationService
+            ExamAutoGenerationService.generate_exams_for_academic_year(self)
 
 
 class Semester(BaseModel):

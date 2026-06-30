@@ -48,7 +48,8 @@ class ExamListView(ExamCoordinatorRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['exam_types'] = Exam.ExamType.choices
+        # Get unique exam types dynamically from existing exams
+        ctx['exam_types'] = Exam.objects.values_list('exam_type', flat=True).distinct().order_by('exam_type')
         ctx['exam_statuses'] = Exam.ExamStatus.choices
         return ctx
 
@@ -62,42 +63,7 @@ class ExamDetailView(ExamCoordinatorRequiredMixin, DetailView):
         return super().get_queryset().prefetch_related('programs')
 
 
-class ExamCreateView(ExamCoordinatorRequiredMixin, CreateView):
-    model = Exam
-    form_class = ExamForm
-    template_name = 'exams/exam_form.html'
-    
-    def get_success_url(self):
-        return reverse_lazy('exams:exam_detail', kwargs={'pk': self.object.pk})
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['title'] = 'Create New Exam'
-        ctx['cancel_url'] = reverse_lazy('exams:exam_list')
-        return ctx
-
-    def form_valid(self, form):
-        messages.success(self.request, "Exam created successfully.")
-        return super().form_valid(form)
-
-
-class ExamUpdateView(ExamCoordinatorRequiredMixin, UpdateView):
-    model = Exam
-    form_class = ExamForm
-    template_name = 'exams/exam_form.html'
-    
-    def get_success_url(self):
-        return reverse_lazy('exams:exam_detail', kwargs={'pk': self.object.pk})
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx['title'] = f'Edit Exam: {self.object.name}'
-        ctx['cancel_url'] = reverse_lazy('exams:exam_detail', kwargs={'pk': self.object.pk})
-        return ctx
-
-    def form_valid(self, form):
-        messages.success(self.request, "Exam updated successfully.")
-        return super().form_valid(form)
 
 
 class ExamDeleteView(ExamCoordinatorRequiredMixin, DeleteView):

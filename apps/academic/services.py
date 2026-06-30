@@ -682,7 +682,6 @@ class AcademicStructureImportService:
                         defaults=scheme_data,
                     )
 
-        # Create import record
         import_record = AcademicStructureImport.objects.create(
             academic_year=self.academic_year,
             original_filename=self.filename,
@@ -699,5 +698,8 @@ class AcademicStructureImportService:
             error_log=self.errors,
             program_name=self.detected_program_name,
         )
+
+        # Trigger automatic exam creation check
+        self.academic_year.check_and_trigger_exam_creation()
 
         return import_record

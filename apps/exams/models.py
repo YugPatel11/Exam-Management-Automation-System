@@ -17,17 +17,8 @@ class Exam(BaseModel):
     Now linked to AcademicYear and Semester via ForeignKeys for the
     new academic-year-first workflow.
     """
-    class ExamType(models.TextChoices):
-        THEORY_CE = 'THEORY_CE', 'Theory CE'
-        THEORY_ESE = 'THEORY_ESE', 'Theory ESE'
-        PRACTICAL_CE = 'PRACTICAL_CE', 'Practical CE'
-        PRACTICAL_ESE = 'PRACTICAL_ESE', 'Practical ESE'
-        TUTORIAL_CE = 'TUTORIAL_CE', 'Tutorial CE'
-        TUTORIAL_ESE = 'TUTORIAL_ESE', 'Tutorial ESE'
-        I1 = 'I1', 'I1 Examination'
-        I2 = 'I2', 'I2 Examination'
-        IMPROVEMENT = 'Improvement', 'Improvement Examination'
-        FE = 'FE', 'FE Examination'
+    # ExamType choices are removed as exams are now generated dynamically 
+    # based on the MarksComponent names.
 
     class ExamStatus(models.TextChoices):
         DRAFT = 'draft', 'Draft'
@@ -77,10 +68,9 @@ class Exam(BaseModel):
     )
     
     exam_type = models.CharField(
-        max_length=20,
-        choices=ExamType.choices,
-        default=ExamType.THEORY_CE,
-        verbose_name="Exam Type"
+        max_length=100,
+        verbose_name="Exam / Component Type",
+        help_text="Dynamically matches the MarksComponent name (e.g., Theory CE, Viva)."
     )
     
     status = models.CharField(
