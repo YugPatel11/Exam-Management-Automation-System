@@ -9,28 +9,28 @@
     <!-- Header & Breadcrumbs -->
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <a href="{% url 'students:student_list' %}" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition">
+            <a href="{% url 'students:student_list' %}" class="text-slate-400 hover:text-slate-600:text-slate-300 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Import Students Wizard</h1>
+            <h1 class="text-2xl font-bold text-slate-900">Import Students Wizard</h1>
         </div>
         <div class="flex items-center gap-2 text-sm font-medium">
-            <span class="{% if step == 1 %}text-brand-600 dark:text-brand-400{% else %}text-slate-500 dark:text-slate-400{% endif %}">Step 1: Upload</span>
-            <svg class="w-4 h-4 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            <span class="{% if step == 2 %}text-brand-600 dark:text-brand-400{% else %}text-slate-500 dark:text-slate-400{% endif %}">Step 2: Preview & Import</span>
+            <span class="{% if step == 1 %}text-brand-600{% else %}text-slate-500{% endif %}">Step 1: Upload</span>
+            <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <span class="{% if step == 2 %}text-brand-600{% else %}text-slate-500{% endif %}">Step 2: Preview & Import</span>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-800">
+    <div class="bg-white rounded-xl p-6 sm:p-8 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
         
         {% if step == 1 %}
         <!-- STEP 1: UPLOAD -->
         <div class="mb-6 flex justify-between items-start">
             <div>
-                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Upload CSV File</h2>
+                <h2 class="text-lg font-bold text-slate-900">Upload CSV File</h2>
                 <p class="text-sm text-slate-500 mt-1">Upload the student export from the ERP system. The file must be a .csv.</p>
             </div>
-            <a href="{% static 'samples/sample_student_import.csv' %}" download class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg dark:text-brand-400 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 transition">
+            <a href="{% static 'samples/sample_student_import.csv' %}" download class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-xl:bg-brand-900/50 transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 Sample CSV
             </a>
@@ -40,20 +40,20 @@
             {% csrf_token %}
             
             {% if form.errors %}
-                <div class="p-4 rounded-lg bg-rose-50 border border-rose-200 text-sm text-rose-600 dark:bg-rose-900/20 dark:border-rose-900/50 dark:text-rose-400">
+                <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-600">
                     {{ form.errors }}
                 </div>
             {% endif %}
 
-            <div class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-8 text-center hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+            <div class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:bg-slate-50:bg-slate-800/50 transition">
                 <svg class="mx-auto h-12 w-12 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                 <div class="max-w-xs mx-auto space-y-4 text-left">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Academic Year</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Academic Year</label>
                         {{ form.academic_year }}
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">CSV File</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">CSV File</label>
                         {{ form.csv_file }}
                     </div>
                 </div>
@@ -61,7 +61,7 @@
             </div>
 
             <div class="flex justify-end pt-4">
-                <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-200">
+                <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 text-white text-sm font-medium rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 transition duration-200">
                     Upload and Preview
                 </button>
             </div>
@@ -70,26 +70,26 @@
         {% elif step == 2 %}
         <!-- STEP 2: PREVIEW -->
         <div class="mb-6">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white">Validation Preview</h2>
+            <h2 class="text-lg font-bold text-slate-900">Validation Preview</h2>
             <p class="text-sm text-slate-500 mt-1">Review the data before committing it to the database.</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-            <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-900/50">
-                <p class="text-sm font-medium text-emerald-800 dark:text-emerald-400">Valid Records Ready</p>
-                <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-500 mt-1">{{ summary.total_valid }}</p>
+            <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50">
+                <p class="text-sm font-medium text-emerald-800">Valid Records Ready</p>
+                <p class="text-3xl font-bold text-emerald-600 mt-1">{{ summary.total_valid }}</p>
             </div>
-            <div class="p-4 rounded-xl border {% if summary.total_errors > 0 %}border-rose-200 bg-rose-50 dark:bg-rose-900/20 dark:border-rose-900/50{% else %}border-slate-200 bg-slate-50 dark:bg-slate-800/50 dark:border-slate-700{% endif %}">
-                <p class="text-sm font-medium {% if summary.total_errors > 0 %}text-rose-800 dark:text-rose-400{% else %}text-slate-600 dark:text-slate-400{% endif %}">Errors / Skipped</p>
-                <p class="text-3xl font-bold {% if summary.total_errors > 0 %}text-rose-600 dark:text-rose-500{% else %}text-slate-900 dark:text-white{% endif %} mt-1">{{ summary.total_errors }}</p>
+            <div class="p-4 rounded-xl border {% if summary.total_errors > 0 %}border-rose-200 bg-rose-50{% else %}border-slate-200 bg-slate-50{% endif %}">
+                <p class="text-sm font-medium {% if summary.total_errors > 0 %}text-rose-800{% else %}text-slate-600{% endif %}">Errors / Skipped</p>
+                <p class="text-3xl font-bold {% if summary.total_errors > 0 %}text-rose-600{% else %}text-slate-900{% endif %} mt-1">{{ summary.total_errors }}</p>
             </div>
         </div>
 
         {% if summary.total_errors > 0 %}
         <div class="mb-8">
-            <h3 class="text-sm font-bold text-rose-600 dark:text-rose-500 uppercase tracking-wider mb-3">Error Log (Top 100)</h3>
-            <div class="bg-rose-50 dark:bg-rose-900/10 rounded-lg p-4 max-h-64 overflow-y-auto custom-scrollbar border border-rose-100 dark:border-rose-900/30">
-                <ul class="space-y-2 text-sm text-rose-700 dark:text-rose-400">
+            <h3 class="text-sm font-bold text-rose-600 uppercase tracking-wider mb-3">Error Log (Top 100)</h3>
+            <div class="bg-rose-50 rounded-xl p-4 max-h-64 overflow-y-auto custom-scrollbar border border-rose-100">
+                <ul class="space-y-2 text-sm text-rose-700">
                     {% for error in summary.errors %}
                     <li class="flex items-start gap-2">
                         <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -103,24 +103,24 @@
 
         {% if summary.total_valid > 0 %}
         <div class="mb-8">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Sample Valid Records</h3>
-            <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
-                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-sm">
-                    <thead class="bg-slate-50 dark:bg-slate-800">
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Sample Valid Records</h3>
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <table class="min-w-full divide-y divide-slate-200 text-sm">
+                    <thead class="bg-slate-50">
                         <tr>
-                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Enrollment No</th>
-                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Name</th>
-                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Class</th>
-                            <th class="px-4 py-2 text-left font-medium text-slate-500 dark:text-slate-400">Batch</th>
+                            <th class="px-4 py-2 text-left font-medium text-slate-500">Enrollment No</th>
+                            <th class="px-4 py-2 text-left font-medium text-slate-500">Name</th>
+                            <th class="px-4 py-2 text-left font-medium text-slate-500">Class</th>
+                            <th class="px-4 py-2 text-left font-medium text-slate-500">Batch</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-slate-900">
+                    <tbody class="divide-y divide-slate-200 bg-white">
                         {% for row in summary.valid_sample %}
                         <tr>
-                            <td class="px-4 py-2 text-slate-900 dark:text-white">{{ row.enrollment_no }}</td>
-                            <td class="px-4 py-2 text-slate-600 dark:text-slate-300">{{ row.name }}</td>
-                            <td class="px-4 py-2 text-slate-600 dark:text-slate-300">{{ row.class_name }}</td>
-                            <td class="px-4 py-2 text-slate-600 dark:text-slate-300">{{ row.batch }}</td>
+                            <td class="px-4 py-2 text-slate-900">{{ row.enrollment_no }}</td>
+                            <td class="px-4 py-2 text-slate-600">{{ row.name }}</td>
+                            <td class="px-4 py-2 text-slate-600">{{ row.class_name }}</td>
+                            <td class="px-4 py-2 text-slate-600">{{ row.batch }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -130,9 +130,9 @@
 
         <form method="post" action="{% url 'students:import_process' %}">
             {% csrf_token %}
-            <div class="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
-                <p class="text-sm text-slate-500">Only the <strong class="text-emerald-600 dark:text-emerald-400">{{ summary.total_valid }}</strong> valid records will be imported. Existing records with matching Enrollment Nos will be updated.</p>
-                <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-200">
+            <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+                <p class="text-sm text-slate-500">Only the <strong class="text-emerald-600">{{ summary.total_valid }}</strong> valid records will be imported. Existing records with matching Enrollment Nos will be updated.</p>
+                <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 transition duration-200">
                     Confirm and Import
                 </button>
             </div>
@@ -140,7 +140,7 @@
         {% else %}
         <div class="text-center py-8">
             <p class="text-rose-600 font-medium">No valid records found to import.</p>
-            <a href="{% url 'students:import_wizard' %}" class="mt-4 inline-block px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg transition">Upload Different File</a>
+            <a href="{% url 'students:import_wizard' %}" class="mt-4 inline-block px-4 py-2 bg-slate-100 hover:bg-slate-200:bg-slate-700 text-slate-700 text-sm font-medium rounded-xl transition">Upload Different File</a>
         </div>
         {% endif %}
 

@@ -9,27 +9,27 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-3">
-                <a href="{% url 'exams:exam_list' %}" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition" title="Back to Exams">
+                <a href="{% url 'exams:exam_list' %}" class="text-slate-400 hover:text-slate-600:text-slate-300 transition" title="Back to Exams">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 </a>
-                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ exam.name }}</h1>
+                <h1 class="text-2xl font-bold text-slate-900">{{ exam.name }}</h1>
                 
                 {% if exam.is_archived %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300">Archived</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">Archived</span>
                 {% elif exam.status == 'draft' %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300">Draft</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">Draft</span>
                 {% elif exam.status == 'scheduled' %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">Scheduled</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Scheduled</span>
                 {% elif exam.status == 'ongoing' %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">Ongoing</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Ongoing</span>
                 {% elif exam.status == 'completed' %}
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">Completed</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Completed</span>
                 {% endif %}
             </div>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 ml-9">{{ exam.academic_year }} &bull; {{ exam.get_exam_type_display }}</p>
+            <p class="text-sm text-slate-500 mt-1 ml-9">{{ exam.academic_year }} &bull; {{ exam.get_exam_type_display }}</p>
         </div>
         <div class="flex items-center gap-3 ml-9 sm:ml-0">
-            <a href="{% url 'exams:exam_delete' exam.pk %}" class="inline-flex items-center gap-2 px-4 py-2 border border-rose-200 text-rose-600 dark:border-rose-900/50 dark:text-rose-500 text-sm font-medium rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 transition duration-200">
+            <a href="{% url 'exams:exam_delete' exam.pk %}" class="inline-flex items-center gap-2 px-4 py-2 border border-rose-200 text-rose-600 text-sm font-medium rounded-xl hover:bg-rose-50:bg-rose-900/20 transition duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 Delete
             </a>
@@ -39,22 +39,22 @@
     <!-- Exam Info Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Details Card -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-            <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Timeline & Info</h3>
+        <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 p-6">
+            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Timeline & Info</h3>
             <div class="space-y-4">
                 <div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Start Date</p>
-                    <p class="font-medium text-slate-900 dark:text-white">{{ exam.start_date|date:"F d, Y" }}</p>
+                    <p class="text-xs text-slate-500">Start Date</p>
+                    <p class="font-medium text-slate-900">{{ exam.start_date|date:"F d, Y" }}</p>
                 </div>
                 <div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">End Date</p>
-                    <p class="font-medium text-slate-900 dark:text-white">{{ exam.end_date|date:"F d, Y" }}</p>
+                    <p class="text-xs text-slate-500">End Date</p>
+                    <p class="font-medium text-slate-900">{{ exam.end_date|date:"F d, Y" }}</p>
                 </div>
                 <div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Applicable Programs</p>
+                    <p class="text-xs text-slate-500">Applicable Programs</p>
                     <div class="mt-1 flex flex-wrap gap-2">
                         {% for prog in exam.programs.all %}
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800">
                             {{ prog.code }}
                         </span>
                         {% empty %}
@@ -66,12 +66,12 @@
         </div>
 
         <!-- Progress/Stats Card (Placeholder for later phases) -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:col-span-2 flex flex-col justify-center items-center text-center">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 mb-4">
+        <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 p-6 md:col-span-2 flex flex-col justify-center items-center text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 text-slate-500 mb-4">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
-            <h3 class="text-lg font-medium text-slate-900 dark:text-white">Workflow Setup Incomplete</h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400 max-w-sm mt-1">
+            <h3 class="text-lg font-medium text-slate-900">Workflow Setup Incomplete</h3>
+            <p class="text-sm text-slate-500 max-w-sm mt-1">
                 You have created the core Exam record. In upcoming phases, you will be able to manage Schedules, Seating, and Marks from this dashboard.
             </p>
         </div>
@@ -81,51 +81,51 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
         <!-- Scheduling -->
-        <a href="#" class="group bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 hover:shadow-md hover:border-brand-300 dark:hover:border-brand-700 transition duration-200 opacity-60">
+        <a href="#" class="group bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 p-6 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md hover:border-brand-300:border-brand-700 transition duration-200 opacity-60">
             <div class="flex items-center justify-between mb-4">
-                <div class="p-3 bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 rounded-lg group-hover:scale-110 transition-transform">
+                <div class="p-3 bg-brand-50 text-brand-600 rounded-xl group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
                 <span class="text-xs font-semibold text-slate-400 uppercase">Coming Soon</span>
             </div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Timetable</h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400">Schedule subjects and assign time slots.</p>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">Timetable</h3>
+            <p class="text-sm text-slate-500">Schedule subjects and assign time slots.</p>
         </a>
 
         <!-- Seating -->
-        <a href="#" class="group bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 hover:shadow-md hover:border-brand-300 dark:hover:border-brand-700 transition duration-200 opacity-60">
+        <a href="#" class="group bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 p-6 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md hover:border-brand-300:border-brand-700 transition duration-200 opacity-60">
             <div class="flex items-center justify-between mb-4">
-                <div class="p-3 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-lg group-hover:scale-110 transition-transform">
+                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
                 </div>
                 <span class="text-xs font-semibold text-slate-400 uppercase">Coming Soon</span>
             </div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Seating Plan</h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400">Allocate students to classrooms.</p>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">Seating Plan</h3>
+            <p class="text-sm text-slate-500">Allocate students to classrooms.</p>
         </a>
 
         <!-- Assessment Schemes -->
-        <a href="#" class="group bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 hover:shadow-md hover:border-brand-300 dark:hover:border-brand-700 transition duration-200 opacity-60">
+        <a href="#" class="group bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 p-6 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md hover:border-brand-300:border-brand-700 transition duration-200 opacity-60">
             <div class="flex items-center justify-between mb-4">
-                <div class="p-3 bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 rounded-lg group-hover:scale-110 transition-transform">
+                <div class="p-3 bg-purple-50 text-purple-600 rounded-xl group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </div>
                 <span class="text-xs font-semibold text-slate-400 uppercase">Coming Soon</span>
             </div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Assessments</h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400">Define schemes and upload papers.</p>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">Assessments</h3>
+            <p class="text-sm text-slate-500">Define schemes and upload papers.</p>
         </a>
 
         <!-- Marks Entry -->
-        <a href="#" class="group bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 hover:shadow-md hover:border-brand-300 dark:hover:border-brand-700 transition duration-200 opacity-60">
+        <a href="#" class="group bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 p-6 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md hover:border-brand-300:border-brand-700 transition duration-200 opacity-60">
             <div class="flex items-center justify-between mb-4">
-                <div class="p-3 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-lg group-hover:scale-110 transition-transform">
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 </div>
                 <span class="text-xs font-semibold text-slate-400 uppercase">Coming Soon</span>
             </div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Marks Control</h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400">Track and lock faculty marks entry.</p>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">Marks Control</h3>
+            <p class="text-sm text-slate-500">Track and lock faculty marks entry.</p>
         </a>
 
     </div>

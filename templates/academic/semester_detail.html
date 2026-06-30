@@ -9,47 +9,47 @@
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ semester.name }}</h1>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            <h1 class="text-2xl font-bold text-slate-900">{{ semester.name }}</h1>
+            <p class="mt-1 text-sm text-slate-500">
                 Academic Year {{ academic_year.name }} — {{ subjects|length }} subject{{ subjects|length|pluralize }}
             </p>
         </div>
         <a href="{% url 'academic:year_detail' pk=academic_year.pk %}"
-           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50:bg-slate-700 transition">
             ← Back to Dashboard
         </a>
     </div>
 
     <!-- Subjects Table -->
     {% if subjects %}
-    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
-                <thead class="bg-slate-50 dark:bg-slate-800/50">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                             Subject Code
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                             Subject Name
                         </th>
                         {% for comp_name in component_names %}
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">
                             {{ comp_name }}
                         </th>
                         {% endfor %}
-                        <th class="px-4 py-3 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">
                             Total
                         </th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                <tbody class="divide-y divide-slate-200">
                     {% for row in subjects %}
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                        <td class="px-6 py-4 text-sm font-mono font-medium text-brand-600 dark:text-brand-400 whitespace-nowrap">
+                    <tr class="hover:bg-slate-50:bg-slate-800/50 transition">
+                        <td class="px-6 py-4 text-sm font-mono font-medium text-brand-600 whitespace-nowrap">
                             {{ row.subject.subject_code }}
                         </td>
-                        <td class="px-6 py-4 text-sm text-slate-900 dark:text-white">
+                        <td class="px-6 py-4 text-sm text-slate-900">
                             {{ row.subject.subject_name }}
                         </td>
                         {% for comp_name in component_names %}
@@ -57,17 +57,17 @@
                             {% with val=row.components %}
                             {% if comp_name in val %}
                             {% with score=val|get_item:comp_name %}
-                            <span class="{% if score %}text-slate-900 dark:text-white font-medium{% else %}text-slate-400{% endif %}">
+                            <span class="{% if score %}text-slate-900 font-medium{% else %}text-slate-400{% endif %}">
                                 {{ score }}
                             </span>
                             {% endwith %}
                             {% else %}
-                            <span class="text-slate-300 dark:text-slate-700">—</span>
+                            <span class="text-slate-300">—</span>
                             {% endif %}
                             {% endwith %}
                         </td>
                         {% endfor %}
-                        <td class="px-4 py-4 text-center text-sm font-bold text-slate-900 dark:text-white">
+                        <td class="px-4 py-4 text-center text-sm font-bold text-slate-900">
                             {{ row.total }}
                         </td>
                     </tr>
@@ -78,18 +78,18 @@
     </div>
 
     {% else %}
-    <div class="text-center py-12 bg-white dark:bg-slate-900 rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
-        <p class="text-slate-500 dark:text-slate-400">No subjects found in this semester.</p>
+    <div class="text-center py-12 bg-white rounded-xl border border-dashed border-slate-300">
+        <p class="text-slate-500">No subjects found in this semester.</p>
     </div>
     {% endif %}
 
     <!-- Component Legend -->
     {% if component_names %}
-    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
-        <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Marks Components in This Semester</h3>
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300">
+        <h3 class="text-sm font-semibold text-slate-700 mb-3">Marks Components in This Semester</h3>
         <div class="flex flex-wrap gap-2">
             {% for comp_name in component_names %}
-            <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-400 border border-brand-200 dark:border-brand-800">
+            <span class="inline-flex items-center px-3 py-1.5 rounded-xl text-xs font-medium bg-brand-50 text-brand-700 border border-brand-200">
                 {{ comp_name }}
             </span>
             {% endfor %}

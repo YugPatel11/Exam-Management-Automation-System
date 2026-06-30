@@ -3,26 +3,26 @@
 {% block content %}
 <div class="space-y-6 animate-fade-in-up">
     <!-- Welcome Section -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+    <div class="bg-white rounded-xl p-6 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 flex items-center justify-between">
         <div>
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Subject Coordinator Dashboard</h2>
-            <p class="text-slate-500 dark:text-slate-400 mt-1">Manage assigned subjects, assessment schemes, and question papers.</p>
+            <h2 class="text-2xl font-bold text-slate-800">Subject Coordinator Dashboard</h2>
+            <p class="text-slate-500 mt-1">Manage assigned subjects, assessment schemes, and question papers.</p>
         </div>
     </div>
 
     <!-- Quick Stats -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800">
-            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Coordinated Subjects</p>
-            <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">{{ total_coordinated }}</p>
+        <div class="bg-white rounded-xl p-5 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
+            <p class="text-sm font-medium text-slate-500">Coordinated Subjects</p>
+            <p class="text-3xl font-bold text-slate-900 mt-1">{{ total_coordinated }}</p>
         </div>
-        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800">
-            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Question Papers Created</p>
-            <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">{{ qp_count }}</p>
+        <div class="bg-white rounded-xl p-5 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
+            <p class="text-sm font-medium text-slate-500">Question Papers Created</p>
+            <p class="text-3xl font-bold text-slate-900 mt-1">{{ qp_count }}</p>
         </div>
-        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800">
-            <p class="text-sm font-medium text-slate-500 dark:text-slate-400">QPs Submitted</p>
-            <p class="text-3xl font-bold text-slate-900 dark:text-white mt-1">{{ qp_submitted }}</p>
+        <div class="bg-white rounded-xl p-5 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
+            <p class="text-sm font-medium text-slate-500">QPs Submitted</p>
+            <p class="text-3xl font-bold text-slate-900 mt-1">{{ qp_submitted }}</p>
         </div>
     </div>
 
@@ -30,20 +30,20 @@
     {% if exam_subjects %}
     <div class="space-y-4">
         {% for exam, subjects in exam_subjects.items %}
-        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <h3 class="text-base font-semibold text-slate-900 dark:text-white">{{ exam.name }}</h3>
+        <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                <h3 class="text-base font-semibold text-slate-900">{{ exam.name }}</h3>
                 <span class="text-sm text-slate-500">{{ subjects|length }} subject{{ subjects|length|pluralize }}</span>
             </div>
             <div class="p-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {% for subject in subjects %}
-                    <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                        <div class="w-10 h-10 rounded-lg bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-700 dark:text-brand-300 font-bold text-sm">
+                    <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                        <div class="w-10 h-10 rounded-xl bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-sm">
                             {{ subject.code|truncatechars:4 }}
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-slate-900 dark:text-white">{{ subject.code }}</p>
+                            <p class="text-sm font-medium text-slate-900">{{ subject.code }}</p>
                             <p class="text-xs text-slate-500 truncate max-w-[150px]">{{ subject.name }}</p>
                         </div>
                     </div>
@@ -54,8 +54,8 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-10 shadow-sm border border-slate-200 dark:border-slate-800 text-center">
-        <p class="text-slate-500 dark:text-slate-400">No subjects assigned yet.</p>
+    <div class="bg-white rounded-xl p-10 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 text-center">
+        <p class="text-slate-500">No subjects assigned yet.</p>
     </div>
     {% endif %}
 </div>

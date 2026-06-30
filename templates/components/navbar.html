@@ -1,25 +1,25 @@
 {% load ems_tags %}
-<nav x-data="{ mobileMenuOpen: false }" class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50">
+<nav x-data="{ mobileMenuOpen: false }" class="bg-white border-b border-slate-200 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <!-- Left: Logo & Links -->
             <div class="flex">
                 <div class="flex-shrink-0 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-500/20">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-lg shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-brand-500/20">
                         E
                     </div>
-                    <span class="text-xl font-bold text-slate-900 dark:text-white tracking-tight hidden sm:block">{{ app_name }}</span>
+                    <span class="text-xl font-bold text-slate-900 tracking-tight hidden sm:block">{{ app_name }}</span>
                 </div>
                 
                 <!-- Desktop Nav Links -->
                 <div class="hidden md:ml-8 md:flex md:space-x-1">
-                    <a href="{% url 'dashboard:home' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 {% active_nav 'dashboard:home' %}">
+                    <a href="{% url 'dashboard:home' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100:bg-slate-800 {% active_nav 'dashboard:home' %}">
                         Dashboard
                     </a>
                     
                     {% if user|has_any_role:"admin,exam_coordinator" %}
                     <!-- Academic Years — Primary Workflow -->
-                    <a href="{% url 'academic:year_list' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 {% active_nav_group '/academic/' %}">
+                    <a href="{% url 'academic:year_list' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100:bg-slate-800 {% active_nav_group '/academic/' %}">
                         <svg class="w-4 h-4 mr-1.5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
@@ -27,64 +27,64 @@
                     </a>
                     <!-- Master Data Dropdown -->
                     <div x-data="{ open: false }" @click.away="open = false" class="relative flex">
-                        <button @click="open = !open" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 {% active_nav_group '/master-data/' %}">
+                        <button @click="open = !open" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100:bg-slate-800 {% active_nav_group '/master-data/' %}">
                             Master Data
                             <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div x-show="open" x-transition x-cloak class="absolute top-14 left-0 w-48 rounded-md shadow-lg bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 py-1 z-50 border border-slate-200 dark:border-slate-700">
-                            <a href="{% url 'master_data:program_list' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Programs</a>
-                            <a href="{% url 'master_data:subject_list' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Subjects</a>
-                            <a href="{% url 'master_data:division_list' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Divisions</a>
-                            <a href="{% url 'master_data:classroom_list' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Classrooms</a>
-                            <a href="{% url 'students:student_list' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Students</a>
-                            <a href="{% url 'accounts:user_list' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Users</a>
+                        <div x-show="open" x-transition x-cloak class="absolute top-14 left-0 w-48 rounded-md shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-lg bg-white ring-1 ring-black ring-opacity-5 py-1 z-50 border border-slate-200">
+                            <a href="{% url 'master_data:program_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Programs</a>
+                            <a href="{% url 'master_data:subject_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Subjects</a>
+                            <a href="{% url 'master_data:division_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Divisions</a>
+                            <a href="{% url 'master_data:classroom_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Classrooms</a>
+                            <a href="{% url 'students:student_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Students</a>
+                            <a href="{% url 'accounts:user_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Users</a>
                         </div>
                     </div>
                     
                     <!-- Exams Dropdown -->
                     <div x-data="{ open: false }" @click.away="open = false" class="relative flex">
-                        <button @click="open = !open" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 {% active_nav_group '/exams/' %} {% active_nav_group '/curriculum/' %}">
+                        <button @click="open = !open" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100:bg-slate-800 {% active_nav_group '/exams/' %} {% active_nav_group '/curriculum/' %}">
                             Exam Operations
                             <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div x-show="open" x-transition x-cloak class="absolute top-14 left-0 w-48 rounded-md shadow-lg bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 py-1 z-50 border border-slate-200 dark:border-slate-700">
-                            <a href="{% url 'exams:exam_list' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Manage Exams</a>
-                            <a href="{% url 'curriculum:scheme_list' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Curriculum</a>
+                        <div x-show="open" x-transition x-cloak class="absolute top-14 left-0 w-48 rounded-md shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-lg bg-white ring-1 ring-black ring-opacity-5 py-1 z-50 border border-slate-200">
+                            <a href="{% url 'exams:exam_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Manage Exams</a>
+                            <a href="{% url 'curriculum:scheme_list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Curriculum</a>
 
-                            <a href="{% url 'scheduling:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Schedules</a>
-                            <a href="{% url 'seating:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Seating</a>
-                            <a href="{% url 'duty_chart:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Duty Chart</a>
-                            <a href="{% url 'assessment:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Assessments</a>
-                            <a href="{% url 'question_papers:list' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Question Papers</a>
+                            <a href="{% url 'scheduling:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Schedules</a>
+                            <a href="{% url 'seating:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Seating</a>
+                            <a href="{% url 'duty_chart:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Duty Chart</a>
+                            <a href="{% url 'assessment:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Assessments</a>
+                            <a href="{% url 'question_papers:list' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Question Papers</a>
                         </div>
                     </div>
 
                     <!-- Evaluation Dropdown -->
                     <div x-data="{ open: false }" @click.away="open = false" class="relative flex">
-                        <button @click="open = !open" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 {% active_nav_group '/marks/' %}">
+                        <button @click="open = !open" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100:bg-slate-800 {% active_nav_group '/marks/' %}">
                             Evaluation
                             <svg class="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
-                        <div x-show="open" x-transition x-cloak class="absolute top-14 left-0 w-48 rounded-md shadow-lg bg-white dark:bg-slate-800 ring-1 ring-black ring-opacity-5 py-1 z-50 border border-slate-200 dark:border-slate-700">
-                            <a href="{% url 'marks:allocation_dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Marks Allocation</a>
-                            <a href="{% url 'marks:review_dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Marks Review</a>
-                            <a href="{% url 'analysis:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Analysis</a>
-                            <a href="{% url 'reports:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Reports</a>
+                        <div x-show="open" x-transition x-cloak class="absolute top-14 left-0 w-48 rounded-md shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-lg bg-white ring-1 ring-black ring-opacity-5 py-1 z-50 border border-slate-200">
+                            <a href="{% url 'marks:allocation_dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Marks Allocation</a>
+                            <a href="{% url 'marks:review_dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Marks Review</a>
+                            <a href="{% url 'analysis:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Analysis</a>
+                            <a href="{% url 'reports:dashboard' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100:bg-slate-700">Reports</a>
                         </div>
                     </div>
                     {% endif %}
 
                     {% if user.is_subject_coordinator %}
-                    <a href="{% url 'assessment:dashboard' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 {% active_nav_group '/assessment/' %}">
+                    <a href="{% url 'assessment:dashboard' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100:bg-slate-800 {% active_nav_group '/assessment/' %}">
                         Assessments
                     </a>
-                    <a href="{% url 'question_papers:list' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 {% active_nav_group '/question-papers/' %}">
+                    <a href="{% url 'question_papers:list' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100:bg-slate-800 {% active_nav_group '/question-papers/' %}">
                         Question Papers
                     </a>
                     {% endif %}
 
                     {% if user.is_faculty_role %}
-                    <a href="{% url 'marks:task_list' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 {% active_nav_group '/marks/tasks/' %}">
+                    <a href="{% url 'marks:task_list' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100:bg-slate-800 {% active_nav_group '/marks/tasks/' %}">
                         Marks Entry
                     </a>
                     {% endif %}
@@ -93,35 +93,30 @@
 
             <!-- Right: Profile & Actions -->
             <div class="flex items-center gap-2 sm:gap-4">
-                <!-- Dark Mode Toggle -->
-                <button id="theme-toggle" class="p-2 text-slate-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                </button>
 
                 <!-- Profile Dropdown -->
                 <div x-data="{ open: false }" @click.away="open = false" class="relative">
                     <button @click="open = !open" class="flex items-center gap-2 focus:outline-none rounded-full ring-2 ring-transparent hover:ring-brand-500 transition-all">
-                        <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-semibold text-slate-700">
                             {{ user|initials }}
                         </div>
                     </button>
                     
-                    <div x-show="open" x-transition x-cloak class="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50">
-                        <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
-                            <p class="text-sm font-medium text-slate-900 dark:text-white truncate">{{ user.get_display_name }}</p>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">{{ user.get_role_display }}</p>
+                    <div x-show="open" x-transition x-cloak class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-lg border border-slate-200 py-1 z-50">
+                        <div class="px-4 py-3 border-b border-slate-100">
+                            <p class="text-sm font-medium text-slate-900 truncate">{{ user.get_display_name }}</p>
+                            <p class="text-xs text-slate-500 truncate mt-0.5">{{ user.get_role_display }}</p>
                         </div>
-                        <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50">Profile Settings</a>
-                        <a href="{% url 'accounts:change_password' %}" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50">Change Password</a>
-                        <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                        <a href="{% url 'accounts:logout' %}" class="block px-4 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20">Log out</a>
+                        <a href="{% url 'accounts:profile' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50:bg-slate-700/50">Profile Settings</a>
+                        <a href="{% url 'accounts:change_password' %}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50:bg-slate-700/50">Change Password</a>
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <a href="{% url 'accounts:logout' %}" class="block px-4 py-2 text-sm text-rose-600 hover:bg-rose-50:bg-rose-900/20">Log out</a>
                     </div>
                 </div>
 
                 <!-- Mobile menu button -->
                 <div class="flex md:hidden">
-                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 dark:hover:text-white">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="p-2 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100:bg-slate-800:text-white">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                             <path x-show="mobileMenuOpen" x-cloak stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -133,51 +128,51 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div x-show="mobileMenuOpen" x-transition x-cloak class="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 absolute w-full shadow-lg h-[calc(100vh-4rem)] overflow-y-auto">
+    <div x-show="mobileMenuOpen" x-transition x-cloak class="md:hidden border-t border-slate-200 bg-white absolute w-full shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-lg h-[calc(100vh-4rem)] overflow-y-auto">
         <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="{% url 'dashboard:home' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800">Dashboard</a>
+            <a href="{% url 'dashboard:home' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-900 hover:bg-slate-50:bg-slate-800">Dashboard</a>
             
             {% if user|has_any_role:"admin,exam_coordinator" %}
-            <a href="{% url 'academic:year_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-brand-600 dark:text-brand-400 hover:bg-slate-50 dark:hover:bg-slate-800">📅 Academic Years</a>
+            <a href="{% url 'academic:year_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-brand-600 hover:bg-slate-50:bg-slate-800">📅 Academic Years</a>
 
             <div class="pt-4 pb-2">
                 <div class="flex items-center px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Master Data</div>
-                <a href="{% url 'master_data:program_list' %}" class="block px-3 py-2 mt-1 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Programs</a>
-                <a href="{% url 'master_data:subject_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Subjects</a>
-                <a href="{% url 'master_data:division_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Divisions</a>
-                <a href="{% url 'master_data:classroom_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Classrooms</a>
-                <a href="{% url 'students:student_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Students</a>
-                <a href="{% url 'accounts:user_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Users</a>
+                <a href="{% url 'master_data:program_list' %}" class="block px-3 py-2 mt-1 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Programs</a>
+                <a href="{% url 'master_data:subject_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Subjects</a>
+                <a href="{% url 'master_data:division_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Divisions</a>
+                <a href="{% url 'master_data:classroom_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Classrooms</a>
+                <a href="{% url 'students:student_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Students</a>
+                <a href="{% url 'accounts:user_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Users</a>
             </div>
             
-            <div class="pt-4 pb-2 border-t border-slate-200 dark:border-slate-800">
+            <div class="pt-4 pb-2 border-t border-slate-200">
                 <div class="flex items-center px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Exam Operations</div>
-                <a href="{% url 'exams:exam_list' %}" class="block px-3 py-2 mt-1 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Manage Exams</a>
-                <a href="{% url 'curriculum:scheme_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Curriculum</a>
+                <a href="{% url 'exams:exam_list' %}" class="block px-3 py-2 mt-1 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Manage Exams</a>
+                <a href="{% url 'curriculum:scheme_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Curriculum</a>
 
-                <a href="{% url 'scheduling:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Schedules</a>
-                <a href="{% url 'seating:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Seating</a>
-                <a href="{% url 'duty_chart:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Duty Chart</a>
-                <a href="{% url 'assessment:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Assessments</a>
-                <a href="{% url 'question_papers:list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Question Papers</a>
+                <a href="{% url 'scheduling:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Schedules</a>
+                <a href="{% url 'seating:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Seating</a>
+                <a href="{% url 'duty_chart:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Duty Chart</a>
+                <a href="{% url 'assessment:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Assessments</a>
+                <a href="{% url 'question_papers:list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Question Papers</a>
             </div>
             
-            <div class="pt-4 pb-2 border-t border-slate-200 dark:border-slate-800">
+            <div class="pt-4 pb-2 border-t border-slate-200">
                 <div class="flex items-center px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Evaluation</div>
-                <a href="{% url 'marks:allocation_dashboard' %}" class="block px-3 py-2 mt-1 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Marks Allocation</a>
-                <a href="{% url 'marks:review_dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Marks Review</a>
-                <a href="{% url 'analysis:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Analysis</a>
-                <a href="{% url 'reports:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Reports</a>
+                <a href="{% url 'marks:allocation_dashboard' %}" class="block px-3 py-2 mt-1 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Marks Allocation</a>
+                <a href="{% url 'marks:review_dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Marks Review</a>
+                <a href="{% url 'analysis:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Analysis</a>
+                <a href="{% url 'reports:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Reports</a>
             </div>
             {% endif %}
 
             {% if user.is_subject_coordinator %}
-            <a href="{% url 'assessment:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Assessments</a>
-            <a href="{% url 'question_papers:list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Question Papers</a>
+            <a href="{% url 'assessment:dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Assessments</a>
+            <a href="{% url 'question_papers:list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Question Papers</a>
             {% endif %}
 
             {% if user.is_faculty_role %}
-            <a href="{% url 'marks:task_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Marks Entry</a>
+            <a href="{% url 'marks:task_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Marks Entry</a>
             {% endif %}
         </div>
     </div>

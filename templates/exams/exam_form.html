@@ -5,9 +5,9 @@
 {% block content %}
 <div class="max-w-3xl mx-auto space-y-6 animate-fade-in-up">
     
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-800">
-        <div class="mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">{{ title }}</h1>
+    <div class="bg-white rounded-xl p-6 sm:p-8 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
+        <div class="mb-6 border-b border-slate-100 pb-4">
+            <h1 class="text-2xl font-bold text-slate-900">{{ title }}</h1>
             <p class="text-sm text-slate-500 mt-1">Fill out the details below to configure the examination event.</p>
         </div>
 
@@ -15,7 +15,7 @@
             {% csrf_token %}
 
             {% if form.non_field_errors %}
-                <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-sm text-rose-600 dark:bg-rose-900/20 dark:border-rose-900/50 dark:text-rose-400">
+                <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-600">
                     {% for error in form.non_field_errors %}
                         <p>{{ error }}</p>
                     {% endfor %}
@@ -25,12 +25,12 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <!-- Academic Year -->
                 <div>
-                    <label for="{{ form.academic_year_ref.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label for="{{ form.academic_year_ref.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                         {{ form.academic_year_ref.label }}
                     </label>
                     {{ form.academic_year_ref }}
                     {% if form.academic_year_ref.help_text %}
-                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ form.academic_year_ref.help_text }}</p>
+                        <p class="mt-1 text-xs text-slate-500">{{ form.academic_year_ref.help_text }}</p>
                     {% endif %}
                     {% if form.academic_year_ref.errors %}
                         <p class="mt-1.5 text-sm text-rose-500">{{ form.academic_year_ref.errors.0 }}</p>
@@ -39,12 +39,12 @@
 
                 <!-- Semester -->
                 <div>
-                    <label for="{{ form.semester_ref.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label for="{{ form.semester_ref.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                         {{ form.semester_ref.label }}
                     </label>
                     {{ form.semester_ref }}
                     {% if form.semester_ref.help_text %}
-                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ form.semester_ref.help_text }}</p>
+                        <p class="mt-1 text-xs text-slate-500">{{ form.semester_ref.help_text }}</p>
                     {% endif %}
                     {% if form.semester_ref.errors %}
                         <p class="mt-1.5 text-sm text-rose-500">{{ form.semester_ref.errors.0 }}</p>
@@ -53,12 +53,12 @@
 
                 <!-- Exam Name -->
                 <div>
-                    <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                         {{ form.name.label }}
                     </label>
                     {{ form.name }}
                     {% if form.name.help_text %}
-                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">{{ form.name.help_text }}</p>
+                        <p class="mt-1 text-xs text-slate-500">{{ form.name.help_text }}</p>
                     {% endif %}
                     {% if form.name.errors %}
                         <p class="mt-1.5 text-sm text-rose-500">{{ form.name.errors.0 }}</p>
@@ -67,7 +67,7 @@
 
                 <!-- Exam Type -->
                 <div>
-                    <label for="{{ form.exam_type.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label for="{{ form.exam_type.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                         {{ form.exam_type.label }}
                     </label>
                     {{ form.exam_type }}
@@ -78,7 +78,7 @@
 
                 <!-- Status -->
                 <div>
-                    <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                         {{ form.status.label }}
                     </label>
                     {{ form.status }}
@@ -89,7 +89,7 @@
 
                 <!-- Start Date -->
                 <div>
-                    <label for="{{ form.start_date.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label for="{{ form.start_date.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                         {{ form.start_date.label }}
                     </label>
                     {{ form.start_date }}
@@ -100,7 +100,7 @@
 
                 <!-- End Date -->
                 <div>
-                    <label for="{{ form.end_date.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label for="{{ form.end_date.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                         {{ form.end_date.label }}
                     </label>
                     {{ form.end_date }}
@@ -111,17 +111,17 @@
             </div>
 
             <!-- Marks Entry Window -->
-            <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 flex items-center gap-2">
+            <div class="mt-6 pt-6 border-t border-slate-100">
+                <h3 class="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
                     <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Marks Entry Window
                 </h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">
+                <p class="text-xs text-slate-500 mb-4">
                     Configure when faculty can enter marks. Leave blank for no restriction.
                 </p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                        <label for="{{ form.marks_entry_start.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        <label for="{{ form.marks_entry_start.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                             {{ form.marks_entry_start.label }}
                         </label>
                         {{ form.marks_entry_start }}
@@ -130,7 +130,7 @@
                         {% endif %}
                     </div>
                     <div>
-                        <label for="{{ form.marks_entry_end.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        <label for="{{ form.marks_entry_end.id_for_label }}" class="block text-sm font-medium text-slate-700 mb-1.5">
                             {{ form.marks_entry_end.label }}
                         </label>
                         {{ form.marks_entry_end }}
@@ -142,15 +142,15 @@
             </div>
 
             <!-- Programs (M2M Checkboxes) -->
-            <div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+            <div class="mt-6 pt-6 border-t border-slate-100">
+                <label class="block text-sm font-medium text-slate-700 mb-3">
                     {{ form.programs.label }}
                 </label>
                 {% if form.programs.help_text %}
-                    <p class="mb-4 text-xs text-slate-500 dark:text-slate-400">{{ form.programs.help_text }}</p>
+                    <p class="mb-4 text-xs text-slate-500">{{ form.programs.help_text }}</p>
                 {% endif %}
                 
-                <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700 max-h-60 overflow-y-auto custom-scrollbar">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 max-h-60 overflow-y-auto custom-scrollbar">
                     {{ form.programs }}
                 </div>
                 {% if form.programs.errors %}
@@ -161,14 +161,14 @@
             <!-- Archived Flag -->
             <div class="mt-6 flex items-center gap-3">
                 {{ form.is_archived }}
-                <label for="{{ form.is_archived.id_for_label }}" class="text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label for="{{ form.is_archived.id_for_label }}" class="text-sm font-medium text-slate-700">
                     {{ form.is_archived.label }}
                 </label>
             </div>
 
-            <div class="pt-6 mt-6 flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
-                <a href="{{ cancel_url }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition">Cancel</a>
-                <button type="submit" class="px-6 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition duration-200">
+            <div class="pt-6 mt-6 flex items-center justify-end gap-3 border-t border-slate-100">
+                <a href="{{ cancel_url }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900:text-white transition">Cancel</a>
+                <button type="submit" class="px-6 py-2 border border-transparent rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 text-sm font-medium text-white bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition duration-200">
                     Save Exam
                 </button>
             </div>

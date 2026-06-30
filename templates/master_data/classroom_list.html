@@ -8,11 +8,11 @@
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Classrooms</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage physical spaces for seating arrangements.</p>
+            <h1 class="text-2xl font-bold text-slate-900">Classrooms</h1>
+            <p class="text-sm text-slate-500 mt-1">Manage physical spaces for seating arrangements.</p>
         </div>
         <div>
-            <a href="{% url 'master_data:classroom_create' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-200">
+            <a href="{% url 'master_data:classroom_create' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 text-white text-sm font-medium rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 transition duration-200">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                 Add Classroom
             </a>
@@ -20,23 +20,23 @@
     </div>
 
     <!-- Filters and Search -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
+    <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 p-4">
         <form method="get" class="flex flex-col sm:flex-row gap-4">
             <div class="flex-1 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
-                <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search by room number..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-brand-500 focus:border-brand-500 sm:text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400">
+                <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search by room number..." class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-xl focus:ring-brand-500 focus:border-brand-500 sm:text-sm bg-white text-slate-900 placeholder-slate-400">
             </div>
             <div class="sm:w-48">
-                <select name="status" class="block w-full py-2 pl-3 pr-10 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-brand-500 focus:border-brand-500 sm:text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white" onchange="this.form.submit()">
+                <select name="status" class="block w-full py-2 pl-3 pr-10 border border-slate-300 rounded-xl focus:ring-brand-500 focus:border-brand-500 sm:text-sm bg-white text-slate-900" onchange="this.form.submit()">
                     <option value="">All Status</option>
                     <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active Only</option>
                     <option value="archived" {% if request.GET.status == 'archived' %}selected{% endif %}>Archived Only</option>
                 </select>
             </div>
             <div>
-                <button type="submit" class="w-full sm:w-auto px-4 py-2 border border-slate-300 dark:border-slate-700 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+                <button type="submit" class="w-full sm:w-auto px-4 py-2 border border-slate-300 text-sm font-medium rounded-xl text-slate-700 bg-white hover:bg-slate-50:bg-slate-700 transition">
                     Apply Filters
                 </button>
             </div>
@@ -44,43 +44,43 @@
     </div>
 
     <!-- Data Table -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                <thead class="bg-slate-50 dark:bg-slate-800/50">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Room Number</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Capacity</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Actions</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Room Number</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Capacity</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-800">
+                <tbody class="bg-white divide-y divide-slate-200">
                     {% for classroom in classrooms %}
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900 dark:text-white">
+                    <tr class="hover:bg-slate-50:bg-slate-800/50 transition">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
                             {{ classroom.room_number }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-300">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                             {{ classroom.capacity }} seats
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             {% if classroom.is_archived %}
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
                                 Archived
                             </span>
                             {% else %}
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
                                 Active
                             </span>
                             {% endif %}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-3">
-                                <a href="{% url 'master_data:classroom_update' classroom.pk %}" class="text-brand-600 hover:text-brand-900 dark:text-brand-400 dark:hover:text-brand-300 transition" title="Edit">
+                                <a href="{% url 'master_data:classroom_update' classroom.pk %}" class="text-brand-600 hover:text-brand-900:text-brand-300 transition" title="Edit">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </a>
-                                <a href="{% url 'master_data:classroom_delete' classroom.pk %}" class="text-rose-600 hover:text-rose-900 dark:text-rose-500 dark:hover:text-rose-400 transition" title="Delete">
+                                <a href="{% url 'master_data:classroom_delete' classroom.pk %}" class="text-rose-600 hover:text-rose-900:text-rose-400 transition" title="Delete">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </a>
                             </div>
@@ -88,13 +88,13 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="px-6 py-10 text-center text-slate-500 dark:text-slate-400">
+                        <td colspan="4" class="px-6 py-10 text-center text-slate-500">
                             <svg class="w-12 h-12 mx-auto text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
                             <p class="text-base font-medium">No classrooms found.</p>
                             <p class="text-sm mt-1">{% if request.GET.q %}Try adjusting your search query.{% else %}Get started by creating a new classroom.{% endif %}</p>
                             {% if not request.GET.q %}
                             <div class="mt-4">
-                                <a href="{% url 'master_data:classroom_create' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-brand-700 bg-brand-100 hover:bg-brand-200 dark:text-brand-300 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 transition">
+                                <a href="{% url 'master_data:classroom_create' %}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-xl text-brand-700 bg-brand-100 hover:bg-brand-200:bg-brand-900/50 transition">
                                     Add your first Classroom
                                 </a>
                             </div>
@@ -108,17 +108,17 @@
         
         <!-- Pagination -->
         {% if is_paginated %}
-        <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-sm text-slate-500 dark:text-slate-400">
+        <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+            <span class="text-sm text-slate-500">
                 Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
             </span>
             <div class="flex gap-2">
                 {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="px-3 py-1 border border-slate-300 dark:border-slate-700 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Previous</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="px-3 py-1 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50:bg-slate-800 transition">Previous</a>
                 {% endif %}
                 
                 {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="px-3 py-1 border border-slate-300 dark:border-slate-700 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Next</a>
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="px-3 py-1 border border-slate-300 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50:bg-slate-800 transition">Next</a>
                 {% endif %}
             </div>
         </div>

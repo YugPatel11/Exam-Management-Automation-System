@@ -1,6 +1,6 @@
 {% load static ems_tags %}
 <!DOCTYPE html>
-<html lang="en" class="{% if request.COOKIES.darkMode == 'true' %}dark{% endif %}">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -59,11 +58,11 @@
 
     {% block extra_css %}{% endblock %}
 </head>
-<body class="font-sans bg-surface-50 text-slate-800 dark:bg-surface-950 dark:text-slate-200 antialiased">
+<body class="font-sans bg-slate-50 text-slate-800 antialiased selection:bg-brand-100 selection:text-brand-900">
 
     {% if user.is_authenticated %}
     <!-- ═══════════ AUTHENTICATED LAYOUT ═══════════ -->
-    <div class="flex min-h-screen flex-col bg-surface-50 dark:bg-surface-950" id="app-layout">
+    <div class="flex min-h-screen flex-col bg-slate-50 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white via-slate-50 to-slate-100" id="app-layout">
 
         <!-- Top Navbar -->
         {% include 'components/navbar.html' %}
@@ -74,7 +73,7 @@
                 {% if messages %}
                 <div class="px-4 sm:px-6 lg:px-8 pt-4 space-y-2" id="message-container">
                     {% for message in messages %}
-                    <div class="flex items-center gap-3 px-4 py-3 rounded-lg border {{ message.tags }} animate-slide-down" role="alert">
+                    <div class="flex items-center gap-3 px-4 py-3 rounded-xl border {{ message.tags }} animate-slide-down" role="alert">
                         {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         {% elif message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
@@ -96,16 +95,16 @@
                 <!-- Breadcrumbs -->
                 {% if breadcrumbs %}
                 <div class="px-4 sm:px-6 lg:px-8 pt-4">
-                    <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                        <a href="{% url 'dashboard:home' %}" class="hover:text-brand-600 dark:hover:text-brand-400 transition">
+                    <nav class="flex items-center gap-2 text-sm text-slate-500">
+                        <a href="{% url 'dashboard:home' %}" class="hover:text-brand-600:text-brand-400 transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg>
                         </a>
                         {% for crumb in breadcrumbs %}
                         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         {% if crumb.url %}
-                        <a href="{{ crumb.url }}" class="hover:text-brand-600 dark:hover:text-brand-400 transition">{{ crumb.label }}</a>
+                        <a href="{{ crumb.url }}" class="hover:text-brand-600:text-brand-400 transition">{{ crumb.label }}</a>
                         {% else %}
-                        <span class="text-slate-800 dark:text-slate-200 font-medium">{{ crumb.label }}</span>
+                        <span class="text-slate-800 font-medium">{{ crumb.label }}</span>
                         {% endif %}
                         {% endfor %}
                     </nav>
@@ -126,7 +125,7 @@
         {% if messages %}
         <div class="fixed top-4 right-4 z-50 space-y-2 max-w-sm" id="message-container">
             {% for message in messages %}
-            <div class="flex items-center gap-3 px-4 py-3 rounded-lg border shadow-lg {{ message.tags }} animate-slide-down" role="alert">
+            <div class="flex items-center gap-3 px-4 py-3 rounded-xl border shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-lg {{ message.tags }} animate-slide-down" role="alert">
                 <p class="text-sm font-medium flex-1">{{ message }}</p>
                 <button onclick="this.parentElement.remove()" class="shrink-0 opacity-60 hover:opacity-100">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -142,7 +141,6 @@
 
     <!-- Core JS -->
     <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'js/dark_mode.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

@@ -4,22 +4,22 @@
 
 {% block content %}
 <div class="max-w-md mx-auto mt-10">
-    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-rose-200 dark:border-rose-900 p-6 sm:p-8 animate-fade-in-up">
+    <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-lg border border-rose-200 p-6 sm:p-8 animate-fade-in-up">
         
-        <div class="flex items-center gap-4 mb-6 text-rose-600 dark:text-rose-500">
-            <div class="p-3 bg-rose-100 dark:bg-rose-900/50 rounded-full">
+        <div class="flex items-center gap-4 mb-6 text-rose-600">
+            <div class="p-3 bg-rose-100 rounded-full">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
             </div>
             <div>
-                <h1 class="text-xl font-bold text-slate-900 dark:text-white">Confirm Deletion</h1>
+                <h1 class="text-xl font-bold text-slate-900">Confirm Deletion</h1>
             </div>
         </div>
 
-        <p class="text-slate-600 dark:text-slate-300 mb-6">
-            Are you sure you want to delete <strong class="text-slate-900 dark:text-white">{{ item_name }}</strong>?
+        <p class="text-slate-600 mb-6">
+            Are you sure you want to delete <strong class="text-slate-900">{{ item_name }}</strong>?
         </p>
         
-        <div class="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-4 mb-8">
+        <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-8">
             <div class="flex">
                 <div class="flex-shrink-0">
                     <svg class="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
@@ -27,7 +27,7 @@
                     </svg>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-amber-700 dark:text-amber-400">
+                    <p class="text-sm text-amber-700">
                         This action cannot be undone. If this item has been used in existing records (like students or exams), deletion will fail. Consider <span class="font-bold">Archiving</span> it instead to preserve history.
                     </p>
                 </div>
@@ -36,8 +36,8 @@
 
         <form method="post" class="flex items-center justify-end gap-3">
             {% csrf_token %}
-            <a href="{{ cancel_url }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition">Cancel</a>
-            <button type="submit" class="px-6 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition duration-200">
+            <a href="{{ cancel_url }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900:text-white transition">Cancel</a>
+            <button type="submit" class="px-6 py-2 border border-transparent rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition duration-200">
                 Yes, Delete It
             </button>
         </form>

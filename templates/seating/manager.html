@@ -4,11 +4,11 @@
 {% block content %}
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
-        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Manage Seating</h1>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ exam.name }}</p>
+        <h1 class="text-2xl font-semibold text-slate-900">Manage Seating</h1>
+        <p class="mt-1 text-sm text-slate-500">{{ exam.name }}</p>
     </div>
     <div class="flex items-center gap-3">
-        <a href="{% url 'seating:dashboard' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+        <a href="{% url 'seating:dashboard' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700:text-slate-300">
             &larr; Back to Dashboard
         </a>
         
@@ -17,13 +17,13 @@
             <input type="hidden" name="tab" value="{{ active_tab }}">
             
             {% if not plan.is_locked %}
-            <button type="submit" name="action" value="auto_generate" class="inline-flex items-center justify-center rounded-md border border-transparent bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
+            <button type="submit" name="action" value="auto_generate" class="inline-flex items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
                 Auto Generate
             </button>
             {% endif %}
             
             {% if total_allocated > 0 %}
-            <button type="submit" name="action" value="toggle_lock" class="inline-flex items-center justify-center rounded-md border {% if plan.is_locked %}border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-surface-700 dark:text-slate-200 dark:hover:bg-surface-600{% else %}border-transparent bg-amber-600 text-white hover:bg-amber-700{% endif %} px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2">
+            <button type="submit" name="action" value="toggle_lock" class="inline-flex items-center justify-center rounded-md border {% if plan.is_locked %}border-slate-300 bg-white text-slate-700 hover:bg-slate-50:bg-surface-600{% else %}border-transparent bg-amber-600 text-white hover:bg-amber-700{% endif %} px-4 py-2 text-sm font-medium shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2">
                 {% if plan.is_locked %}Unlock Seating{% else %}Lock Seating{% endif %}
             </button>
             {% endif %}
@@ -31,14 +31,14 @@
     </div>
 </div>
 
-<div class="bg-white dark:bg-surface-800 shadow rounded-lg overflow-hidden">
+<div class="bg-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden">
     <!-- Tabs -->
-    <div class="border-b border-slate-200 dark:border-slate-700 px-4 sm:px-6">
+    <div class="border-b border-slate-200 px-4 sm:px-6">
         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-            <a href="?tab=date" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {% if active_tab == 'date' %}border-brand-500 text-brand-600 dark:text-brand-400{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300{% endif %}">
+            <a href="?tab=date" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {% if active_tab == 'date' %}border-brand-500 text-brand-600{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300:text-slate-300{% endif %}">
                 Date-wise View
             </a>
-            <a href="?tab=room" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {% if active_tab == 'room' %}border-brand-500 text-brand-600 dark:text-brand-400{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300{% endif %}">
+            <a href="?tab=room" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm {% if active_tab == 'room' %}border-brand-500 text-brand-600{% else %}border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300:text-slate-300{% endif %}">
                 Room-wise View
             </a>
         </nav>
@@ -48,7 +48,7 @@
     <div class="p-4 sm:p-6">
         {% if total_allocated == 0 %}
         <div class="text-center py-10">
-            <p class="text-sm text-slate-500 dark:text-slate-400">No seating arrangement generated yet.</p>
+            <p class="text-sm text-slate-500">No seating arrangement generated yet.</p>
         </div>
         {% else %}
         
@@ -56,35 +56,35 @@
             <div class="space-y-8">
                 {% for session_key, classrooms in date_wise.items %}
                 <div>
-                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-4 bg-slate-50 dark:bg-slate-800/50 p-3 rounded">
+                    <h3 class="text-lg font-medium text-slate-900 mb-4 bg-slate-50 p-3 rounded">
                         {{ session_key.0 }} | {{ session_key.1|time:"H:i" }} - {{ session_key.2|time:"H:i" }}
                     </h3>
                     
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {% for classroom, allocations in classrooms.items %}
-                        <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-                            <div class="bg-slate-100 dark:bg-slate-800 px-4 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between">
-                                <span class="font-medium text-slate-900 dark:text-white">{{ classroom.room_number }}</span>
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-100 px-4 py-2 border-b border-slate-200 flex justify-between">
+                                <span class="font-medium text-slate-900">{{ classroom.room_number }}</span>
                                 <span class="text-sm text-slate-500">{{ allocations|length }} / {{ classroom.capacity }}</span>
                             </div>
                             <div class="p-4">
-                                <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <ul class="divide-y divide-slate-100">
                                     {% for alloc in allocations %}
                                     <li class="py-2 flex items-center justify-between text-sm group">
                                         <div class="flex items-center gap-3">
-                                            <span class="text-slate-600 dark:text-slate-400">Seat {{ alloc.seat_number }}</span>
-                                            <span class="font-medium text-slate-900 dark:text-white" title="{{ alloc.student.name }}">{{ alloc.student.roll_no }}</span>
+                                            <span class="text-slate-600">Seat {{ alloc.seat_number }}</span>
+                                            <span class="font-medium text-slate-900" title="{{ alloc.student.name }}">{{ alloc.student.roll_no }}</span>
                                         </div>
                                         {% if not plan.is_locked %}
                                         <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onclick="openSwapModal({{ alloc.id }})" class="p-1 text-blue-500 hover:text-blue-700 dark:hover:text-blue-300" title="Swap">
+                                            <button onclick="openSwapModal({{ alloc.id }})" class="p-1 text-blue-500 hover:text-blue-700:text-blue-300" title="Swap">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
                                             </button>
                                             <form method="post" class="inline" onsubmit="return confirm('Delete this allocation?')">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="action" value="delete_allocation">
                                                 <input type="hidden" name="allocation_id" value="{{ alloc.id }}">
-                                                <button type="submit" class="p-1 text-red-500 hover:text-red-700 dark:hover:text-red-300" title="Delete">
+                                                <button type="submit" class="p-1 text-red-500 hover:text-red-700:text-red-300" title="Delete">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                 </button>
                                             </form>
@@ -105,24 +105,24 @@
             <div class="space-y-8">
                 {% for classroom, sessions in room_wise.items %}
                 <div>
-                    <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-4 bg-slate-50 dark:bg-slate-800/50 p-3 rounded">
+                    <h3 class="text-lg font-medium text-slate-900 mb-4 bg-slate-50 p-3 rounded">
                         Classroom: {{ classroom.room_number }} (Capacity: {{ classroom.capacity }})
                     </h3>
                     
                     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {% for session_key, allocations in sessions.items %}
-                        <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-                            <div class="bg-slate-100 dark:bg-slate-800 px-4 py-2 border-b border-slate-200 dark:border-slate-700 flex justify-between text-sm">
-                                <span class="font-medium text-slate-900 dark:text-white">{{ session_key.0 }}</span>
+                        <div class="border border-slate-200 rounded-xl overflow-hidden">
+                            <div class="bg-slate-100 px-4 py-2 border-b border-slate-200 flex justify-between text-sm">
+                                <span class="font-medium text-slate-900">{{ session_key.0 }}</span>
                                 <span class="text-slate-500">{{ session_key.1|time:"H:i" }}</span>
                             </div>
                             <div class="p-4">
-                                <ul class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <ul class="divide-y divide-slate-100">
                                     {% for alloc in allocations %}
                                     <li class="py-2 flex items-center justify-between text-sm group">
                                         <div class="flex items-center gap-3">
-                                            <span class="text-slate-600 dark:text-slate-400">Seat {{ alloc.seat_number }}</span>
-                                            <span class="font-medium text-slate-900 dark:text-white" title="{{ alloc.student.name }}">{{ alloc.student.roll_no }}</span>
+                                            <span class="text-slate-600">Seat {{ alloc.seat_number }}</span>
+                                            <span class="font-medium text-slate-900" title="{{ alloc.student.name }}">{{ alloc.student.roll_no }}</span>
                                         </div>
                                         {% if not plan.is_locked %}
                                         <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -158,24 +158,24 @@
 <!-- Swap Modal -->
 {% if not plan.is_locked %}
 <div id="swapModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white dark:bg-surface-800 rounded-xl shadow-xl w-full max-w-md p-6 border border-slate-200 dark:border-slate-700">
-        <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-4">Swap Seat Allocations</h3>
+    <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-xl w-full max-w-md p-6 border border-slate-200">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Swap Seat Allocations</h3>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="action" value="swap">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Allocation 1 (ID)</label>
-                    <input type="number" name="allocation_id_1" id="swap_alloc_1" required class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-surface-700 text-slate-900 dark:text-white px-3 py-2 text-sm">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Allocation 1 (ID)</label>
+                    <input type="number" name="allocation_id_1" id="swap_alloc_1" required class="w-full rounded-xl border border-slate-300 bg-white text-slate-900 px-3 py-2 text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Allocation 2 (ID)</label>
-                    <input type="number" name="allocation_id_2" required class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-surface-700 text-slate-900 dark:text-white px-3 py-2 text-sm">
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Allocation 2 (ID)</label>
+                    <input type="number" name="allocation_id_2" required class="w-full rounded-xl border border-slate-300 bg-white text-slate-900 px-3 py-2 text-sm">
                 </div>
             </div>
             <div class="flex items-center justify-end gap-3 mt-6">
-                <button type="button" onclick="closeSwapModal()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">Cancel</button>
-                <button type="submit" class="px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-medium hover:bg-brand-700">Swap</button>
+                <button type="button" onclick="closeSwapModal()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900:text-white">Cancel</button>
+                <button type="submit" class="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-brand-500 text-white text-sm font-medium hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30">Swap</button>
             </div>
         </form>
     </div>

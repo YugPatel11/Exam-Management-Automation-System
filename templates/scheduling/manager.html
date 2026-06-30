@@ -8,16 +8,16 @@
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-            <a href="{% url 'scheduling:dashboard' %}" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition">
+            <a href="{% url 'scheduling:dashboard' %}" class="text-slate-400 hover:text-slate-600:text-slate-300 transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
             <div>
-                <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Schedule: {{ exam.name }}</h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ exam.start_date|date:"d M Y" }} to {{ exam.end_date|date:"d M Y" }}</p>
+                <h1 class="text-2xl font-bold text-slate-900">Schedule: {{ exam.name }}</h1>
+                <p class="text-sm text-slate-500 mt-1">{{ exam.start_date|date:"d M Y" }} to {{ exam.end_date|date:"d M Y" }}</p>
             </div>
         </div>
         <div class="flex gap-3">
-            <button @click="showAutoModal = true" class="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-lg shadow-sm transition duration-200">
+            <button @click="showAutoModal = true" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 text-white text-sm font-medium rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 transition duration-200">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 Auto Generate
             </button>
@@ -25,18 +25,18 @@
     </div>
 
     <!-- Main Content Box -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+    <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
         
         <!-- Tabs -->
-        <div class="border-b border-slate-200 dark:border-slate-800 px-6">
+        <div class="border-b border-slate-200 px-6">
             <nav class="-mb-px flex space-x-8">
-                <button @click="tab = 'date'" :class="{'border-brand-500 text-brand-600 dark:text-brand-400': tab === 'date', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300': tab !== 'date'}" class="whitespace-nowrap pb-4 pt-4 px-1 border-b-2 font-medium text-sm transition">
+                <button @click="tab = 'date'" :class="{'border-brand-500 text-brand-600': tab === 'date', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300:text-slate-300': tab !== 'date'}" class="whitespace-nowrap pb-4 pt-4 px-1 border-b-2 font-medium text-sm transition">
                     Date-wise
                 </button>
-                <button @click="tab = 'program'" :class="{'border-brand-500 text-brand-600 dark:text-brand-400': tab === 'program', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300': tab !== 'program'}" class="whitespace-nowrap pb-4 pt-4 px-1 border-b-2 font-medium text-sm transition">
+                <button @click="tab = 'program'" :class="{'border-brand-500 text-brand-600': tab === 'program', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300:text-slate-300': tab !== 'program'}" class="whitespace-nowrap pb-4 pt-4 px-1 border-b-2 font-medium text-sm transition">
                     Program-wise
                 </button>
-                <button @click="tab = 'subject'" :class="{'border-brand-500 text-brand-600 dark:text-brand-400': tab === 'subject', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 dark:text-slate-400 dark:hover:text-slate-300': tab !== 'subject'}" class="whitespace-nowrap pb-4 pt-4 px-1 border-b-2 font-medium text-sm transition">
+                <button @click="tab = 'subject'" :class="{'border-brand-500 text-brand-600': tab === 'subject', 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300:text-slate-300': tab !== 'subject'}" class="whitespace-nowrap pb-4 pt-4 px-1 border-b-2 font-medium text-sm transition">
                     Subject-wise (List)
                 </button>
             </nav>
@@ -46,7 +46,7 @@
             {% if not schedules %}
                 <div class="text-center py-10">
                     <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-white">No schedules generated yet</h3>
+                    <h3 class="mt-2 text-sm font-medium text-slate-900">No schedules generated yet</h3>
                     <p class="mt-1 text-sm text-slate-500">Click Auto Generate to create schedules for all subjects with Theory ESE > 0.</p>
                 </div>
             {% else %}
@@ -55,26 +55,26 @@
                 <div x-show="tab === 'date'" class="space-y-8">
                     {% for date, day_schedules in date_wise.items %}
                     <div>
-                        <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                            <span class="bg-brand-100 text-brand-800 dark:bg-brand-900/30 dark:text-brand-300 px-3 py-1 rounded text-sm">{{ date|date:"l, d M Y" }}</span>
+                        <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
+                            <span class="bg-brand-100 text-brand-800 px-3 py-1 rounded text-sm">{{ date|date:"l, d M Y" }}</span>
                         </h3>
-                        <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-                            <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                                <thead class="bg-slate-50 dark:bg-slate-900/50">
+                        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                            <table class="min-w-full divide-y divide-slate-200">
+                                <thead class="bg-slate-50">
                                     <tr>
                                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Time</th>
                                         <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Subject</th>
                                         <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                                <tbody class="divide-y divide-slate-200">
                                     {% for s in day_schedules %}
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
-                                        <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    <tr class="hover:bg-slate-50:bg-slate-800/80 transition">
+                                        <td class="px-4 py-3 text-sm font-medium text-slate-900 whitespace-nowrap">
                                             {{ s.start_time|time:"H:i" }} - {{ s.end_time|time:"H:i" }}
                                         </td>
-                                        <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
-                                            <span class="font-bold text-slate-900 dark:text-white">{{ s.subject.code }}</span>: {{ s.subject.name }}
+                                        <td class="px-4 py-3 text-sm text-slate-600">
+                                            <span class="font-bold text-slate-900">{{ s.subject.code }}</span>: {{ s.subject.name }}
                                         </td>
                                         <td class="px-4 py-3 text-right text-sm">
                                             {% include 'scheduling/_action_buttons.html' with sched=s %}
@@ -91,12 +91,12 @@
                 <!-- PROGRAM-WISE TAB -->
                 <div x-show="tab === 'program'" style="display: none;" class="space-y-8">
                     {% for program, items in program_wise.items %}
-                    <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-                        <div class="bg-slate-50 dark:bg-slate-900/50 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
-                            <h3 class="text-base font-bold text-slate-900 dark:text-white">{{ program.name }}</h3>
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-4 py-3 border-b border-slate-200">
+                            <h3 class="text-base font-bold text-slate-900">{{ program.name }}</h3>
                         </div>
-                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                            <thead class="bg-slate-50 dark:bg-slate-900/50">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
                                 <tr>
                                     <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase w-20">Sem</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Subject</th>
@@ -104,16 +104,16 @@
                                     <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                            <tbody class="divide-y divide-slate-200">
                                 {% for item in items|dictsort:"semester" %}
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
-                                    <td class="px-4 py-3 text-sm font-bold text-slate-900 dark:text-white text-center">
+                                <tr class="hover:bg-slate-50:bg-slate-800/80 transition">
+                                    <td class="px-4 py-3 text-sm font-bold text-slate-900 text-center">
                                         {{ item.semester }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                                    <td class="px-4 py-3 text-sm text-slate-600">
                                         <span class="font-bold">{{ item.schedule.subject.code }}</span>: {{ item.schedule.subject.name }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm font-medium text-brand-600 dark:text-brand-400 whitespace-nowrap">
+                                    <td class="px-4 py-3 text-sm font-medium text-brand-600 whitespace-nowrap">
                                         {{ item.schedule.date|date:"d M Y" }}<br>
                                         <span class="text-xs text-slate-500">{{ item.schedule.start_time|time:"H:i" }} - {{ item.schedule.end_time|time:"H:i" }}</span>
                                     </td>
@@ -130,9 +130,9 @@
 
                 <!-- SUBJECT-WISE TAB -->
                 <div x-show="tab === 'subject'" style="display: none;">
-                    <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                            <thead class="bg-slate-50 dark:bg-slate-900/50">
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
                                 <tr>
                                     <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Subject</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Date</th>
@@ -141,23 +141,23 @@
                                     <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                            <tbody class="divide-y divide-slate-200">
                                 {% for s in schedules %}
-                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition">
-                                    <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
-                                        <span class="font-bold text-slate-900 dark:text-white">{{ s.subject.code }}</span>: {{ s.subject.name }}
+                                <tr class="hover:bg-slate-50:bg-slate-800/80 transition">
+                                    <td class="px-4 py-3 text-sm text-slate-600">
+                                        <span class="font-bold text-slate-900">{{ s.subject.code }}</span>: {{ s.subject.name }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm font-medium text-slate-900 dark:text-white whitespace-nowrap">
+                                    <td class="px-4 py-3 text-sm font-medium text-slate-900 whitespace-nowrap">
                                         {{ s.date|date:"d M Y" }}
                                     </td>
-                                    <td class="px-4 py-3 text-sm text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                    <td class="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">
                                         {{ s.start_time|time:"H:i" }} - {{ s.end_time|time:"H:i" }}
                                     </td>
                                     <td class="px-4 py-3 text-center">
                                         {% if s.is_locked %}
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400">Locked</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-100 text-rose-800">Locked</span>
                                         {% else %}
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">Unlocked</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">Unlocked</span>
                                         {% endif %}
                                     </td>
                                     <td class="px-4 py-3 text-right text-sm">
@@ -181,7 +181,7 @@
                 <div class="absolute inset-0 bg-slate-900 opacity-75"></div>
             </div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div x-show="showAutoModal" class="inline-block align-bottom bg-white dark:bg-slate-800 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+            <div x-show="showAutoModal" class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="auto_generate">
@@ -189,30 +189,30 @@
                     
                     <div class="px-6 py-5">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Auto Generate Schedule</h3>
+                            <h3 class="text-lg font-bold text-slate-900">Auto Generate Schedule</h3>
                             <button type="button" @click="showAutoModal = false" class="text-slate-400 hover:text-slate-500">
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                        <p class="text-sm text-slate-500 mb-6">
                             This will schedule all subjects with <strong>Theory ESE &gt; 0</strong>. It will group subjects by Program and Semester, and skip Sundays.<br><br>
-                            <span class="text-rose-600 dark:text-rose-400 font-medium">Warning: This will overwrite any currently unlocked schedules!</span>
+                            <span class="text-rose-600 font-medium">Warning: This will overwrite any currently unlocked schedules!</span>
                         </p>
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ auto_generate_form.start_time.label }}</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">{{ auto_generate_form.start_time.label }}</label>
                                 {{ auto_generate_form.start_time }}
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ auto_generate_form.end_time.label }}</label>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">{{ auto_generate_form.end_time.label }}</label>
                                 {{ auto_generate_form.end_time }}
                             </div>
                         </div>
                     </div>
-                    <div class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3">
-                        <button type="button" @click="showAutoModal = false" class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-brand-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-brand-700 transition shadow-sm flex items-center gap-2">
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3">
+                        <button type="button" @click="showAutoModal = false" class="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50:bg-slate-700 transition">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-brand-600 to-brand-500 border border-transparent rounded-xl text-sm font-medium text-white hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 transition shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                             Generate
                         </button>
@@ -229,7 +229,7 @@
                 <div class="absolute inset-0 bg-slate-900 opacity-75"></div>
             </div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div x-show="showEditModal" class="inline-block align-bottom bg-white dark:bg-slate-800 rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full">
+            <div x-show="showEditModal" class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full">
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="edit">
@@ -238,7 +238,7 @@
                     
                     <div class="px-6 py-5">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Edit Schedule</h3>
+                            <h3 class="text-lg font-bold text-slate-900">Edit Schedule</h3>
                             <button type="button" @click="showEditModal = false" class="text-slate-400 hover:text-slate-500">
                                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
@@ -246,24 +246,24 @@
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Date</label>
-                                <input type="date" name="date" x-model="editDate" required class="block w-full border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm dark:bg-slate-800 dark:text-white">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Date</label>
+                                <input type="date" name="date" x-model="editDate" required class="block w-full border-slate-300 rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                             </div>
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Start Time</label>
-                                    <input type="time" name="start_time" x-model="editStart" required class="block w-full border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm dark:bg-slate-800 dark:text-white">
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">Start Time</label>
+                                    <input type="time" name="start_time" x-model="editStart" required class="block w-full border-slate-300 rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">End Time</label>
-                                    <input type="time" name="end_time" x-model="editEnd" required class="block w-full border-slate-300 dark:border-slate-700 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm dark:bg-slate-800 dark:text-white">
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">End Time</label>
+                                    <input type="time" name="end_time" x-model="editEnd" required class="block w-full border-slate-300 rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:ring-brand-500 focus:border-brand-500 sm:text-sm">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3">
-                        <button type="button" @click="showEditModal = false" class="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition">Cancel</button>
-                        <button type="submit" class="px-4 py-2 bg-brand-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-brand-700 transition shadow-sm">Save Changes</button>
+                    <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3">
+                        <button type="button" @click="showEditModal = false" class="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50:bg-slate-700 transition">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-brand-600 to-brand-500 border border-transparent rounded-xl text-sm font-medium text-white hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 transition shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300">Save Changes</button>
                     </div>
                 </form>
             </div>

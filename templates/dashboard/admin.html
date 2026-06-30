@@ -3,49 +3,49 @@
 {% block content %}
 <div class="space-y-6 animate-fade-in-up">
     <!-- Welcome Section -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+    <div class="bg-white rounded-xl p-6 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 flex items-center justify-between">
         <div>
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">Admin Dashboard</h2>
-            <p class="text-slate-500 dark:text-slate-400 mt-1">System-wide overview and master data management.</p>
+            <h2 class="text-2xl font-bold text-slate-800">Admin Dashboard</h2>
+            <p class="text-slate-500 mt-1">System-wide overview and master data management.</p>
         </div>
         <div class="hidden sm:block">
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800 dark:bg-brand-900/30 dark:text-brand-300 border border-brand-200 dark:border-brand-800/50">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-brand-100 text-brand-800 border border-brand-200">
                 {{ exam_count }} Total Exams
             </span>
         </div>
     </div>
 
     <!-- Quick Actions -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
-        <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Quick Actions</h3>
+    <div class="bg-white rounded-xl p-6 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
+        <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Quick Actions</h3>
         <div class="flex flex-wrap gap-3">
-            <a href="{% url 'accounts:user_create' %}" id="btn-create-user" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 focus:ring-4 focus:ring-brand-500/20 transition-all duration-200 shadow-sm hover:shadow-md">
+            <a href="{% url 'accounts:user_create' %}" id="btn-create-user" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-brand-600 to-brand-500 rounded-xl hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:ring-4 focus:ring-brand-500/20 transition-all duration-200 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
                 Create User
             </a>
-            <a href="{% url 'academic:year_list' %}" id="btn-academic-years" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
+            <a href="{% url 'academic:year_list' %}" id="btn-academic-years" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 Academic Years
             </a>
-            <a href="{% url 'accounts:user_list' %}" id="btn-manage-users" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
+            <a href="{% url 'accounts:user_list' %}" id="btn-manage-users" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 Manage Users
             </a>
-            <a href="{% url 'marks:allocation_dashboard' %}" id="btn-marks-allocation" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
+            <a href="{% url 'marks:allocation_dashboard' %}" id="btn-marks-allocation" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                 Marks Allocation
             </a>
-            <a href="{% url 'exams:exam_list' %}" id="btn-manage-exams" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
+            <a href="{% url 'exams:exam_list' %}" id="btn-manage-exams" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 Manage Exams
             </a>
 
-            <a href="{% url 'reports:dashboard' %}" id="btn-reports" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
+            <a href="{% url 'reports:dashboard' %}" id="btn-reports" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 Reports & Export
             </a>
             
-            <a href="{% url 'students:import_wizard' %}" id="btn-import-students" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
+            <a href="{% url 'students:import_wizard' %}" id="btn-import-students" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                 Import Students
             </a>
@@ -55,85 +55,85 @@
     <!-- Quick Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <!-- Users -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition">
+        <div class="bg-white rounded-xl p-5 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md transition">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Users</h3>
-                <div class="p-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg">
+                <h3 class="text-sm font-semibold text-slate-500">Users</h3>
+                <div class="p-1.5 bg-blue-50 text-blue-600 rounded-xl">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 </div>
             </div>
-            <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ user_count }}</p>
+            <p class="text-2xl font-bold text-slate-900">{{ user_count }}</p>
         </div>
 
         <!-- Programs -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition">
+        <div class="bg-white rounded-xl p-5 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md transition">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Programs</h3>
-                <div class="p-1.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                <h3 class="text-sm font-semibold text-slate-500">Programs</h3>
+                <div class="p-1.5 bg-emerald-50 text-emerald-600 rounded-xl">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                 </div>
             </div>
-            <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ program_count }}</p>
+            <p class="text-2xl font-bold text-slate-900">{{ program_count }}</p>
         </div>
 
         <!-- Subjects -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition">
+        <div class="bg-white rounded-xl p-5 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md transition">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Subjects</h3>
-                <div class="p-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-lg">
+                <h3 class="text-sm font-semibold text-slate-500">Subjects</h3>
+                <div class="p-1.5 bg-amber-50 text-amber-600 rounded-xl">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                 </div>
             </div>
-            <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ subject_count }}</p>
+            <p class="text-2xl font-bold text-slate-900">{{ subject_count }}</p>
         </div>
 
         <!-- Students -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition">
+        <div class="bg-white rounded-xl p-5 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md transition">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Students</h3>
-                <div class="p-1.5 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-lg">
+                <h3 class="text-sm font-semibold text-slate-500">Students</h3>
+                <div class="p-1.5 bg-purple-50 text-purple-600 rounded-xl">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                 </div>
             </div>
-            <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ student_count }}</p>
+            <p class="text-2xl font-bold text-slate-900">{{ student_count }}</p>
         </div>
 
         <!-- Exams -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition">
+        <div class="bg-white rounded-xl p-5 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md transition">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Exams</h3>
-                <div class="p-1.5 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-lg">
+                <h3 class="text-sm font-semibold text-slate-500">Exams</h3>
+                <div class="p-1.5 bg-rose-50 text-rose-600 rounded-xl">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 </div>
             </div>
-            <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ exam_count }}</p>
+            <p class="text-2xl font-bold text-slate-900">{{ exam_count }}</p>
         </div>
 
         <!-- Classrooms -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition">
+        <div class="bg-white rounded-xl p-5 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md transition">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Classrooms</h3>
-                <div class="p-1.5 bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 rounded-lg">
+                <h3 class="text-sm font-semibold text-slate-500">Classrooms</h3>
+                <div class="p-1.5 bg-cyan-50 text-cyan-600 rounded-xl">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>
                 </div>
             </div>
-            <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ classroom_count }}</p>
+            <p class="text-2xl font-bold text-slate-900">{{ classroom_count }}</p>
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Active Exams -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-                <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Active Exams</h3>
+        <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-100">
+                <h3 class="text-lg font-semibold text-slate-800">Active Exams</h3>
             </div>
             <div class="p-6">
                 {% if active_exams %}
                 <ul class="space-y-3">
                     {% for exam in active_exams %}
-                    <li class="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+                    <li class="flex items-center justify-between p-3 rounded-xl bg-slate-50">
                         <div>
-                            <p class="text-sm font-medium text-slate-900 dark:text-white">{{ exam.name }}</p>
+                            <p class="text-sm font-medium text-slate-900">{{ exam.name }}</p>
                             <p class="text-xs text-slate-500">{{ exam.start_date|date:"M d" }} — {{ exam.end_date|date:"M d, Y" }}</p>
                         </div>
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ exam.get_status_display }}</span>
@@ -147,9 +147,9 @@
         </div>
 
         <!-- Recent Activity -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-                <h3 class="text-lg font-semibold text-slate-800 dark:text-white">Recent Activity</h3>
+        <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
+            <div class="px-6 py-4 border-b border-slate-100">
+                <h3 class="text-lg font-semibold text-slate-800">Recent Activity</h3>
             </div>
             <div class="p-6">
                 {% if recent_logs %}
@@ -158,7 +158,7 @@
                     <li class="flex items-start gap-3 text-sm">
                         <div class="w-2 h-2 rounded-full bg-brand-500 mt-1.5 shrink-0"></div>
                         <div class="flex-1">
-                            <p class="text-slate-700 dark:text-slate-300">
+                            <p class="text-slate-700">
                                 <span class="font-medium">{{ log.user.get_display_name }}</span>
                                 {{ log.action }} {{ log.model_name }}
                             </p>

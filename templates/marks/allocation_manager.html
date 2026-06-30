@@ -4,31 +4,31 @@
 {% block content %}
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
-        <h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Manage Marks Allocation</h1>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ exam.name }}</p>
+        <h1 class="text-2xl font-semibold text-slate-900">Manage Marks Allocation</h1>
+        <p class="mt-1 text-sm text-slate-500">{{ exam.name }}</p>
     </div>
     <div class="flex items-center gap-3">
-        <a href="{% url 'marks:allocation_dashboard' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+        <a href="{% url 'marks:allocation_dashboard' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700:text-slate-300">
             &larr; Back to Dashboard
         </a>
         
         <form method="post" class="inline">
             {% csrf_token %}
-            <button type="submit" name="action" value="auto_allocate" class="inline-flex items-center justify-center rounded-md border border-transparent bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
+            <button type="submit" name="action" value="auto_allocate" class="inline-flex items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
                 Auto Allocate from Faculty Assignments
             </button>
         </form>
     </div>
 </div>
 
-<div class="bg-white dark:bg-surface-800 shadow rounded-lg overflow-hidden">
-    <div class="px-4 py-5 sm:px-6 border-b border-slate-200 dark:border-slate-700">
-        <h3 class="text-lg leading-6 font-medium text-slate-900 dark:text-white">Allocated Tasks ({{ total_tasks }})</h3>
+<div class="bg-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden">
+    <div class="px-4 py-5 sm:px-6 border-b border-slate-200">
+        <h3 class="text-lg leading-6 font-medium text-slate-900">Allocated Tasks ({{ total_tasks }})</h3>
     </div>
     
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-            <thead class="bg-slate-50 dark:bg-slate-800/50">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Subject</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Class</th>
@@ -36,16 +36,16 @@
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-200 dark:divide-slate-700 bg-white dark:bg-surface-800">
+            <tbody class="divide-y divide-slate-200 bg-white">
                 {% for task in tasks %}
                 <tr>
-                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900 dark:text-white">
+                    <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">
                         {{ task.subject.code }}
                     </td>
-                    <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
+                    <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
                         {{ task.teaching_assignment.class_name|default:"All Classes" }}
                     </td>
-                    <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-900 dark:text-white">
+                    <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-900">
                         {{ task.faculty.get_display_name }}
                     </td>
                     <td class="whitespace-nowrap px-6 py-4 text-sm">
@@ -61,7 +61,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
+                    <td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">
                         No marks entry tasks allocated yet.
                     </td>
                 </tr>

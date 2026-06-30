@@ -10,18 +10,18 @@
                 <a href="{{ crumb.url }}" class="hover:text-brand-600 transition">{{ crumb.label }}</a>
                 <span class="mx-2">/</span>
             {% else %}
-                <span class="text-slate-900 dark:text-white font-medium">{{ crumb.label }}</span>
+                <span class="text-slate-900 font-medium">{{ crumb.label }}</span>
             {% endif %}
         {% endfor %}
     </nav>
-    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div class="px-6 py-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-200 flex justify-between items-center">
             <div>
-                <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Import Course Allocation Data</h2>
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Step {{ step }} of 3: {% if step == 1 %}Upload File{% elif step == 2 %}Review & Validate{% else %}Complete{% endif %}</p>
+                <h2 class="text-xl font-semibold text-slate-900">Import Course Allocation Data</h2>
+                <p class="mt-1 text-sm text-slate-500">Step {{ step }} of 3: {% if step == 1 %}Upload File{% elif step == 2 %}Review & Validate{% else %}Complete{% endif %}</p>
             </div>
             {% if step == 1 and not has_faculty_master %}
-            <div class="bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
+            <div class="bg-rose-100 text-rose-800 px-3 py-1.5 rounded-xl text-sm font-medium flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 Faculty Master Required
             </div>
@@ -29,24 +29,24 @@
         </div>
 
         <!-- Progress Bar -->
-        <div class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+        <div class="bg-slate-50 border-b border-slate-200 px-6 py-4">
             <div class="flex items-center justify-between relative">
-                <div class="absolute left-0 top-1/2 -mt-px w-full h-0.5 bg-slate-200 dark:bg-slate-700" aria-hidden="true"></div>
+                <div class="absolute left-0 top-1/2 -mt-px w-full h-0.5 bg-slate-200" aria-hidden="true"></div>
                 <div class="absolute left-0 top-1/2 -mt-px h-0.5 bg-brand-500 transition-all duration-500" style="width: {% if step == 1 %}0%{% elif step == 2 %}50%{% else %}100%{% endif %}"></div>
                 
                 <div class="relative flex items-center justify-center">
-                    <span class="h-8 w-8 rounded-full flex items-center justify-center text-sm font-semibold {% if step >= 1 %}bg-brand-600 text-white ring-4 ring-brand-50 dark:ring-brand-900/30{% else %}bg-slate-200 text-slate-500 dark:bg-slate-700{% endif %}">1</span>
-                    <span class="absolute -bottom-6 text-xs font-medium {% if step >= 1 %}text-brand-600 dark:text-brand-400{% else %}text-slate-500{% endif %}">Upload</span>
+                    <span class="h-8 w-8 rounded-full flex items-center justify-center text-sm font-semibold {% if step >= 1 %}bg-gradient-to-r from-brand-600 to-brand-500 text-white ring-4 ring-brand-50{% else %}bg-slate-200 text-slate-500{% endif %}">1</span>
+                    <span class="absolute -bottom-6 text-xs font-medium {% if step >= 1 %}text-brand-600{% else %}text-slate-500{% endif %}">Upload</span>
                 </div>
                 
                 <div class="relative flex items-center justify-center">
-                    <span class="h-8 w-8 rounded-full flex items-center justify-center text-sm font-semibold {% if step >= 2 %}bg-brand-600 text-white ring-4 ring-brand-50 dark:ring-brand-900/30{% else %}bg-slate-200 text-slate-500 dark:bg-slate-700{% endif %}">2</span>
-                    <span class="absolute -bottom-6 text-xs font-medium {% if step >= 2 %}text-brand-600 dark:text-brand-400{% else %}text-slate-500{% endif %}">Validate</span>
+                    <span class="h-8 w-8 rounded-full flex items-center justify-center text-sm font-semibold {% if step >= 2 %}bg-gradient-to-r from-brand-600 to-brand-500 text-white ring-4 ring-brand-50{% else %}bg-slate-200 text-slate-500{% endif %}">2</span>
+                    <span class="absolute -bottom-6 text-xs font-medium {% if step >= 2 %}text-brand-600{% else %}text-slate-500{% endif %}">Validate</span>
                 </div>
                 
                 <div class="relative flex items-center justify-center">
-                    <span class="h-8 w-8 rounded-full flex items-center justify-center text-sm font-semibold {% if step >= 3 %}bg-brand-600 text-white ring-4 ring-brand-50 dark:ring-brand-900/30{% else %}bg-slate-200 text-slate-500 dark:bg-slate-700{% endif %}">3</span>
-                    <span class="absolute -bottom-6 text-xs font-medium {% if step >= 3 %}text-brand-600 dark:text-brand-400{% else %}text-slate-500{% endif %}">Import</span>
+                    <span class="h-8 w-8 rounded-full flex items-center justify-center text-sm font-semibold {% if step >= 3 %}bg-gradient-to-r from-brand-600 to-brand-500 text-white ring-4 ring-brand-50{% else %}bg-slate-200 text-slate-500{% endif %}">3</span>
+                    <span class="absolute -bottom-6 text-xs font-medium {% if step >= 3 %}text-brand-600{% else %}text-slate-500{% endif %}">Import</span>
                 </div>
             </div>
             <div class="h-6"></div>
@@ -59,12 +59,12 @@
                     <div class="md:col-span-2 space-y-6">
                         
                         {% if not has_academic_structure %}
-                        <div class="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-lg p-4">
+                        <div class="bg-rose-50 border border-rose-200 rounded-xl p-4">
                             <div class="flex">
                                 <svg class="h-5 w-5 text-rose-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-rose-800 dark:text-rose-400">Academic Structure Missing</h3>
-                                    <div class="mt-2 text-sm text-rose-700 dark:text-rose-300">
+                                    <h3 class="text-sm font-medium text-rose-800">Academic Structure Missing</h3>
+                                    <div class="mt-2 text-sm text-rose-700">
                                         <p>You must import the Academic Structure (Semesters and Subjects) before importing teaching allocations.</p>
                                     </div>
                                 </div>
@@ -76,23 +76,23 @@
                             {% csrf_token %}
                             <div>
                             <div class="flex justify-between items-end mb-2">
-                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                                <label class="block text-sm font-medium text-slate-700">
                                     Upload Allocation File
                                 </label>
-                                <a href="{% static 'samples/sample_course_allocation_import.csv' %}" download class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-md dark:text-brand-400 dark:bg-brand-900/30 dark:hover:bg-brand-900/50 transition">
+                                <a href="{% static 'samples/sample_course_allocation_import.csv' %}" download class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-md:bg-brand-900/50 transition">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                                     Sample CSV
                                 </a>
                             </div>
-                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-xl {% if has_faculty_master and has_academic_structure %}hover:border-brand-500 dark:hover:border-brand-500 transition cursor-pointer{% endif %} bg-slate-50 dark:bg-slate-800/50">
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-xl {% if has_faculty_master and has_academic_structure %}hover:border-brand-500:border-brand-500 transition cursor-pointer{% endif %} bg-slate-50">
                                     <div class="space-y-2 text-center">
                                         <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                             <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                         </svg>
-                                        <div class="text-sm text-slate-600 dark:text-slate-400">
+                                        <div class="text-sm text-slate-600">
                                             {{ form.allocation_file }}
                                         </div>
-                                        <p class="text-xs text-slate-500 dark:text-slate-500">
+                                        <p class="text-xs text-slate-500">
                                             .xlsx or .csv files with multi-row headers
                                         </p>
                                         {% if form.allocation_file.errors %}
@@ -101,11 +101,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-                                <a href="{% url 'academic:allocation_list' pk=academic_year.pk %}" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+                            <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                                <a href="{% url 'academic:allocation_list' pk=academic_year.pk %}" class="px-4 py-2 border border-slate-300 rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50:bg-slate-700 transition">
                                     Cancel
                                 </a>
-                                <button type="submit" {% if not has_faculty_master or not has_academic_structure %}disabled class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-slate-400 cursor-not-allowed"{% else %}class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition"{% endif %}>
+                                <button type="submit" {% if not has_faculty_master or not has_academic_structure %}disabled class="inline-flex justify-center py-2 px-4 border border-transparent shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 text-sm font-medium rounded-xl text-white bg-slate-400 cursor-not-allowed"{% else %}class="inline-flex justify-center py-2 px-4 border border-transparent shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition"{% endif %}>
                                     Upload & Preview
                                 </button>
                             </div>
@@ -113,22 +113,22 @@
                     </div>
 
                     <!-- Guidelines Sidebar -->
-                    <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5 border border-slate-200 dark:border-slate-700">
-                        <h3 class="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
+                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                        <h3 class="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-4">
                             <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             Format Requirements
                         </h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">The importer automatically parses the multi-row header format. Ensure these column headers exist:</p>
-                        <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 mb-4">
-                            <li><span class="font-mono text-xs bg-slate-200 dark:bg-slate-700 px-1 rounded">Sem</span></li>
-                            <li><span class="font-mono text-xs bg-slate-200 dark:bg-slate-700 px-1 rounded">Class</span></li>
-                            <li><span class="font-mono text-xs bg-slate-200 dark:bg-slate-700 px-1 rounded">Course Code</span></li>
+                        <p class="text-xs text-slate-500 mb-3">The importer automatically parses the multi-row header format. Ensure these column headers exist:</p>
+                        <ul class="space-y-2 text-sm text-slate-600 mb-4">
+                            <li><span class="font-mono text-xs bg-slate-200 px-1 rounded">Sem</span></li>
+                            <li><span class="font-mono text-xs bg-slate-200 px-1 rounded">Class</span></li>
+                            <li><span class="font-mono text-xs bg-slate-200 px-1 rounded">Course Code</span></li>
                         </ul>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Teaching assignments generated based on sub-columns:</p>
-                        <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                            <li><span class="font-mono text-xs bg-slate-200 dark:bg-slate-700 px-1 rounded">Course Coordinator</span></li>
-                            <li><span class="font-mono text-xs bg-slate-200 dark:bg-slate-700 px-1 rounded">Theory All</span> → All students</li>
-                            <li><span class="font-mono text-xs bg-slate-200 dark:bg-slate-700 px-1 rounded">Batch-A/B/C</span> → Batch specific</li>
+                        <p class="text-xs text-slate-500 mb-2">Teaching assignments generated based on sub-columns:</p>
+                        <ul class="space-y-2 text-sm text-slate-600">
+                            <li><span class="font-mono text-xs bg-slate-200 px-1 rounded">Course Coordinator</span></li>
+                            <li><span class="font-mono text-xs bg-slate-200 px-1 rounded">Theory All</span> → All students</li>
+                            <li><span class="font-mono text-xs bg-slate-200 px-1 rounded">Batch-A/B/C</span> → Batch specific</li>
                         </ul>
                     </div>
                 </div>
@@ -138,36 +138,36 @@
                 <div class="space-y-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-medium text-slate-900 dark:text-white">Validation Results</h3>
-                            <p class="text-sm text-slate-500 dark:text-slate-400">File: <span class="font-medium text-slate-700 dark:text-slate-300">{{ original_name }}</span></p>
+                            <h3 class="text-lg font-medium text-slate-900">Validation Results</h3>
+                            <p class="text-sm text-slate-500">File: <span class="font-medium text-slate-700">{{ original_name }}</span></p>
                         </div>
                         <div class="flex gap-4 text-center">
-                            <div class="bg-slate-50 dark:bg-slate-800 rounded-lg px-4 py-2 border border-slate-200 dark:border-slate-700">
-                                <div class="text-2xl font-bold text-slate-900 dark:text-white">{{ summary.total_valid }}</div>
-                                <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">Valid Assignments</div>
+                            <div class="bg-slate-50 rounded-xl px-4 py-2 border border-slate-200">
+                                <div class="text-2xl font-bold text-slate-900">{{ summary.total_valid }}</div>
+                                <div class="text-xs font-medium text-slate-500 uppercase">Valid Assignments</div>
                             </div>
-                            <div class="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg px-4 py-2 border border-indigo-200 dark:border-indigo-800/50">
-                                <div class="text-2xl font-bold text-indigo-700 dark:text-indigo-400">{{ summary.unique_subjects }}</div>
-                                <div class="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase">Unique Subjects</div>
+                            <div class="bg-indigo-50 rounded-xl px-4 py-2 border border-indigo-200">
+                                <div class="text-2xl font-bold text-indigo-700">{{ summary.unique_subjects }}</div>
+                                <div class="text-xs font-medium text-indigo-600 uppercase">Unique Subjects</div>
                             </div>
                             {% if summary.total_errors > 0 %}
-                            <div class="bg-rose-50 dark:bg-rose-900/20 rounded-lg px-4 py-2 border border-rose-200 dark:border-rose-800">
-                                <div class="text-2xl font-bold text-rose-600 dark:text-rose-400">{{ summary.total_errors }}</div>
-                                <div class="text-xs font-medium text-rose-500 dark:text-rose-400 uppercase">Errors</div>
+                            <div class="bg-rose-50 rounded-xl px-4 py-2 border border-rose-200">
+                                <div class="text-2xl font-bold text-rose-600">{{ summary.total_errors }}</div>
+                                <div class="text-xs font-medium text-rose-500 uppercase">Errors</div>
                             </div>
                             {% endif %}
                         </div>
                     </div>
 
                     {% if summary.errors %}
-                        <div class="rounded-lg bg-rose-50 dark:bg-rose-900/20 p-4 border border-rose-200 dark:border-rose-800/50">
+                        <div class="rounded-xl bg-rose-50 p-4 border border-rose-200">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     <svg class="h-5 w-5 text-rose-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
                                 </div>
                                 <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-rose-800 dark:text-rose-300">Errors found (these rows will be skipped)</h3>
-                                    <div class="mt-2 text-sm text-rose-700 dark:text-rose-400 overflow-y-auto max-h-48">
+                                    <h3 class="text-sm font-medium text-rose-800">Errors found (these rows will be skipped)</h3>
+                                    <div class="mt-2 text-sm text-rose-700 overflow-y-auto max-h-48">
                                         <ul class="list-disc pl-5 space-y-1">
                                             {% for error in summary.errors %}
                                             <li>Row {{ error.row }}: {{ error.identifier }} — {{ error.message }}</li>
@@ -180,14 +180,14 @@
                     {% endif %}
 
                     {% if summary.warnings %}
-                        <div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-4 border border-amber-200 dark:border-amber-800/50">
+                        <div class="rounded-xl bg-amber-50 p-4 border border-amber-200">
                             <div class="flex">
                                 <div class="flex-shrink-0">
                                     <svg class="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
                                 </div>
                                 <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-amber-800 dark:text-amber-300">{{ summary.total_warnings }} Warnings (Assignments will still be created)</h3>
-                                    <div class="mt-2 text-sm text-amber-700 dark:text-amber-400 overflow-y-auto max-h-48">
+                                    <h3 class="text-sm font-medium text-amber-800">{{ summary.total_warnings }} Warnings (Assignments will still be created)</h3>
+                                    <div class="mt-2 text-sm text-amber-700 overflow-y-auto max-h-48">
                                         <ul class="list-disc pl-5 space-y-1">
                                             {% for warning in summary.warnings|slice:":20" %}
                                             <li>Row {{ warning.row }}: {{ warning.message }}</li>
@@ -204,11 +204,11 @@
 
                     {% if summary.total_valid > 0 %}
                         <div>
-                            <h4 class="text-sm font-medium text-slate-900 dark:text-white mb-3">Sample Assignments (First {{ summary.valid_sample|length }} generated rows)</h4>
-                            <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden shadow-sm">
+                            <h4 class="text-sm font-medium text-slate-900 mb-3">Sample Assignments (First {{ summary.valid_sample|length }} generated rows)</h4>
+                            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300">
                                 <div class="overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
-                                        <thead class="bg-slate-50 dark:bg-slate-800">
+                                    <table class="min-w-full divide-y divide-slate-200">
+                                        <thead class="bg-slate-50">
                                             <tr>
                                                 <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Row</th>
                                                 <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Class</th>
@@ -217,12 +217,12 @@
                                                 <th class="px-4 py-2 text-left text-xs font-medium text-slate-500 uppercase">Resolved Faculty</th>
                                             </tr>
                                         </thead>
-                                        <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+                                        <tbody class="divide-y divide-slate-200">
                                             {% for row in summary.valid_sample %}
-                                            <tr class="bg-white dark:bg-slate-900">
+                                            <tr class="bg-white">
                                                 <td class="px-4 py-2 text-sm text-slate-500">{{ row.row }}</td>
-                                                <td class="px-4 py-2 text-sm text-slate-900 dark:text-white">{{ row.class_name }}</td>
-                                                <td class="px-4 py-2 text-sm text-slate-900 dark:text-white">{{ row.course_code }}</td>
+                                                <td class="px-4 py-2 text-sm text-slate-900">{{ row.class_name }}</td>
+                                                <td class="px-4 py-2 text-sm text-slate-900">{{ row.course_code }}</td>
                                                 <td class="px-4 py-2 text-sm text-slate-500">
                                                     {% if row.is_coordinator %}
                                                     <span class="text-amber-600 font-medium">Coordinator</span>
@@ -232,9 +232,9 @@
                                                 </td>
                                                 <td class="px-4 py-2 text-sm">
                                                     {% if row.faculty_id %}
-                                                    <span class="text-emerald-600 dark:text-emerald-400 font-medium">{{ row.faculty_name }}</span>
+                                                    <span class="text-emerald-600 font-medium">{{ row.faculty_name }}</span>
                                                     {% else %}
-                                                    <span class="text-rose-500 dark:text-rose-400">Unresolved ({{ row.alias_raw }})</span>
+                                                    <span class="text-rose-500">Unresolved ({{ row.alias_raw }})</span>
                                                     {% endif %}
                                                 </td>
                                             </tr>
@@ -246,20 +246,20 @@
                         </div>
                     {% endif %}
 
-                    <div class="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
-                        <a href="{% url 'academic:allocation_import_upload' pk=academic_year.pk %}" class="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg shadow-sm text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+                    <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+                        <a href="{% url 'academic:allocation_import_upload' pk=academic_year.pk %}" class="px-4 py-2 border border-slate-300 rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50:bg-slate-700 transition">
                             Back to Upload
                         </a>
                         {% if summary.total_valid > 0 %}
                         <form method="post" action="{% url 'academic:allocation_import_process' pk=academic_year.pk %}">
                             {% csrf_token %}
-                            <button type="submit" class="inline-flex items-center justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition">
+                            <button type="submit" class="inline-flex items-center justify-center py-2 px-4 border border-transparent shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 text-sm font-medium rounded-xl text-white bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                 Confirm & Import {{ summary.total_valid }} Assignments
                             </button>
                         </form>
                         {% else %}
-                        <button disabled class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-slate-400 cursor-not-allowed">
+                        <button disabled class="inline-flex justify-center py-2 px-4 border border-transparent shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 text-sm font-medium rounded-xl text-white bg-slate-400 cursor-not-allowed">
                             Cannot Import
                         </button>
                         {% endif %}

@@ -8,45 +8,45 @@
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Exam Schedules</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage timetables for upcoming examination events.</p>
+            <h1 class="text-2xl font-bold text-slate-900">Exam Schedules</h1>
+            <p class="text-sm text-slate-500 mt-1">Manage timetables for upcoming examination events.</p>
         </div>
     </div>
 
     <!-- Data Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for exam in exams %}
-        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 hover:shadow-md hover:border-brand-300 dark:hover:border-brand-700 transition duration-200 group flex flex-col h-full">
+        <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 p-6 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md hover:border-brand-300:border-brand-700 transition duration-200 group flex flex-col h-full">
             <div class="flex justify-between items-start mb-4">
-                <div class="bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400 p-2.5 rounded-lg">
+                <div class="bg-brand-50 text-brand-600 p-2.5 rounded-xl">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                    {% if exam.status == 'draft' %}bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300
-                    {% elif exam.status == 'scheduled' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400
-                    {% elif exam.status == 'ongoing' %}bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400
-                    {% else %}bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300{% endif %}">
+                    {% if exam.status == 'draft' %}bg-slate-100 text-slate-800
+                    {% elif exam.status == 'scheduled' %}bg-blue-100 text-blue-800
+                    {% elif exam.status == 'ongoing' %}bg-emerald-100 text-emerald-800
+                    {% else %}bg-slate-100 text-slate-800{% endif %}">
                     {{ exam.get_status_display }}
                 </span>
             </div>
             
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">{{ exam.name }}</h3>
-            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">{{ exam.start_date|date:"d M Y" }} to {{ exam.end_date|date:"d M Y" }}</p>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">{{ exam.name }}</h3>
+            <p class="text-sm text-slate-500 mb-4">{{ exam.start_date|date:"d M Y" }} to {{ exam.end_date|date:"d M Y" }}</p>
             
             <div class="mt-auto space-y-4">
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-slate-500">Scheduled Subjects</span>
-                    <span class="font-semibold text-slate-900 dark:text-white">{{ exam.schedules.count }}</span>
+                    <span class="font-semibold text-slate-900">{{ exam.schedules.count }}</span>
                 </div>
-                <a href="{% url 'scheduling:manager' exam.id %}" class="block w-full py-2.5 px-4 bg-slate-50 hover:bg-brand-50 text-slate-700 hover:text-brand-700 border border-slate-200 hover:border-brand-200 dark:bg-slate-800/50 dark:hover:bg-brand-900/20 dark:text-slate-300 dark:hover:text-brand-400 dark:border-slate-700 dark:hover:border-brand-800 text-sm font-medium rounded-lg text-center transition">
+                <a href="{% url 'scheduling:manager' exam.id %}" class="block w-full py-2.5 px-4 bg-slate-50 hover:bg-brand-50 text-slate-700 hover:text-brand-700 border border-slate-200 hover:border-brand-200:bg-brand-900/20:text-brand-400:border-brand-800 text-sm font-medium rounded-xl text-center transition">
                     Manage Schedule
                 </a>
             </div>
         </div>
         {% empty %}
-        <div class="col-span-full bg-white dark:bg-slate-900 rounded-xl p-10 text-center border border-slate-200 dark:border-slate-800">
+        <div class="col-span-full bg-white rounded-xl p-10 text-center border border-slate-200">
             <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-white">No exams found</h3>
+            <h3 class="mt-2 text-sm font-medium text-slate-900">No exams found</h3>
             <p class="mt-1 text-sm text-slate-500">Exams must be created in the Master Data section first.</p>
         </div>
         {% endfor %}

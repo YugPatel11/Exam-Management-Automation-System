@@ -6,35 +6,35 @@
 {% block content %}
 <div class="max-w-3xl mx-auto space-y-6">
     <div class="flex items-center gap-4">
-        <a href="{% url 'accounts:user_list' %}" class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
+        <a href="{% url 'accounts:user_list' %}" class="p-2 text-slate-500 hover:text-slate-700:text-slate-200 transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </a>
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Import Users</h1>
-            <p class="text-slate-500 dark:text-slate-400 mt-1">Upload a CSV file to bulk create user accounts.</p>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Import Users</h1>
+            <p class="text-slate-500 mt-1">Upload a CSV file to bulk create user accounts.</p>
         </div>
     </div>
 
-    <div class="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+    <div class="bg-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 rounded-xl overflow-hidden">
         <div class="p-6">
             <div class="mb-8">
-                <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">Instructions</h3>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                <h3 class="text-lg font-medium text-slate-900 mb-2">Instructions</h3>
+                <p class="text-sm text-slate-500 mb-4">
                     Please prepare your CSV file with the following exact headers (case-sensitive). 
                     Passwords will be auto-generated and emailed to the new users.
                 </p>
                 
-                <div class="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 font-mono text-xs text-slate-700 dark:text-slate-300 overflow-x-auto">
+                <div class="bg-slate-50 rounded-xl p-4 font-mono text-xs text-slate-700 overflow-x-auto">
                     FirstName,LastName,Email,Role,Phone,Department,Designation,EmployeeId
                 </div>
                 
-                <div class="mt-4 space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                <div class="mt-4 space-y-2 text-sm text-slate-600">
                     <p><strong>Required Fields:</strong> FirstName, LastName, Email, Role.</p>
-                    <p><strong>Valid Roles:</strong> <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">subject_faculty</code>, <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">subject_coordinator</code>{% if user.is_admin_role or user.is_superuser %}, <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">exam_coordinator</code>, <code class="px-1 py-0.5 bg-slate-100 dark:bg-slate-800 rounded">admin</code>{% endif %}.</p>
+                    <p><strong>Valid Roles:</strong> <code class="px-1 py-0.5 bg-slate-100 rounded">subject_faculty</code>, <code class="px-1 py-0.5 bg-slate-100 rounded">subject_coordinator</code>{% if user.is_admin_role or user.is_superuser %}, <code class="px-1 py-0.5 bg-slate-100 rounded">exam_coordinator</code>, <code class="px-1 py-0.5 bg-slate-100 rounded">admin</code>{% endif %}.</p>
                 </div>
                 
                 <div class="mt-6">
-                    <a href="{% static 'samples/users_import_template.csv' %}" download class="inline-flex items-center text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">
+                    <a href="{% static 'samples/users_import_template.csv' %}" download class="inline-flex items-center text-sm font-medium text-brand-600 hover:text-brand-700:text-brand-300">
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                         Download Sample Template
                     </a>
@@ -54,11 +54,11 @@
                     {% endif %}
                 </div>
 
-                <div class="pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-3">
-                    <a href="{% url 'accounts:user_list' %}" class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                <div class="pt-4 border-t border-slate-200 flex justify-end gap-3">
+                    <a href="{% url 'accounts:user_list' %}" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50:bg-slate-700 transition-colors">
                         Cancel
                     </a>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 focus:ring-4 focus:ring-brand-500/20 transition-colors shadow-sm">
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-brand-600 to-brand-500 rounded-xl hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:ring-4 focus:ring-brand-500/20 transition-colors shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300">
                         Upload & Import
                     </button>
                 </div>
