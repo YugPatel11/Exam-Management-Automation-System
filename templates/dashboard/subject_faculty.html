@@ -32,7 +32,7 @@
                             <span class="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">Pending</span>
                         </div>
                         <p class="text-xs text-slate-500">{{ task.exam.name }} | Class: {{ task.teaching_assignment.class_name|default:"All" }}</p>
-                        <a href="{% url 'marks:entry' task.pk %}" class="mt-2 inline-flex items-center text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                        <a href="{% url 'marks:entry_form' task.pk %}" class="mt-2 inline-flex items-center text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400">
                             Enter Marks &rarr;
                         </a>
                     </li>

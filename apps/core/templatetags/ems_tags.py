@@ -105,3 +105,15 @@ def get_item(dictionary, key):
     if isinstance(dictionary, dict):
         return dictionary.get(key)
     return None
+
+
+@register.filter(name='get_form_field')
+def get_form_field(form, field_name):
+    """
+    Get a bound field from a form dynamically by name.
+    Usage: {{ form|get_form_field:field_name }}
+    """
+    try:
+        return form[field_name]
+    except KeyError:
+        return ''
