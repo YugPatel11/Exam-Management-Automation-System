@@ -255,6 +255,7 @@ class MarksSubComponent(BaseModel):
     name = models.CharField(max_length=100, verbose_name="Sub-Component Name", help_text="e.g., Exam, Faculty Evaluation")
     slug = models.SlugField(max_length=100, verbose_name="Sub-Component Slug")
     max_marks = models.PositiveIntegerField(verbose_name="Maximum Marks", null=True, blank=True)
+    number_of_questions = models.PositiveIntegerField(default=1, verbose_name="Number of Questions")
     display_order = models.PositiveIntegerField(default=0, verbose_name="Display Order")
 
     class Meta:

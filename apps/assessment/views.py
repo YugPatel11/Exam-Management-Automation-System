@@ -134,12 +134,16 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
         # Save to DB
         MarksSubComponent.objects.filter(marks_component=component).delete()
         
+        from django.utils.text import slugify
         new_components = []
         for i, c in enumerate(components_data):
+            c_name = str(c.get('name', '')).strip()
             new_components.append(MarksSubComponent(
                 marks_component=component,
-                name=str(c.get('name', '')).strip(),
+                name=c_name,
+                slug=slugify(c_name).replace('-', '_'),
                 max_marks=int(c.get('max_marks')),
+                number_of_questions=int(c.get('number_of_questions', 1)),
                 display_order=i
             ))
         MarksSubComponent.objects.bulk_create(new_components)

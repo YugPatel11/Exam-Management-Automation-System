@@ -76,14 +76,33 @@ class MarksEntryTask(BaseModel):
                 name=exam_component_name
             ).order_by('display_order'):
                 
+                comp_name_lower = mc.name.lower()
                 sub_comps = MarksSubComponent.objects.filter(marks_component=mc).order_by('display_order')
                 if sub_comps.exists():
                     for sc in sub_comps:
-                        components.append({
-                            'key': sc.slug,
-                            'label': sc.name,
-                            'max_marks': sc.max_marks,
-                        })
+                        sc_name_lower = sc.name.lower()
+                        is_exam_part = 'exam' in sc_name_lower or 'theory' in sc_name_lower
+                        
+                        num_q = sc.number_of_questions
+                        if is_exam_part:
+                            if comp_name_lower in ['theory ce', 'theory_ce']:
+                                num_q = 6
+                            elif comp_name_lower in ['theory ese', 'theory_ese']:
+                                num_q = 8
+                                
+                        if num_q > 1:
+                            for i in range(1, num_q + 1):
+                                components.append({
+                                    'key': f"{sc.slug}_q{i}",
+                                    'label': f"{sc.name} Q{i}",
+                                    'max_marks': None,
+                                })
+                        else:
+                            components.append({
+                                'key': sc.slug,
+                                'label': sc.name,
+                                'max_marks': sc.max_marks,
+                            })
                     continue
                 
                 comp_name_lower = mc.name.lower()

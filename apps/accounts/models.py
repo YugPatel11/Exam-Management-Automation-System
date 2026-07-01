@@ -71,7 +71,15 @@ class User(AbstractUser):
 
     @property
     def is_subject_coordinator(self):
-        return self.role == self.ROLE_SUBJECT_COORDINATOR
+        if self.role == self.ROLE_SUBJECT_COORDINATOR:
+            return True
+        if self.role == self.ROLE_SUBJECT_FACULTY:
+            try:
+                from apps.academic.models import FacultyTeachingAssignment
+                return FacultyTeachingAssignment.objects.filter(faculty__user=self, is_coordinator=True).exists()
+            except Exception:
+                pass
+        return False
 
     @property
     def is_subject_faculty(self):

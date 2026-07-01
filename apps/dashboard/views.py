@@ -103,17 +103,20 @@ def subject_coordinator_dashboard(request):
         return redirect(request.user.get_dashboard_url())
 
     # Get subjects coordinated by this user
-    from apps.faculty.models import FacultySubjectCoordinator
-    coordinated = FacultySubjectCoordinator.objects.filter(
-        faculty=request.user
-    ).select_related('subject', 'exam')
+    from apps.academic.models import FacultyTeachingAssignment
+    coordinated = FacultyTeachingAssignment.objects.filter(
+        faculty__user=request.user,
+        is_coordinator=True
+    ).select_related('semester_subject__subject', 'semester')
 
-    # Group by exam
+    # Group by semester
     exam_subjects = {}
     for c in coordinated:
-        if c.exam not in exam_subjects:
-            exam_subjects[c.exam] = []
-        exam_subjects[c.exam].append(c.subject)
+        if c.semester not in exam_subjects:
+            exam_subjects[c.semester] = []
+        # Ensure distinct subjects are added
+        if c.semester_subject.subject not in exam_subjects[c.semester]:
+            exam_subjects[c.semester].append(c.semester_subject.subject)
 
     # Question paper stats
     from apps.question_papers.models import QuestionPaper

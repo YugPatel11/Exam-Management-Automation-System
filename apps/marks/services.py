@@ -156,6 +156,17 @@ class MarksCsvImportService:
                                 break
                                 
                     if not row_has_error:
+                        if 'Total' in row:
+                            try:
+                                provided_total = float(row['Total'].strip())
+                                if abs(provided_total - total) > 0.01:
+                                    self.errors.append(f"Row {row_num}: Provided Total ({provided_total}) does not match calculated total ({total}).")
+                                    row_has_error = True
+                            except ValueError:
+                                self.errors.append(f"Row {row_num}: Invalid number format for Total.")
+                                row_has_error = True
+                                
+                    if not row_has_error:
                         marks_to_create.append(
                             StudentMark(
                                 task=self.task,

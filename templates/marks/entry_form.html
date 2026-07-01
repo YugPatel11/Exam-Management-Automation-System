@@ -42,6 +42,7 @@
                             {% for comp in components %}
                             <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider">{{ comp.label }}{% if comp.max_marks %}<br><span class="text-xs text-slate-400">(Max: {{ comp.max_marks }})</span>{% endif %}</th>
                             {% endfor %}
+                            <th scope="col" class="px-6 py-3 text-center text-xs font-bold text-brand-600 uppercase tracking-wider bg-brand-50">Total</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 bg-white">
@@ -82,6 +83,13 @@
                                 {% endif %}
                             </td>
                             {% endfor %}
+                            <td class="whitespace-nowrap px-6 py-4 text-sm text-center font-bold text-brand-700 bg-brand-50/50">
+                                {% if is_read_only %}
+                                    {{ form.instance.total_marks|default:"0" }}
+                                {% else %}
+                                    <span class="row-total">{{ form.instance.total_marks|default:"0" }}</span>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endwith %}
                         {% endfor %}
@@ -145,7 +153,36 @@
                             input.classList.remove('bg-slate-100', '', 'cursor-not-allowed');
                         });
                     }
+                    calculateTotals();
                 }
+
+                function calculateTotals() {
+                    const rows = document.querySelectorAll('tbody tr');
+                    rows.forEach(tr => {
+                        const statusSelect = tr.querySelector('select[name$="-status"]');
+                        if (statusSelect && statusSelect.value !== 'Present') {
+                            const totalSpan = tr.querySelector('.row-total');
+                            if (totalSpan) totalSpan.textContent = '0';
+                            return;
+                        }
+                        const inputs = tr.querySelectorAll('.marks-input');
+                        let sum = 0;
+                        inputs.forEach(input => {
+                            const val = parseFloat(input.value);
+                            if (!isNaN(val)) sum += val;
+                        });
+                        const totalSpan = tr.querySelector('.row-total');
+                        if (totalSpan) totalSpan.textContent = sum;
+                    });
+                }
+                
+                const allMarksInputs = document.querySelectorAll('.marks-input');
+                allMarksInputs.forEach(input => {
+                    input.addEventListener('input', calculateTotals);
+                });
+                
+                // Initial calculation
+                calculateTotals();
             });
         </script>
         
@@ -153,7 +190,7 @@
         <div class="bg-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 rounded-xl p-6 border border-slate-200">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-slate-900">Bulk Import (CSV)</h3>
-                <a href="{% static 'samples/sample_marks_import.csv' %}" download class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-md:bg-brand-900/50 transition">
+                <a href="{% url 'marks:sample_csv' task.pk %}" class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-md:bg-brand-900/50 transition">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     Sample
                 </a>

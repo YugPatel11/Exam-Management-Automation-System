@@ -19,4 +19,5 @@ urlpatterns = [
     path('tasks/', views.MarksEntryListView.as_view(), name='task_list'),
     path('tasks/<int:pk>/', views.MarksEntryFormView.as_view(), name='entry_form'),
     path('tasks/<int:pk>/upload/', views.MarksCsvUploadView.as_view(), name='csv_upload'),
+    path('tasks/<int:pk>/sample-csv/', views.MarksCsvSampleView.as_view(), name='sample_csv'),
 ]

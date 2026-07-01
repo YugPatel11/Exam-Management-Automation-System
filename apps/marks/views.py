@@ -288,3 +288,57 @@ class MarksCsvUploadView(FacultyRequiredMixin, View):
                     messages.error(request, err)
                     
         return redirect('marks:entry_form', pk=task.pk)
+
+import csv
+from django.http import HttpResponse
+
+class MarksCsvSampleView(FacultyRequiredMixin, View):
+    """
+    Generate a dynamic sample CSV with correct headers for the task.
+    """
+    def get(self, request, pk):
+        task = get_object_or_404(MarksEntryTask, pk=pk, faculty=request.user)
+        components = task.get_marks_components()
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="sample_marks_{task.subject.code}.csv"'
+        
+        writer = csv.writer(response)
+        
+        # Write headers
+        headers = ['RollNo', 'Status']
+        for comp in components:
+            headers.append(comp['key'])
+        headers.append('Total')
+        writer.writerow(headers)
+        
+        # Write some sample rows
+        row1_marks = [comp.get('max_marks', 10) or 5 for comp in components]
+        
+        # Get students for this task
+        if task.teaching_assignment:
+            from apps.students.models import Student
+            qs = Student.objects.filter(
+                academic_year=task.teaching_assignment.academic_year,
+                class_name=task.teaching_assignment.class_name
+            )
+            t_type = task.teaching_assignment.teaching_type
+            if t_type == 'practical_batch_a':
+                qs = qs.filter(batch='A')
+            elif t_type == 'practical_batch_b':
+                qs = qs.filter(batch='B')
+            elif t_type == 'practical_batch_c':
+                qs = qs.filter(batch='C')
+            students = list(qs.order_by('enrollment_no'))
+        else:
+            students = [] # Fallback
+            
+        sample_rows = []
+        if students:
+            for s in students:
+                sample_rows.append([s.roll_no, 'Present'] + row1_marks + [sum(row1_marks)])
+        else:
+            sample_rows.append(['101', 'Present'] + row1_marks + [sum(row1_marks)])
+            
+        writer.writerows(sample_rows)
+        return response
