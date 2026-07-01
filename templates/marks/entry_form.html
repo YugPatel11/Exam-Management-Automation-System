@@ -7,9 +7,12 @@
     <div>
         <h1 class="text-2xl font-semibold text-slate-900">Enter Marks</h1>
         <p class="mt-1 text-sm text-slate-500">{{ task.subject.code }} — {{ task.division.name|default:"All Divisions" }} ({{ task.exam.name }})</p>
+        {% if comp_data.use_theory_ce_formula %}
+        <p class="mt-1 text-xs text-brand-600 font-medium">Formula: Theory CE = ((Internal 1 + Internal 2) / 2) + Faculty Evaluation</p>
+        {% endif %}
     </div>
     <div class="flex items-center gap-3">
-        <a href="{% url 'marks:task_list' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700:text-slate-300">
+        <a href="{% url 'marks:task_list' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700">
             &larr; Back to Tasks
         </a>
     </div>
@@ -48,7 +51,7 @@
                     <tbody class="divide-y divide-slate-200 bg-white">
                         {% for item in student_forms %}
                         {% with form=item.form student=item.student %}
-                        <tr class="hover:bg-slate-50:bg-slate-800/50">
+                        <tr class="hover:bg-slate-50">
                             <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">{{ student.roll_no }}</td>
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500">{{ student.name }}</td>
                             
@@ -99,7 +102,7 @@
             
             {% if not is_read_only %}
             <div class="px-4 py-4 sm:px-6 border-t border-slate-200 flex justify-end gap-3 bg-slate-50">
-                <button type="submit" name="action" value="save_draft" class="inline-flex justify-center rounded-md border border-slate-300 bg-white py-2 px-4 text-sm font-medium text-slate-700 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2:bg-surface-600">
+                <button type="submit" name="action" value="save_draft" class="inline-flex justify-center rounded-md border border-slate-300 bg-white py-2 px-4 text-sm font-medium text-slate-700 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
                     Save Draft
                 </button>
                 <button type="submit" name="action" value="submit" class="inline-flex justify-center rounded-md border border-transparent bg-gradient-to-r from-brand-600 to-brand-500 py-2 px-4 text-sm font-medium text-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2" onclick="return confirm('Are you sure you want to submit these marks? You will not be able to edit them after submission.');">
@@ -118,6 +121,9 @@
                 <li>Enter marks for all students present.</li>
                 <li>Select <strong>AB (Absent)</strong> or <strong>UFM (Unfair Means)</strong> from the status dropdown if applicable. Marks will be disabled and saved as zero.</li>
                 <li>Ensure all marks entered are integers. No decimal values allowed.</li>
+                {% if comp_data.use_theory_ce_formula %}
+                <li><strong>Theory CE Formula:</strong> Total = ((Internal 1 + Internal 2) / 2) + Faculty Evaluation</li>
+                {% endif %}
                 <li>Click <strong>Save Draft</strong> to save your progress without submitting.</li>
                 <li>Click <strong>Submit for Review</strong> when you have verified all entries.</li>
             </ul>
@@ -125,6 +131,15 @@
         
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                const useFormula = {{ comp_data.use_theory_ce_formula|yesno:"true,false" }};
+                
+                // Build group info from components for formula calculation
+                const componentGroups = [
+                    {% for comp in components %}
+                    { key: '{{ comp.key }}', group: '{{ comp.group }}' }{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ];
+                
                 const statusSelects = document.querySelectorAll('select[name$="-status"]');
                 statusSelects.forEach(select => {
                     // Initialize state
@@ -145,12 +160,12 @@
                         inputs.forEach(input => {
                             input.disabled = true;
                             input.value = '';
-                            input.classList.add('bg-slate-100', '', 'cursor-not-allowed');
+                            input.classList.add('bg-slate-100', 'cursor-not-allowed');
                         });
                     } else {
                         inputs.forEach(input => {
                             input.disabled = false;
-                            input.classList.remove('bg-slate-100', '', 'cursor-not-allowed');
+                            input.classList.remove('bg-slate-100', 'cursor-not-allowed');
                         });
                     }
                     calculateTotals();
@@ -166,13 +181,52 @@
                             return;
                         }
                         const inputs = tr.querySelectorAll('.marks-input');
-                        let sum = 0;
-                        inputs.forEach(input => {
-                            const val = parseFloat(input.value);
-                            if (!isNaN(val)) sum += val;
-                        });
-                        const totalSpan = tr.querySelector('.row-total');
-                        if (totalSpan) totalSpan.textContent = sum;
+                        
+                        if (useFormula && inputs.length > 0) {
+                            // Theory CE formula: ((I1 + I2) / 2) + FE
+                            // Group inputs by their data-group attribute
+                            const groupTotals = {};
+                            inputs.forEach(input => {
+                                const group = input.getAttribute('data-group') || '';
+                                const val = parseFloat(input.value) || 0;
+                                groupTotals[group] = (groupTotals[group] || 0) + val;
+                            });
+                            
+                            const internalSums = [];
+                            let feSum = 0;
+                            const counted = new Set();
+                            
+                            for (const [group, total] of Object.entries(groupTotals)) {
+                                if (counted.has(group)) continue;
+                                counted.add(group);
+                                const gLower = group.toLowerCase();
+                                if (gLower.includes('internal') || gLower.includes('exam') || gLower.includes('theory')) {
+                                    internalSums.push(total);
+                                } else {
+                                    feSum += total;
+                                }
+                            }
+                            
+                            let total;
+                            if (internalSums.length >= 2) {
+                                const avgInternals = internalSums.reduce((a, b) => a + b, 0) / internalSums.length;
+                                total = avgInternals + feSum;
+                            } else {
+                                total = Object.values(groupTotals).reduce((a, b) => a + b, 0);
+                            }
+                            
+                            const totalSpan = tr.querySelector('.row-total');
+                            if (totalSpan) totalSpan.textContent = total % 1 === 0 ? total : total.toFixed(2);
+                        } else {
+                            // Standard sum
+                            let sum = 0;
+                            inputs.forEach(input => {
+                                const val = parseFloat(input.value);
+                                if (!isNaN(val)) sum += val;
+                            });
+                            const totalSpan = tr.querySelector('.row-total');
+                            if (totalSpan) totalSpan.textContent = sum;
+                        }
                     });
                 }
                 
@@ -190,7 +244,7 @@
         <div class="bg-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 rounded-xl p-6 border border-slate-200">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-medium text-slate-900">Bulk Import (CSV)</h3>
-                <a href="{% url 'marks:sample_csv' task.pk %}" class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-md:bg-brand-900/50 transition">
+                <a href="{% url 'marks:sample_csv' task.pk %}" class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-md transition">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                     Sample
                 </a>
@@ -199,8 +253,8 @@
             
             <form action="{% url 'marks:csv_upload' task.pk %}" method="post" enctype="multipart/form-data" class="space-y-4">
                 {% csrf_token %}
-                <input type="file" name="file" accept=".csv" required class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100:bg-brand-900/50:text-brand-300:file:bg-brand-900">
-                <button type="submit" class="w-full inline-flex justify-center rounded-md border border-slate-300 bg-white py-2 px-4 text-sm font-medium text-slate-700 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2:bg-surface-600">
+                <input type="file" name="file" accept=".csv" required class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                <button type="submit" class="w-full inline-flex justify-center rounded-md border border-slate-300 bg-white py-2 px-4 text-sm font-medium text-slate-700 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
                     Upload CSV
                 </button>
             </form>

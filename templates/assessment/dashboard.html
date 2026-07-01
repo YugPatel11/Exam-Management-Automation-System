@@ -32,16 +32,12 @@
                 {% else %}
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {% for component in subject.active_components %}
-                            {% if component.name != 'Theory ESE' %}
+                            {% if component.name != 'Tutorial CE' and component.name != 'Tutorial ESE' %}
                             <div class="p-4 border border-slate-200 rounded-xl hover:border-brand-500 transition group cursor-pointer" onclick="window.location.href='{% url 'assessment:builder' component.id %}'">
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition">
-                                            {% if component.name == 'Tutorial CE' %}
-                                                Tutorial/Practical
-                                            {% else %}
-                                                {{ component.name }}
-                                            {% endif %}
+                                            {{ component.name }}
                                         </h3>
                                         <p class="text-sm text-slate-500 mt-1">Max Marks: {{ component.max_marks }}</p>
                                     </div>

@@ -21,13 +21,15 @@ class CsvUploadForm(forms.Form):
 class DynamicMarksEntryForm(forms.ModelForm):
     """
     Dynamically generates fields based on the assessment scheme components.
+    Supports the Theory CE formula: ((Internal1 + Internal2) / 2) + FE
     """
     class Meta:
         model = StudentMark
         fields = ['status']
 
     def __init__(self, *args, **kwargs):
-        self.components = kwargs.pop('components', [])
+        self.components = kwargs.pop('components', [])  # list of field dicts
+        self.use_theory_ce_formula = kwargs.pop('use_theory_ce_formula', False)
         super().__init__(*args, **kwargs)
         
         self.fields['status'].widget.attrs.update({'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm'})
@@ -44,11 +46,14 @@ class DynamicMarksEntryForm(forms.ModelForm):
                 
             self.fields[field_name] = forms.IntegerField(
                 min_value=0,
+                max_value=max_marks if max_marks is not None else None,
                 required=False, # Not required if absent/ufm
                 initial=initial_val,
                 widget=forms.NumberInput(attrs={
                     'class': 'block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm marks-input',
-                    'placeholder': 'Marks'
+                    'placeholder': 'Marks',
+                    'max': max_marks if max_marks is not None else '',
+                    'data-group': comp.get('group', ''),
                 })
             )
 
@@ -79,7 +84,52 @@ class DynamicMarksEntryForm(forms.ModelForm):
             key = comp['key']
             val = self.cleaned_data.get(key, 0)
             marks_dict[key] = float(val) if val else 0
-            total += float(val) if val else 0
+
+        if self.use_theory_ce_formula:
+            # Theory CE = ((Internal 1 + Internal 2) / 2) + FE
+            # Group fields by their group slug
+            group_totals = {}
+            for comp in self.components:
+                group = comp.get('group', '')
+                val = marks_dict.get(comp['key'], 0)
+                group_totals.setdefault(group, 0)
+                group_totals[group] += val
+
+            # Find internal groups (those with _q suffixed keys) and FE group
+            internal_sums = []
+            fe_sum = 0
+            for comp in self.components:
+                group = comp.get('group', '')
+                # Already counted via group_totals
+                pass
+
+            # Identify internals vs FE from group names
+            counted_groups = set()
+            for comp in self.components:
+                group = comp.get('group', '')
+                if group in counted_groups:
+                    continue
+                counted_groups.add(group)
+                group_lower = group.lower()
+                group_val = group_totals.get(group, 0)
+                if 'internal' in group_lower or 'exam' in group_lower or 'theory' in group_lower:
+                    internal_sums.append(group_val)
+                else:
+                    fe_sum += group_val
+
+            if len(internal_sums) >= 2:
+                # Average of internals + FE
+                avg_internals = sum(internal_sums) / len(internal_sums)
+                total = avg_internals + fe_sum
+            elif len(internal_sums) == 1:
+                total = internal_sums[0] + fe_sum
+            else:
+                total = fe_sum
+        else:
+            # Standard: total = sum of all marks
+            for comp in self.components:
+                val = marks_dict.get(comp['key'], 0)
+                total += val
             
         instance.component_marks = marks_dict
         instance.total_marks = total

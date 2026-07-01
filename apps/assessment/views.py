@@ -46,6 +46,12 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
     def get(self, request, component_id):
         component = get_object_or_404(MarksComponent, id=component_id)
         semester_subject = component.semester_subject
+        comp_name_lower = component.name.lower()
+        
+        # Block Tutorial components — no sub-components allowed
+        if comp_name_lower in ['tutorial ce', 'tutorial_ce', 'tutorial ese', 'tutorial_ese']:
+            messages.error(request, "Tutorial components do not support sub-components. Marks are entered directly.")
+            return redirect('assessment:dashboard')
         
         # Verify access
         if not request.user.is_admin_role:
@@ -65,6 +71,11 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
 
         sub_components = MarksSubComponent.objects.filter(marks_component=component).order_by('display_order')
         
+        # Determine component-specific rules for the template
+        is_theory_ce = comp_name_lower in ['theory ce', 'theory_ce']
+        is_theory_ese = comp_name_lower in ['theory ese', 'theory_ese']
+        is_practical = 'practical' in comp_name_lower
+        
         context = {
             'subject': semester_subject.subject,
             'semester_subject': semester_subject,
@@ -72,13 +83,21 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
             'parent_type_display': component.name,
             'parent_max_marks': max_marks,
             'components': sub_components,
-            'component': component
+            'component': component,
+            'is_theory_ce': is_theory_ce,
+            'is_theory_ese': is_theory_ese,
+            'is_practical': is_practical,
         }
         return render(request, 'assessment/builder.html', context)
 
     def post(self, request, component_id):
         component = get_object_or_404(MarksComponent, id=component_id)
         semester_subject = component.semester_subject
+        comp_name_lower = component.name.lower()
+        
+        # Block Tutorial components
+        if comp_name_lower in ['tutorial ce', 'tutorial_ce', 'tutorial ese', 'tutorial_ese']:
+            return self._json_response(False, "Tutorial components do not support sub-components.")
         
         # Verify access
         if not request.user.is_admin_role:
@@ -88,8 +107,7 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
                 is_coordinator=True
             ).exists()
             if not is_coordinator:
-                messages.error(request, "Unauthorized.")
-                return redirect('assessment:dashboard')
+                return self._json_response(False, "Unauthorized.")
 
         # Parent max marks
         parent_max_marks = component.max_marks
@@ -126,10 +144,44 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
             variables_dict[c_name] = v_marks
             names_seen.add(c_name)
 
-        # Validate that the sum of components does not exceed the parent max marks
+        # Validate total — must EQUAL parent max marks (not just "not exceed")
         total_component_marks = sum(variables_dict.values())
-        if total_component_marks > parent_max_marks:
-            return self._json_response(False, f"Total component marks ({total_component_marks}) cannot exceed the parent max marks ({parent_max_marks}).")
+        
+        is_theory_ce = comp_name_lower in ['theory ce', 'theory_ce']
+        
+        if is_theory_ce:
+            # Theory CE special validation:
+            # Internal 1 and Internal 2 must each be 30 marks
+            # Check that internals are present and correct
+            internal_count = 0
+            for c_name, c_marks in variables_dict.items():
+                c_lower = c_name.lower()
+                if 'internal' in c_lower or 'exam' in c_lower:
+                    internal_count += 1
+                    if c_marks != 30:
+                        return self._json_response(
+                            False,
+                            f"'{c_name}' must have exactly 30 marks (6 questions × 5 marks each)."
+                        )
+            
+            if internal_count < 2:
+                return self._json_response(
+                    False,
+                    "Theory CE requires at least 2 internal/exam components (e.g., Internal 1 and Internal 2), each with 30 marks."
+                )
+            
+            if total_component_marks != parent_max_marks:
+                return self._json_response(
+                    False,
+                    f"Total component marks ({total_component_marks}) must equal the parent max marks ({parent_max_marks})."
+                )
+        else:
+            # All other types: total must equal parent max marks
+            if total_component_marks != parent_max_marks:
+                return self._json_response(
+                    False,
+                    f"Total component marks ({total_component_marks}) must equal the parent max marks ({parent_max_marks})."
+                )
 
         # Save to DB
         MarksSubComponent.objects.filter(marks_component=component).delete()
@@ -138,12 +190,19 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
         new_components = []
         for i, c in enumerate(components_data):
             c_name = str(c.get('name', '')).strip()
+            c_lower = c_name.lower()
+            
+            # For Theory CE internals, force 6 questions
+            num_questions = int(c.get('number_of_questions', 1))
+            if is_theory_ce and ('internal' in c_lower or 'exam' in c_lower):
+                num_questions = 6
+            
             new_components.append(MarksSubComponent(
                 marks_component=component,
                 name=c_name,
                 slug=slugify(c_name).replace('-', '_'),
                 max_marks=int(c.get('max_marks')),
-                number_of_questions=int(c.get('number_of_questions', 1)),
+                number_of_questions=num_questions,
                 display_order=i
             ))
         MarksSubComponent.objects.bulk_create(new_components)

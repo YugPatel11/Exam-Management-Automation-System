@@ -68,16 +68,51 @@ class MarksAllocationService:
 
 
 class MarksCsvImportService:
-    def __init__(self, task, components):
+    def __init__(self, task, components, use_theory_ce_formula=False):
         self.task = task
-        self.components = components # List of dicts: [{'key': 'internal_1', 'max_marks': 25}, ...]
+        self.components = components  # List of field dicts from comp_data['fields']
+        self.use_theory_ce_formula = use_theory_ce_formula
         self.errors = []
         self.success_count = 0
+
+    def _calculate_total(self, marks_dict):
+        """Calculate total marks, applying Theory CE formula if needed."""
+        if self.use_theory_ce_formula:
+            group_totals = {}
+            for comp in self.components:
+                group = comp.get('group', '')
+                val = marks_dict.get(comp['key'], 0)
+                group_totals.setdefault(group, 0)
+                group_totals[group] += val
+
+            internal_sums = []
+            fe_sum = 0
+            counted = set()
+            for comp in self.components:
+                group = comp.get('group', '')
+                if group in counted:
+                    continue
+                counted.add(group)
+                g_lower = group.lower()
+                g_val = group_totals.get(group, 0)
+                if 'internal' in g_lower or 'exam' in g_lower or 'theory' in g_lower:
+                    internal_sums.append(g_val)
+                else:
+                    fe_sum += g_val
+
+            if len(internal_sums) >= 2:
+                return sum(internal_sums) / len(internal_sums) + fe_sum
+            elif len(internal_sums) == 1:
+                return internal_sums[0] + fe_sum
+            else:
+                return fe_sum
+        else:
+            return sum(marks_dict.get(comp['key'], 0) for comp in self.components)
         
     def process(self, csv_file):
         """
         Processes an uploaded CSV file containing marks.
-        Expected columns: RollNo, Absent, Component1_Key, Component2_Key, ...
+        Expected columns: RollNo, Status, Component1_Key, Component2_Key, ...
         """
         try:
             # Read CSV
@@ -128,11 +163,11 @@ class MarksCsvImportService:
                         continue
                     
                     marks_dict = {}
-                    total = 0
                     
                     if status in ['AB', 'UFM']:
                         for comp in self.components:
                             marks_dict[comp['key']] = 0
+                        total = 0
                     else:
                         for comp in self.components:
                             val_str = row.get(comp['key'], '0').strip()
@@ -142,18 +177,19 @@ class MarksCsvImportService:
                                     self.errors.append(f"Row {row_num}: Marks cannot be negative.")
                                     row_has_error = True
                                     break
-                                # If max_marks is known, validate it
-                                if 'max_marks' in comp and comp['max_marks']:
+                                # Validate max_marks
+                                if 'max_marks' in comp and comp['max_marks'] is not None:
                                     if val > comp['max_marks']:
-                                        self.errors.append(f"Row {row_num}: Marks {val} for {comp['key']} out of range (max {comp['max_marks']}).")
+                                        self.errors.append(f"Row {row_num}: Marks {val} for {comp['key']} exceeds max ({comp['max_marks']}).")
                                         row_has_error = True
                                         break
                                 marks_dict[comp['key']] = val
-                                total += val
                             except ValueError:
                                 self.errors.append(f"Row {row_num}: Invalid integer format for {comp['key']}.")
                                 row_has_error = True
                                 break
+
+                        total = self._calculate_total(marks_dict)
                                 
                     if not row_has_error:
                         if 'Total' in row:

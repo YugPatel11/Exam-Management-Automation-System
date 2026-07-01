@@ -81,12 +81,14 @@ class MarksReviewDetailView(ExamCoordinatorRequiredMixin, View):
         marks = StudentMark.objects.filter(task=task).select_related('student')
         
         # Get components dynamically from the task
-        components = task.get_marks_components()
+        comp_data = task.get_marks_components()
+        components = comp_data.get('fields', [])
             
         context = {
             'task': task,
             'marks': marks,
-            'components': components
+            'components': components,
+            'comp_data': comp_data,
         }
         return render(request, 'marks/review_detail.html', context)
         
@@ -137,8 +139,8 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
     """
     Dynamic form to enter marks for a specific task.
     """
-    def _get_components(self, task):
-        """Get marks components dynamically from the academic structure."""
+    def _get_comp_data(self, task):
+        """Get marks components dict from the task."""
         return task.get_marks_components()
         
     def get(self, request, pk):
@@ -161,7 +163,9 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
             messages.warning(request, f"Marks entry window has closed. Marks are view-only.")
             is_read_only = True
             
-        components = self._get_components(task)
+        comp_data = self._get_comp_data(task)
+        components = comp_data.get('fields', [])
+        use_theory_ce_formula = comp_data.get('use_theory_ce_formula', False)
         
         # Get students for this task
         if task.teaching_assignment:
@@ -197,7 +201,11 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
             # Get existing mark or create
             mark, _ = StudentMark.objects.get_or_create(task=task, student=student)
             prefix = f'student_{student.id}'
-            form = DynamicMarksEntryForm(instance=mark, prefix=prefix, components=components)
+            form = DynamicMarksEntryForm(
+                instance=mark, prefix=prefix,
+                components=components,
+                use_theory_ce_formula=use_theory_ce_formula
+            )
             student_forms.append({
                 'student': student,
                 'form': form
@@ -206,6 +214,7 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
         context = {
             'task': task,
             'components': components,
+            'comp_data': comp_data,
             'student_forms': student_forms,
             'is_read_only': is_read_only,
         }
@@ -228,7 +237,10 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
         if exam.marks_entry_end and now > exam.marks_entry_end:
             messages.error(request, "Marks entry window has closed.")
             return redirect('marks:task_list')
-        components = self._get_components(task)
+
+        comp_data = self._get_comp_data(task)
+        components = comp_data.get('fields', [])
+        use_theory_ce_formula = comp_data.get('use_theory_ce_formula', False)
         
         action = request.POST.get('action')
         
@@ -239,7 +251,11 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
         with transaction.atomic():
             for mark in marks_qs:
                 prefix = f'student_{mark.student.id}'
-                form = DynamicMarksEntryForm(request.POST, instance=mark, prefix=prefix, components=components)
+                form = DynamicMarksEntryForm(
+                    request.POST, instance=mark, prefix=prefix,
+                    components=components,
+                    use_theory_ce_formula=use_theory_ce_formula
+                )
                 if form.is_valid():
                     form.save()
                 else:
@@ -256,7 +272,6 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
                 return redirect('marks:task_list')
             else:
                 messages.error(request, "Please correct the errors in the form.")
-                # We should really render the form with errors, but for simplicity we'll just redirect back.
                 return redirect('marks:entry_form', pk=task.pk)
 
 
@@ -276,9 +291,14 @@ class MarksCsvUploadView(FacultyRequiredMixin, View):
             csv_file = form.cleaned_data['file']
             
             # Get components dynamically from the task
-            components = task.get_marks_components()
+            comp_data = task.get_marks_components()
+            components = comp_data.get('fields', [])
+            use_theory_ce_formula = comp_data.get('use_theory_ce_formula', False)
             
-            service = MarksCsvImportService(task=task, components=components)
+            service = MarksCsvImportService(
+                task=task, components=components,
+                use_theory_ce_formula=use_theory_ce_formula
+            )
             success = service.process(csv_file)
             
             if success:
@@ -298,7 +318,8 @@ class MarksCsvSampleView(FacultyRequiredMixin, View):
     """
     def get(self, request, pk):
         task = get_object_or_404(MarksEntryTask, pk=pk, faculty=request.user)
-        components = task.get_marks_components()
+        comp_data = task.get_marks_components()
+        components = comp_data.get('fields', [])
         
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="sample_marks_{task.subject.code}.csv"'
@@ -312,8 +333,8 @@ class MarksCsvSampleView(FacultyRequiredMixin, View):
         headers.append('Total')
         writer.writerow(headers)
         
-        # Write some sample rows
-        row1_marks = [comp.get('max_marks', 10) or 5 for comp in components]
+        # Write sample rows with actual max_marks as sample values
+        row1_marks = [comp.get('max_marks', 5) or 5 for comp in components]
         
         # Get students for this task
         if task.teaching_assignment:
@@ -332,13 +353,42 @@ class MarksCsvSampleView(FacultyRequiredMixin, View):
             students = list(qs.order_by('enrollment_no'))
         else:
             students = [] # Fallback
+
+        # Calculate sample total
+        if comp_data.get('use_theory_ce_formula', False):
+            # Group marks by group for formula
+            group_totals = {}
+            for comp, val in zip(components, row1_marks):
+                group = comp.get('group', '')
+                group_totals.setdefault(group, 0)
+                group_totals[group] += val
+            internal_sums = []
+            fe_sum = 0
+            counted = set()
+            for comp in components:
+                group = comp.get('group', '')
+                if group in counted:
+                    continue
+                counted.add(group)
+                g_lower = group.lower()
+                g_val = group_totals.get(group, 0)
+                if 'internal' in g_lower or 'exam' in g_lower or 'theory' in g_lower:
+                    internal_sums.append(g_val)
+                else:
+                    fe_sum += g_val
+            if len(internal_sums) >= 2:
+                sample_total = sum(internal_sums) / len(internal_sums) + fe_sum
+            else:
+                sample_total = sum(row1_marks)
+        else:
+            sample_total = sum(row1_marks)
             
         sample_rows = []
         if students:
             for s in students:
-                sample_rows.append([s.roll_no, 'Present'] + row1_marks + [sum(row1_marks)])
+                sample_rows.append([s.roll_no, 'Present'] + row1_marks + [sample_total])
         else:
-            sample_rows.append(['101', 'Present'] + row1_marks + [sum(row1_marks)])
+            sample_rows.append(['101', 'Present'] + row1_marks + [sample_total])
             
         writer.writerows(sample_rows)
         return response
