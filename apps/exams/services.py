@@ -70,6 +70,15 @@ class ExamAutoGenerationService:
                     if not assignment.faculty.user:
                         continue
                         
+                    # Filter assignment by component type
+                    comp_name_lower = comp_name.lower()
+                    if 'theory' in comp_name_lower:
+                        if assignment.teaching_type != FacultyTeachingAssignment.TeachingType.THEORY:
+                            continue
+                    elif 'practical' in comp_name_lower or 'tutorial' in comp_name_lower:
+                        if 'practical' not in assignment.teaching_type:
+                            continue
+                            
                     MarksEntryTask.objects.get_or_create(
                         exam=exam,
                         subject=assignment.semester_subject.subject,

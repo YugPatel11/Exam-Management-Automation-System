@@ -31,9 +31,9 @@
                 <p class="font-semibold">Theory CE Configuration Rules</p>
                 <ul class="mt-2 space-y-1 list-disc pl-4">
                     <li><strong>Internal 1</strong> and <strong>Internal 2</strong> must each have <strong>30 marks</strong> (6 questions × 5 marks).</li>
-                    <li>You can add additional components like <strong>Faculty Evaluation</strong>.</li>
-                    <li><strong>Formula:</strong> Theory CE = ((Internal 1 + Internal 2) / 2) + Faculty Evaluation</li>
-                    <li>Total of all sub-components must <strong>equal {{ parent_max_marks }}</strong>.</li>
+                    <li>You can add additional components like <strong>Faculty Evaluation (10 marks)</strong>.</li>
+                    <li><strong>Formula:</strong> Theory CE = ((Internal 1 + Internal 2) / 2) + FE = ((30+30)/2) + 10 = <strong>{{ parent_max_marks }}</strong></li>
+                    <li>Entry total will be <strong>70 marks</strong>, but calculated result must equal <strong>{{ parent_max_marks }}</strong>.</li>
                 </ul>
             </div>
         </div>
@@ -113,7 +113,7 @@
 
 
         <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-            <span class="text-sm text-slate-500">The sum of component marks must <strong class="text-brand-600">equal {{ parent_max_marks }}</strong>.</span>
+            <span class="text-sm text-slate-500">{% if is_theory_ce %}Formula result must <strong class="text-brand-600">equal {{ parent_max_marks }}</strong>. Entry total = 70.{% else %}The sum of component marks must <strong class="text-brand-600">equal {{ parent_max_marks }}</strong>.{% endif %}</span>
             <button @click="saveScheme" :disabled="isSaving" type="button" class="inline-flex items-center justify-center px-6 py-2.5 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 text-white text-sm font-medium rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
                 <span x-show="!isSaving">Save Components</span>
                 <span x-show="isSaving" class="flex items-center gap-2">
@@ -165,20 +165,45 @@ function schemeBuilder() {
                 return;
             }
 
-            let total = 0;
+            const isTheoryCE = {{ is_theory_ce|yesno:"true,false" }};
+            let internalTotal = 0;
+            let internalCount = 0;
+            let nonInternalTotal = 0;
+
             for (let i=0; i<this.components.length; i++) {
                 let c = this.components[i];
                 if (!c.name.trim() || !c.max_marks) {
                     this.showAlert('error', `Component #${i+1} is missing required fields.`);
                     return;
                 }
-                total += parseInt(c.max_marks) || 0;
+                const marks = parseInt(c.max_marks) || 0;
+                const nameLower = c.name.toLowerCase();
+                if (isTheoryCE && (nameLower.includes('internal') || nameLower.includes('exam'))) {
+                    internalTotal += marks;
+                    internalCount++;
+                } else {
+                    nonInternalTotal += marks;
+                }
             }
 
             const parentMax = {{ parent_max_marks }};
-            if (total !== parentMax) {
-                this.showAlert('error', `Total marks (${total}) must equal the target max marks (${parentMax}).`);
-                return;
+            if (isTheoryCE) {
+                // Theory CE formula validation
+                if (internalCount < 2) {
+                    this.showAlert('error', 'Theory CE requires at least 2 Internal components.');
+                    return;
+                }
+                const formulaResult = (internalTotal / internalCount) + nonInternalTotal;
+                if (formulaResult !== parentMax) {
+                    this.showAlert('error', `Formula result (${formulaResult}) must equal target max marks (${parentMax}). Entry total = ${internalTotal + nonInternalTotal}.`);
+                    return;
+                }
+            } else {
+                const total = internalTotal + nonInternalTotal;
+                if (total !== parentMax) {
+                    this.showAlert('error', `Total marks (${total}) must equal the target max marks (${parentMax}).`);
+                    return;
+                }
             }
 
             this.isSaving = true;

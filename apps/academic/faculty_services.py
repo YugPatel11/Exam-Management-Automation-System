@@ -375,6 +375,35 @@ class FacultyMasterImportService:
 
             # Auto-link to User account if exists
             linked_user = self.users_cache.get(email)
+            if not linked_user:
+                import uuid
+                base_username = email.split('@')[0]
+                username = base_username
+                # Ensure unique username
+                counter = 1
+                while User.objects.filter(username=username).exists():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+                    
+                first_name = row_data['faculty_name']
+                last_name = ''
+                if ' ' in first_name:
+                    parts = first_name.split(' ', 1)
+                    first_name = parts[0]
+                    last_name = parts[1]
+                    
+                linked_user = User.objects.create(
+                    username=username,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name,
+                    role=User.ROLE_SUBJECT_FACULTY,
+                    department=row_data['department'],
+                    employee_id=row_data['employee_code'],
+                )
+                linked_user.set_unusable_password()
+                linked_user.save()
+                self.users_cache[email] = linked_user
 
             defaults = {
                 'faculty_name': row_data['faculty_name'],

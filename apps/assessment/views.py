@@ -152,17 +152,21 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
         if is_theory_ce:
             # Theory CE special validation:
             # Internal 1 and Internal 2 must each be 30 marks
-            # Check that internals are present and correct
             internal_count = 0
+            internal_total = 0
+            non_internal_total = 0
             for c_name, c_marks in variables_dict.items():
                 c_lower = c_name.lower()
                 if 'internal' in c_lower or 'exam' in c_lower:
                     internal_count += 1
+                    internal_total += c_marks
                     if c_marks != 30:
                         return self._json_response(
                             False,
                             f"'{c_name}' must have exactly 30 marks (6 questions × 5 marks each)."
                         )
+                else:
+                    non_internal_total += c_marks
             
             if internal_count < 2:
                 return self._json_response(
@@ -170,10 +174,13 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
                     "Theory CE requires at least 2 internal/exam components (e.g., Internal 1 and Internal 2), each with 30 marks."
                 )
             
-            if total_component_marks != parent_max_marks:
+            # Validate formula result: ((sum_internals / count) + non_internal) must equal parent max
+            formula_result = (internal_total / internal_count) + non_internal_total
+            if formula_result != parent_max_marks:
                 return self._json_response(
                     False,
-                    f"Total component marks ({total_component_marks}) must equal the parent max marks ({parent_max_marks})."
+                    f"Formula result ({formula_result:.0f}) must equal target max marks ({parent_max_marks}). "
+                    f"Formula: ((Internal total {internal_total}) / {internal_count}) + FE ({non_internal_total}) = {formula_result:.0f}"
                 )
         else:
             # All other types: total must equal parent max marks
