@@ -173,6 +173,12 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
                 academic_year=task.teaching_assignment.academic_year,
                 class_name=task.teaching_assignment.class_name
             )
+            
+            # Include any students who already have marks for this task (e.g. from CSV upload)
+            from apps.marks.models import StudentMark
+            marked_student_ids = StudentMark.objects.filter(task=task).values_list('student_id', flat=True)
+            qs = qs | Student.objects.filter(id__in=marked_student_ids)
+            
             # Filter by batch if it's a practical batch
             t_type = task.teaching_assignment.teaching_type
             if t_type == 'practical_batch_a':
@@ -182,7 +188,7 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
             elif t_type == 'practical_batch_c':
                 qs = qs.filter(batch='C')
             
-            students = list(qs.order_by('enrollment_no'))
+            students = list(qs.distinct().order_by('enrollment_no'))
         else:
             # Legacy fallback
             mappings = CurriculumMapping.objects.filter(subject=task.subject)
