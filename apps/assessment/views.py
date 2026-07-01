@@ -213,6 +213,21 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
                 display_order=i
             ))
         MarksSubComponent.objects.bulk_create(new_components)
+        
+        # Regenerate Marks Entry Tasks for this component to reflect sub-component split
+        from apps.marks.models import MarksEntryTask
+        from apps.exams.services import ExamAutoGenerationService
+        
+        # Delete old tasks for this subject/component that are pending
+        MarksEntryTask.objects.filter(
+            exam__exam_type=component.name,
+            subject=component.semester_subject.subject,
+            status='pending'
+        ).delete()
+        
+        # Regenerate
+        ay = component.semester_subject.semester.academic_year
+        ExamAutoGenerationService.generate_exams_for_academic_year(ay)
 
         return self._json_response(True, "Assessment Scheme configured successfully!")
 

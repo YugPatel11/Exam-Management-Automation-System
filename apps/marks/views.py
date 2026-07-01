@@ -264,11 +264,18 @@ class MarksEntryFormView(FacultyRequiredMixin, View):
             if all_valid:
                 if action == 'submit':
                     task.status = 'submitted'
+                    task.save()
                     messages.success(request, "Marks submitted for review.")
+                    
+                    # If this is a sub-component, try to calculate the parent mark
+                    from apps.marks.services import ParentMarksCalculatorService
+                    ParentMarksCalculatorService.calculate_parent_marks_if_ready(task)
+                    
                 else:
                     task.status = 'in_progress'
+                    task.save()
                     messages.success(request, "Marks saved as draft.")
-                task.save()
+                
                 return redirect('marks:task_list')
             else:
                 messages.error(request, "Please correct the errors in the form.")

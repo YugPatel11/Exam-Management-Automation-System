@@ -35,6 +35,16 @@ class MarksEntryTask(BaseModel):
         help_text="Links this task to the academic structure for dynamic marks components."
     )
     
+    sub_component = models.ForeignKey(
+        'academic.MarksSubComponent',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='marks_tasks',
+        verbose_name="Marks Sub-Component",
+        help_text="If this task is specifically for a sub-component like Internal 1."
+    )
+    
     teaching_assignment = models.ForeignKey(
         'academic.FacultyTeachingAssignment',
         on_delete=models.SET_NULL,
@@ -48,15 +58,16 @@ class MarksEntryTask(BaseModel):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
     class Meta:
-        unique_together = ('exam', 'subject', 'division', 'teaching_assignment', 'faculty')
+        unique_together = ('exam', 'subject', 'division', 'teaching_assignment', 'faculty', 'sub_component')
         verbose_name = "Marks Entry Task"
         verbose_name_plural = "Marks Entry Tasks"
 
     def __str__(self):
+        suffix = f" - {self.sub_component.name}" if self.sub_component else ""
         if self.teaching_assignment:
-            return f"{self.subject.code} - {self.teaching_assignment.class_name} ({self.faculty.get_display_name()})"
+            return f"{self.subject.code} - {self.teaching_assignment.class_name}{suffix} ({self.faculty.get_display_name()})"
         div_code = self.division.name if self.division else "All"
-        return f"{self.subject.code} - {div_code} ({self.faculty.get_display_name()})"
+        return f"{self.subject.code} - {div_code}{suffix} ({self.faculty.get_display_name()})"
 
     def get_marks_components(self):
         """
@@ -97,6 +108,9 @@ class MarksEntryTask(BaseModel):
             comp_name_lower = mc.name.lower()
             result['component_type'] = comp_type
             result['parent_max_marks'] = mc.max_marks
+            
+            if self.sub_component:
+                result['parent_max_marks'] = self.sub_component.max_marks
 
             sub_comps = MarksSubComponent.objects.filter(
                 marks_component=mc
@@ -121,6 +135,8 @@ class MarksEntryTask(BaseModel):
                 if comp_name_lower in ['theory ce', 'theory_ce']:
                     result['use_theory_ce_formula'] = True
                     for sc in sub_comps:
+                        if self.sub_component and sc.id != self.sub_component.id:
+                            continue
                         sc_lower = sc.name.lower()
                         is_internal = ('internal' in sc_lower or 'exam' in sc_lower
                                        or 'theory' in sc_lower)
@@ -145,6 +161,8 @@ class MarksEntryTask(BaseModel):
 
                 # Theory ESE / Practical CE / Practical ESE with sub-components
                 for sc in sub_comps:
+                    if self.sub_component and sc.id != self.sub_component.id:
+                        continue
                     result['fields'].append({
                         'key': sc.slug,
                         'label': sc.name,

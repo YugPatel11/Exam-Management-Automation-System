@@ -226,3 +226,97 @@ class MarksCsvImportService:
             return False
             
 marks_allocation_service = MarksAllocationService
+
+class ParentMarksCalculatorService:
+    @classmethod
+    def calculate_parent_marks_if_ready(cls, task):
+        """
+        Check if a task is a sub-component. If so, check if all sibling tasks
+        are submitted. If yes, calculate and populate the parent task marks.
+        """
+        if not task.sub_component:
+            return
+            
+        from apps.marks.models import MarksEntryTask
+        siblings = MarksEntryTask.objects.filter(
+            exam=task.exam,
+            subject=task.subject,
+            division=task.division,
+            teaching_assignment=task.teaching_assignment,
+            faculty=task.faculty,
+            sub_component__isnull=False
+        )
+        
+        # Check if all sibling tasks are submitted or locked
+        if siblings.exclude(status__in=['submitted', 'locked']).exists():
+            return
+            
+        parent_task = MarksEntryTask.objects.filter(
+            exam=task.exam,
+            subject=task.subject,
+            division=task.division,
+            teaching_assignment=task.teaching_assignment,
+            faculty=task.faculty,
+            sub_component__isnull=True
+        ).first()
+        
+        if not parent_task:
+            return
+            
+        # Compile marks from siblings
+        from apps.marks.models import StudentMark
+        from django.db import transaction
+        student_totals = {}
+        
+        for sibling in siblings:
+            marks = StudentMark.objects.filter(task=sibling)
+            for m in marks:
+                if m.student.id not in student_totals:
+                    student_totals[m.student.id] = {
+                        'student': m.student,
+                        'internals': [],
+                        'fe': 0,
+                        'status': m.status
+                    }
+                
+                # Check status - if any is AB or UFM, the total might be affected, but usually we just calculate with 0.
+                if m.status != 'Present':
+                    student_totals[m.student.id]['status'] = m.status
+                
+                # Theory CE Logic: ((Internal 1 + Internal 2) / 2) + FE
+                sc_name = sibling.sub_component.name.lower()
+                if 'internal' in sc_name or 'exam' in sc_name or 'theory' in sc_name:
+                    student_totals[m.student.id]['internals'].append(m.total_marks)
+                else:
+                    student_totals[m.student.id]['fe'] += m.total_marks
+                    
+        # Save to parent task
+        with transaction.atomic():
+            StudentMark.objects.filter(task=parent_task).delete()
+            
+            parent_marks_to_create = []
+            for st_id, data in student_totals.items():
+                internals = data['internals']
+                fe = data['fe']
+                
+                if len(internals) >= 2:
+                    avg_internals = sum(internals) / len(internals)
+                    total = avg_internals + fe
+                elif len(internals) == 1:
+                    total = internals[0] + fe
+                else:
+                    total = fe
+                    
+                parent_marks_to_create.append(StudentMark(
+                    task=parent_task,
+                    student=data['student'],
+                    component_marks={'calculated_total': total},
+                    total_marks=total,
+                    status=data['status']
+                ))
+                
+            StudentMark.objects.bulk_create(parent_marks_to_create)
+            
+            parent_task.status = 'submitted'
+            parent_task.save()
+

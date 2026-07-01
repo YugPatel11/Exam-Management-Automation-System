@@ -79,14 +79,53 @@ class ExamAutoGenerationService:
                         if 'practical' not in assignment.teaching_type:
                             continue
                             
-                    MarksEntryTask.objects.get_or_create(
-                        exam=exam,
-                        subject=assignment.semester_subject.subject,
-                        division=None,
-                        teaching_assignment=assignment,
-                        faculty=assignment.faculty.user,
-                        defaults={
-                            'semester_subject': assignment.semester_subject,
-                            'status': 'pending'
-                        }
-                    )
+                    # Get the MarksComponent for this subject
+                    try:
+                        mc = assignment.semester_subject.marks_components.get(name=comp_name)
+                    except:
+                        continue
+                        
+                    sub_comps = mc.sub_components.all()
+                    
+                    if sub_comps.exists():
+                        # Create parent task for final calculated mark (not shown in pending entry list for faculty)
+                        MarksEntryTask.objects.get_or_create(
+                            exam=exam,
+                            subject=assignment.semester_subject.subject,
+                            division=None,
+                            teaching_assignment=assignment,
+                            faculty=assignment.faculty.user,
+                            sub_component=None,
+                            defaults={
+                                'semester_subject': assignment.semester_subject,
+                                'status': 'locked' # locked so it doesn't show in entry list
+                            }
+                        )
+                        # Create individual tasks for sub-components
+                        for sc in sub_comps:
+                            MarksEntryTask.objects.get_or_create(
+                                exam=exam,
+                                subject=assignment.semester_subject.subject,
+                                division=None,
+                                teaching_assignment=assignment,
+                                faculty=assignment.faculty.user,
+                                sub_component=sc,
+                                defaults={
+                                    'semester_subject': assignment.semester_subject,
+                                    'status': 'pending'
+                                }
+                            )
+                    else:
+                        # Single task for the whole component
+                        MarksEntryTask.objects.get_or_create(
+                            exam=exam,
+                            subject=assignment.semester_subject.subject,
+                            division=None,
+                            teaching_assignment=assignment,
+                            faculty=assignment.faculty.user,
+                            sub_component=None,
+                            defaults={
+                                'semester_subject': assignment.semester_subject,
+                                'status': 'pending'
+                            }
+                        )
