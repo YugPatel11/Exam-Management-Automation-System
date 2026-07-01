@@ -1,5 +1,5 @@
-RollNo,Status,component_1,component_2
-101,Present,20,45
-102,AB,0,0
-103,Present,22,48
-104,UFM,0,0
+RollNo,Status,theory_ce_q1,theory_ce_q2,theory_ce_q3,theory_ce_q4,theory_ce_q5,theory_ce_q6
+101,Present,5,4,5,3,4,5
+102,AB,0,0,0,0,0,0
+103,Present,4,5,4,5,5,4
+104,UFM,0,0,0,0,0,0

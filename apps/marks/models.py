@@ -64,32 +64,61 @@ class MarksEntryTask(BaseModel):
         Tries the new SemesterSubject first, falls back to legacy AssessmentScheme.
         """
         if self.semester_subject:
-            from apps.academic.models import MarksComponent
+            from apps.academic.models import MarksComponent, MarksSubComponent
             
             # The exam_type field on the Exam model stores the MarksComponent name dynamically
             exam_component_name = self.exam.exam_type
             
-            return [
-                {
-                    'key': mc.slug,
-                    'label': mc.name,
-                    'max_marks': mc.max_marks,
-                }
-                for mc in MarksComponent.objects.filter(
-                    semester_subject=self.semester_subject,
-                    max_marks__gt=0,
-                    name=exam_component_name
-                ).order_by('display_order')
-            ]
+            components = []
+            for mc in MarksComponent.objects.filter(
+                semester_subject=self.semester_subject,
+                max_marks__gt=0,
+                name=exam_component_name
+            ).order_by('display_order'):
+                
+                sub_comps = MarksSubComponent.objects.filter(marks_component=mc).order_by('display_order')
+                if sub_comps.exists():
+                    for sc in sub_comps:
+                        components.append({
+                            'key': sc.slug,
+                            'label': sc.name,
+                            'max_marks': sc.max_marks,
+                        })
+                    continue
+                
+                comp_name_lower = mc.name.lower()
+                if comp_name_lower in ['theory ce', 'theory_ce']:
+                    for i in range(1, 7):
+                        components.append({
+                            'key': f"{mc.slug}_q{i}",
+                            'label': f"Q{i}",
+                            'max_marks': None,
+                        })
+                elif comp_name_lower in ['theory ese', 'theory_ese']:
+                    for i in range(1, 9):
+                        components.append({
+                            'key': f"{mc.slug}_q{i}",
+                            'label': f"Q{i}",
+                            'max_marks': None,
+                        })
+                else:
+                    components.append({
+                        'key': mc.slug,
+                        'label': mc.name,
+                        'max_marks': mc.max_marks,
+                    })
+            return components
         else:
             # Legacy fallback: use AssessmentScheme
             try:
                 scheme = self.subject.assessment_scheme
                 components = []
                 if scheme.theory_ce > 0:
-                    components.append({'key': 'theory_ce', 'label': 'Theory CE', 'max_marks': scheme.theory_ce})
+                    for i in range(1, 7):
+                        components.append({'key': f'theory_ce_q{i}', 'label': f'Q{i}', 'max_marks': None})
                 if scheme.theory_ese > 0:
-                    components.append({'key': 'theory_ese', 'label': 'Theory ESE', 'max_marks': scheme.theory_ese})
+                    for i in range(1, 9):
+                        components.append({'key': f'theory_ese_q{i}', 'label': f'Q{i}', 'max_marks': None})
                 if scheme.practical_ce > 0:
                     components.append({'key': 'practical_ce', 'label': 'Practical CE', 'max_marks': scheme.practical_ce})
                 if scheme.practical_ese > 0:

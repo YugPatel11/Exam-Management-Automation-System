@@ -158,7 +158,7 @@
                     Sample
                 </a>
             </div>
-            <p class="text-sm text-slate-500 mb-4">Upload marks using a CSV file. The file must contain headers: RollNo, Absent, {% for c in components %}{{ c.key }}{% if not forloop.last %}, {% endif %}{% endfor %}.</p>
+            <p class="text-sm text-slate-500 mb-4">Upload marks using a CSV file. The file must contain headers: RollNo, Status, {% for c in components %}{{ c.key }}{% if not forloop.last %}, {% endif %}{% endfor %}.</p>
             
             <form action="{% url 'marks:csv_upload' task.pk %}" method="post" enctype="multipart/form-data" class="space-y-4">
                 {% csrf_token %}

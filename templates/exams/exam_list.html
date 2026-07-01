@@ -25,8 +25,8 @@
             <div class="sm:w-48">
                 <select name="exam_type" class="block w-full py-2 pl-3 pr-10 border border-slate-300 rounded-xl focus:ring-brand-500 focus:border-brand-500 sm:text-sm bg-white text-slate-900" onchange="this.form.submit()">
                     <option value="">All Types</option>
-                    {% for value, label in exam_types %}
-                    <option value="{{ value }}" {% if request.GET.exam_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% for exam_type in exam_types %}
+                    <option value="{{ exam_type }}" {% if request.GET.exam_type == exam_type %}selected{% endif %}>{{ exam_type }}</option>
                     {% endfor %}
                 </select>
             </div>

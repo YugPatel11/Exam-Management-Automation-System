@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 import json
 
 from apps.master_data.models import Subject
+from apps.academic.models import SemesterSubject, FacultyTeachingAssignment, MarksComponent, MarksSubComponent
 from apps.curriculum.models import AssessmentScheme
 from apps.assessment.models import AssessmentComponent
 
@@ -21,17 +22,20 @@ class CoordinatorDashboardView(SubjectCoordinatorRequiredMixin, ListView):
     """
     Shows a list of subjects assigned to the logged-in user as a Coordinator.
     """
-    model = Subject
+    model = SemesterSubject
     template_name = 'assessment/dashboard.html'
-    context_object_name = 'subjects'
+    context_object_name = 'semester_subjects'
 
     def get_queryset(self):
         user = self.request.user
         if user.is_admin_role:
-            return Subject.objects.all().select_related('assessment_scheme')
+            return SemesterSubject.objects.all().select_related('subject', 'semester__academic_year')
         
-        assigned_ids = user.coordinated_subjects.values_list('subject_id', flat=True)
-        return Subject.objects.filter(id__in=assigned_ids).select_related('assessment_scheme')
+        assigned_ss_ids = FacultyTeachingAssignment.objects.filter(
+            faculty__user=user,
+            is_coordinator=True
+        ).values_list('semester_subject_id', flat=True)
+        return SemesterSubject.objects.filter(id__in=assigned_ss_ids).select_related('subject', 'semester__academic_year')
 
 
 class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
@@ -39,51 +43,56 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
     Interactive form builder for assessment components.
     Handles dynamic UI and mathematical validation.
     """
-    def get(self, request, subject_id, parent_type):
-        subject = get_object_or_404(Subject, id=subject_id)
+    def get(self, request, component_id):
+        component = get_object_or_404(MarksComponent, id=component_id)
+        semester_subject = component.semester_subject
         
         # Verify access
         if not request.user.is_admin_role:
-            is_coordinator = request.user.coordinated_subjects.filter(subject_id=subject.id).exists()
+            is_coordinator = FacultyTeachingAssignment.objects.filter(
+                faculty__user=request.user,
+                semester_subject=semester_subject,
+                is_coordinator=True
+            ).exists()
             if not is_coordinator:
                 messages.error(request, "You are not assigned as the coordinator for this subject.")
                 return redirect('assessment:dashboard')
 
-        # Get parent max marks from Curriculum AssessmentScheme
-        try:
-            scheme = subject.assessment_scheme
-            max_marks = getattr(scheme, parent_type)
-        except AssessmentScheme.DoesNotExist:
-            messages.error(request, "No assessment scheme configured for this subject.")
-            return redirect('assessment:dashboard')
-            
+        max_marks = component.max_marks
         if max_marks == 0:
             messages.error(request, "This component type is not applicable for this subject (Max Marks = 0).")
             return redirect('assessment:dashboard')
 
-        components = AssessmentComponent.objects.filter(subject=subject, parent_type=parent_type)
+        sub_components = MarksSubComponent.objects.filter(marks_component=component).order_by('display_order')
+        
         context = {
-            'subject': subject,
-            'parent_type': parent_type,
-            'parent_type_display': dict(AssessmentComponent.PARENT_TYPE_CHOICES).get(parent_type, parent_type),
+            'subject': semester_subject.subject,
+            'semester_subject': semester_subject,
+            'parent_type': component.slug,
+            'parent_type_display': component.name,
             'parent_max_marks': max_marks,
-            'components': components
+            'components': sub_components,
+            'component': component
         }
         return render(request, 'assessment/builder.html', context)
 
-    def post(self, request, subject_id, parent_type):
-        subject = get_object_or_404(Subject, id=subject_id)
+    def post(self, request, component_id):
+        component = get_object_or_404(MarksComponent, id=component_id)
+        semester_subject = component.semester_subject
         
         # Verify access
         if not request.user.is_admin_role:
-            is_coordinator = request.user.coordinated_subjects.filter(subject_id=subject.id).exists()
+            is_coordinator = FacultyTeachingAssignment.objects.filter(
+                faculty__user=request.user,
+                semester_subject=semester_subject,
+                is_coordinator=True
+            ).exists()
             if not is_coordinator:
                 messages.error(request, "Unauthorized.")
                 return redirect('assessment:dashboard')
 
         # Parent max marks
-        scheme = subject.assessment_scheme
-        parent_max_marks = getattr(scheme, parent_type)
+        parent_max_marks = component.max_marks
 
         # Parse submitted data
         try:
@@ -97,25 +106,25 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
 
         # Build variables dict for validation
         variables_dict = {}
-        variable_names_seen = set()
+        names_seen = set()
         
-        for c in components_data:
-            v_name = str(c.get('variable_name', '')).strip()
+        for i, c in enumerate(components_data):
+            c_name = str(c.get('name', '')).strip()
             v_marks = c.get('max_marks')
             
-            if not v_name or v_marks is None:
-                return self._json_response(False, "All components must have a Variable Name and Max Marks.")
+            if not c_name or v_marks is None or v_marks == '':
+                return self._json_response(False, f"Component #{i+1} is missing a Name or Max Marks.")
                 
-            if v_name in variable_names_seen:
-                return self._json_response(False, f"Duplicate variable name found: '{v_name}'")
+            if c_name in names_seen:
+                return self._json_response(False, f"Duplicate component name found: '{c_name}'")
                 
             try:
                 v_marks = int(v_marks)
             except ValueError:
-                return self._json_response(False, f"Max Marks for '{v_name}' must be an integer.")
+                return self._json_response(False, f"Max Marks for '{c_name}' must be an integer.")
                 
-            variables_dict[v_name] = v_marks
-            variable_names_seen.add(v_name)
+            variables_dict[c_name] = v_marks
+            names_seen.add(c_name)
 
         # Validate that the sum of components does not exceed the parent max marks
         total_component_marks = sum(variables_dict.values())
@@ -123,18 +132,17 @@ class SchemeBuilderView(SubjectCoordinatorRequiredMixin, View):
             return self._json_response(False, f"Total component marks ({total_component_marks}) cannot exceed the parent max marks ({parent_max_marks}).")
 
         # Save to DB
-        AssessmentComponent.objects.filter(subject=subject, parent_type=parent_type).delete()
+        MarksSubComponent.objects.filter(marks_component=component).delete()
         
         new_components = []
-        for c in components_data:
-            new_components.append(AssessmentComponent(
-                subject=subject,
-                parent_type=parent_type,
+        for i, c in enumerate(components_data):
+            new_components.append(MarksSubComponent(
+                marks_component=component,
                 name=str(c.get('name', '')).strip(),
-                variable_name=str(c.get('variable_name', '')).strip(),
-                max_marks=int(c.get('max_marks'))
+                max_marks=int(c.get('max_marks')),
+                display_order=i
             ))
-        AssessmentComponent.objects.bulk_create(new_components)
+        MarksSubComponent.objects.bulk_create(new_components)
 
         return self._json_response(True, "Assessment Scheme configured successfully!")
 

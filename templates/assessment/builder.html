@@ -49,14 +49,10 @@
             <div class="space-y-4">
                 <template x-for="(comp, index) in components" :key="index">
                     <div class="flex items-start gap-4 p-4 rounded-xl border border-slate-200 bg-slate-50/50">
-                        <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Name</label>
-                                <input type="text" x-model="comp.name" placeholder="e.g., Internal 1" class="block w-full border-slate-300 rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:ring-brand-500 focus:border-brand-500 sm:text-sm placeholder-slate-400">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Variable Name</label>
-                                <input type="text" x-model="comp.variable_name" placeholder="e.g., I1" class="block w-full border-slate-300 rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:ring-brand-500 focus:border-brand-500 sm:text-sm font-mono placeholder-slate-400" @input="comp.variable_name = comp.variable_name.replace(/[^a-zA-Z0-9_]/g, '')">
+                                <input type="text" x-model="comp.name" placeholder="e.g., Exam, Faculty Evaluation" class="block w-full border-slate-300 rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:ring-brand-500 focus:border-brand-500 sm:text-sm placeholder-slate-400">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Conducted Marks</label>
@@ -95,7 +91,6 @@ function schemeBuilder() {
             {% for c in components %}
             {
                 name: '{{ c.name|escapejs }}',
-                variable_name: '{{ c.variable_name|escapejs }}',
                 max_marks: {{ c.max_marks }}
             }{% if not forloop.last %},{% endif %}
             {% endfor %}
@@ -104,7 +99,7 @@ function schemeBuilder() {
         alert: { show: false, type: 'success', message: '' },
 
         addComponent() {
-            this.components.push({ name: '', variable_name: '', max_marks: '' });
+            this.components.push({ name: '', max_marks: '' });
         },
 
         removeComponent(index) {
@@ -128,7 +123,7 @@ function schemeBuilder() {
 
             for (let i=0; i<this.components.length; i++) {
                 let c = this.components[i];
-                if (!c.name.trim() || !c.variable_name.trim() || !c.max_marks) {
+                if (!c.name.trim() || !c.max_marks) {
                     this.showAlert('error', `Component #${i+1} is missing required fields.`);
                     return;
                 }

@@ -15,28 +15,28 @@
 
     <!-- Data Grid -->
     <div class="grid grid-cols-1 gap-6">
-        {% for subject in subjects %}
+        {% for subject in semester_subjects %}
         <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-900">{{ subject.code }} - {{ subject.name }}</h2>
+                    <h2 class="text-lg font-bold text-slate-900">{{ subject.subject_code }} - {{ subject.subject_name }}</h2>
+                    <p class="text-sm text-slate-500">Sem {{ subject.semester.number }} | {{ subject.semester.academic_year.name }}</p>
                 </div>
             </div>
             
             <div class="p-6">
-                {% if not subject.assessment_scheme %}
+                {% if not subject.active_components %}
                     <div class="p-4 rounded-xl bg-amber-50 text-amber-700 text-sm">
-                        No Curriculum Scheme has been imported for this subject. The core max marks must be defined in the Curriculum module first.
+                        No Marks Components imported for this subject.
                     </div>
                 {% else %}
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        
-                        {% if subject.assessment_scheme.theory_ce > 0 %}
-                        <div class="p-4 border border-slate-200 rounded-xl hover:border-brand-500 transition group cursor-pointer" onclick="window.location.href='{% url 'assessment:builder' subject.id 'theory_ce' %}'">
+                        {% for component in subject.active_components %}
+                        <div class="p-4 border border-slate-200 rounded-xl hover:border-brand-500 transition group cursor-pointer" onclick="window.location.href='{% url 'assessment:builder' component.id %}'">
                             <div class="flex justify-between items-start">
                                 <div>
-                                    <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition">Theory CE</h3>
-                                    <p class="text-sm text-slate-500 mt-1">Max: {{ subject.assessment_scheme.theory_ce }}</p>
+                                    <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition">{{ component.name }}</h3>
+                                    <p class="text-sm text-slate-500 mt-1">Max Marks: {{ component.max_marks }}</p>
                                 </div>
                                 <div class="bg-slate-100 p-2 rounded-xl text-slate-500 group-hover:bg-brand-100 group-hover:text-brand-600 transition">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -46,93 +46,7 @@
                                 Configure Components &rarr;
                             </div>
                         </div>
-                        {% endif %}
-
-                        {% if subject.assessment_scheme.theory_ese > 0 %}
-                        <div class="p-4 border border-slate-200 rounded-xl hover:border-brand-500 transition group cursor-pointer" onclick="window.location.href='{% url 'assessment:builder' subject.id 'theory_ese' %}'">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition">Theory ESE</h3>
-                                    <p class="text-sm text-slate-500 mt-1">Max: {{ subject.assessment_scheme.theory_ese }}</p>
-                                </div>
-                                <div class="bg-slate-100 p-2 rounded-xl text-slate-500 group-hover:bg-brand-100 group-hover:text-brand-600 transition">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                </div>
-                            </div>
-                            <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-brand-600 font-medium group-hover:underline">
-                                Configure Components &rarr;
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        {% if subject.assessment_scheme.practical_ce > 0 %}
-                        <div class="p-4 border border-slate-200 rounded-xl hover:border-brand-500 transition group cursor-pointer" onclick="window.location.href='{% url 'assessment:builder' subject.id 'practical_ce' %}'">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition">Practical CE</h3>
-                                    <p class="text-sm text-slate-500 mt-1">Max: {{ subject.assessment_scheme.practical_ce }}</p>
-                                </div>
-                                <div class="bg-slate-100 p-2 rounded-xl text-slate-500 group-hover:bg-brand-100 group-hover:text-brand-600 transition">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                </div>
-                            </div>
-                            <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-brand-600 font-medium group-hover:underline">
-                                Configure Components &rarr;
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        {% if subject.assessment_scheme.practical_ese > 0 %}
-                        <div class="p-4 border border-slate-200 rounded-xl hover:border-brand-500 transition group cursor-pointer" onclick="window.location.href='{% url 'assessment:builder' subject.id 'practical_ese' %}'">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition">Practical ESE</h3>
-                                    <p class="text-sm text-slate-500 mt-1">Max: {{ subject.assessment_scheme.practical_ese }}</p>
-                                </div>
-                                <div class="bg-slate-100 p-2 rounded-xl text-slate-500 group-hover:bg-brand-100 group-hover:text-brand-600 transition">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                </div>
-                            </div>
-                            <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-brand-600 font-medium group-hover:underline">
-                                Configure Components &rarr;
-                            </div>
-                        </div>
-                        {% endif %}
-                        
-                        {% if subject.assessment_scheme.tutorial_ce > 0 %}
-                        <div class="p-4 border border-slate-200 rounded-xl hover:border-brand-500 transition group cursor-pointer" onclick="window.location.href='{% url 'assessment:builder' subject.id 'tutorial_ce' %}'">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition">Tutorial CE</h3>
-                                    <p class="text-sm text-slate-500 mt-1">Max: {{ subject.assessment_scheme.tutorial_ce }}</p>
-                                </div>
-                                <div class="bg-slate-100 p-2 rounded-xl text-slate-500 group-hover:bg-brand-100 group-hover:text-brand-600 transition">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                </div>
-                            </div>
-                            <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-brand-600 font-medium group-hover:underline">
-                                Configure Components &rarr;
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        {% if subject.assessment_scheme.tutorial_ese > 0 %}
-                        <div class="p-4 border border-slate-200 rounded-xl hover:border-brand-500 transition group cursor-pointer" onclick="window.location.href='{% url 'assessment:builder' subject.id 'tutorial_ese' %}'">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition">Tutorial ESE</h3>
-                                    <p class="text-sm text-slate-500 mt-1">Max: {{ subject.assessment_scheme.tutorial_ese }}</p>
-                                </div>
-                                <div class="bg-slate-100 p-2 rounded-xl text-slate-500 group-hover:bg-brand-100 group-hover:text-brand-600 transition">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                </div>
-                            </div>
-                            <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-brand-600 font-medium group-hover:underline">
-                                Configure Components &rarr;
-                            </div>
-                        </div>
-                        {% endif %}
-
+                        {% endfor %}
                     </div>
                 {% endif %}
             </div>

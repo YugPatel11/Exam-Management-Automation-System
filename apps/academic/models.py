@@ -241,6 +241,37 @@ class MarksComponent(BaseModel):
         super().save(*args, **kwargs)
 
 
+class MarksSubComponent(BaseModel):
+    """
+    Custom distribution defined by the Subject Coordinator for a MarksComponent.
+    E.g., "Exam" (30) and "Faculty Evaluation" (10) for a "Theory CE" component.
+    """
+    marks_component = models.ForeignKey(
+        MarksComponent,
+        on_delete=models.CASCADE,
+        related_name='sub_components',
+        verbose_name="Marks Component"
+    )
+    name = models.CharField(max_length=100, verbose_name="Sub-Component Name", help_text="e.g., Exam, Faculty Evaluation")
+    slug = models.SlugField(max_length=100, verbose_name="Sub-Component Slug")
+    max_marks = models.PositiveIntegerField(verbose_name="Maximum Marks", null=True, blank=True)
+    display_order = models.PositiveIntegerField(default=0, verbose_name="Display Order")
+
+    class Meta:
+        unique_together = ('marks_component', 'slug')
+        ordering = ['marks_component', 'display_order', 'name']
+        verbose_name = "Marks Sub-Component"
+        verbose_name_plural = "Marks Sub-Components"
+
+    def __str__(self):
+        return f"{self.marks_component} → {self.name} ({self.max_marks})"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name).replace('-', '_')
+        super().save(*args, **kwargs)
+
+
 class AcademicStructureImport(BaseModel):
     """
     Audit trail for academic structure imports.
