@@ -15,4 +15,5 @@ urlpatterns = [
     path('component/<int:exam_id>/', views.ComponentAnalysisView.as_view(), name='component'),
     path('co/<int:exam_id>/', views.COAnalysisView.as_view(), name='co'),
     path('btl/<int:exam_id>/', views.BTLAnalysisView.as_view(), name='btl'),
+    path('student-marks/', views.StudentMarksAnalyticsView.as_view(), name='student_marks'),
 ]

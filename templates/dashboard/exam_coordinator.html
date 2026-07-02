@@ -19,13 +19,17 @@
     <div class="bg-white rounded-xl p-6 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 border border-slate-200">
         <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Quick Actions</h3>
         <div class="flex flex-wrap gap-3">
-            <a href="{% url 'academic:year_list' %}" id="btn-academic-years" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-brand-600 to-brand-500 rounded-xl hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:ring-4 focus:ring-brand-500/20 transition-all duration-200 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-md">
+            <a href="{% url 'academic:year_list' %}" id="btn-academic-years" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-brand-600 to-brand-500 rounded-xl hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:ring-4 focus:ring-brand-500/20 transition-all duration-200 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 Academic Years
             </a>
-            <a href="{% url 'exams:exam_list' %}" id="btn-manage-exams" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50:bg-slate-700 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
+            <a href="{% url 'exams:exam_list' %}" id="btn-manage-exams" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 Manage Exams
+            </a>
+            <a href="{% url 'question_papers:template' %}" id="btn-manage-template" class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 focus:ring-4 focus:ring-slate-500/10 transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15M9 11l3 3L22 4" /></svg>
+                QP Template Config
             </a>
         </div>
     </div>

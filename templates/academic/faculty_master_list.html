@@ -42,11 +42,11 @@
                         </svg>
                     </div>
                     <input type="text" name="q" value="{{ search_query }}" placeholder="Search faculty name, alias, email..."
-                           class="block w-full pl-10 rounded-xl border-slate-300 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                           class="block w-full pl-10 rounded-xl border-slate-300 shadow-sm transition-colors focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                 </div>
             </div>
             <div class="sm:w-48">
-                <select name="department" class="block w-full rounded-xl border-slate-300 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <select name="department" class="block w-full rounded-xl border-slate-300 shadow-sm transition-colors focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                     <option value="">All Departments</option>
                     {% for dept in departments %}
                     <option value="{{ dept }}" {% if dept == current_department %}selected{% endif %}>{{ dept }}</option>
@@ -54,7 +54,7 @@
                 </select>
             </div>
             <div class="sm:w-48">
-                <select name="status" class="block w-full rounded-xl border-slate-300 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <select name="status" class="block w-full rounded-xl border-slate-300 shadow-sm transition-colors focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                     <option value="">All Statuses</option>
                     <option value="active" {% if current_status == 'active' %}selected{% endif %}>Active</option>
                     <option value="inactive" {% if current_status == 'inactive' %}selected{% endif %}>Inactive</option>

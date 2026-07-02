@@ -48,7 +48,7 @@ def active_nav(context, url_name):
     try:
         current = resolve(request.path_info).url_name
         if current == url_name:
-            return 'bg-teal-700/20 text-teal-300 border-r-2 border-teal-400'
+            return 'bg-brand-50 text-brand-700'
     except Exception:
         pass
     return ''
@@ -66,7 +66,7 @@ def active_nav_group(context, *url_prefixes):
     path = request.path
     for prefix in url_prefixes:
         if path.startswith(prefix):
-            return 'bg-teal-700/20 text-teal-300'
+            return 'bg-brand-50 text-brand-700'
     return ''
 
 

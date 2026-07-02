@@ -26,10 +26,10 @@
     <form method="get" class="flex flex-wrap gap-3">
         <div class="flex-1 min-w-[200px]">
             <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search academic years..."
-                   class="w-full rounded-xl border-slate-300 text-sm focus:ring-brand-500 focus:border-brand-500 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300">
+                   class="w-full rounded-xl border-slate-300 text-sm focus:ring-brand-500 focus:border-brand-500 shadow-sm transition-colors">
         </div>
         <select name="status"
-                class="rounded-xl border-slate-300 text-sm focus:ring-brand-500 focus:border-brand-500 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300">
+                class="rounded-xl border-slate-300 text-sm focus:ring-brand-500 focus:border-brand-500 shadow-sm transition-colors">
             <option value="">All Statuses</option>
             <option value="active" {% if request.GET.status == "active" %}selected{% endif %}>Active</option>
             <option value="closed" {% if request.GET.status == "closed" %}selected{% endif %}>Closed</option>

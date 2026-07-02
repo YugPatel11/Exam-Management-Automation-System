@@ -16,6 +16,7 @@
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Exam</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Subject</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Class</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
@@ -29,6 +30,13 @@
                     </td>
                     <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
                         {{ task.subject.code }}
+                    </td>
+                    <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
+                        {% if task.sub_component %}
+                            {{ task.sub_component.name }}
+                        {% else %}
+                            {{ task.exam.exam_type|default:"-" }}
+                        {% endif %}
                     </td>
                     <td class="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
                         {{ task.teaching_assignment.class_name|default:"All Classes" }}

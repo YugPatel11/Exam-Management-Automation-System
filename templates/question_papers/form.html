@@ -1,6 +1,28 @@
 {% extends 'base.html' %}
 {% block title %}{% if object %}Edit{% else %}Create{% endif %} Question Paper{% endblock %}
 
+{% block extra_head %}
+<!-- TinyMCE -->
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  tinymce.init({
+    selector: '.tinymce',
+    height: 150,
+    menubar: false,
+    plugins: [
+      'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
+      'searchreplace', 'visualblocks', 'code', 'fullscreen',
+      'table', 'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | formatselect | ' +
+    'bold italic | alignleft aligncenter ' +
+    'alignright alignjustify | bullist numlist outdent indent | ' +
+    'removeformat | help',
+    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+  });
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="mb-6 flex items-center justify-between">
     <div>
@@ -52,10 +74,6 @@
                         <label class="block text-sm font-medium text-slate-700">{{ form.question_number.label }}</label>
                         {{ form.question_number }}
                     </div>
-                    <div class="sm:col-span-4">
-                        <label class="block text-sm font-medium text-slate-700">{{ form.text.label }}</label>
-                        {{ form.text }}
-                    </div>
                     <div class="sm:col-span-1">
                         <label class="block text-sm font-medium text-slate-700">{{ form.marks.label }}</label>
                         {{ form.marks }}
@@ -68,22 +86,13 @@
                         <label class="block text-sm font-medium text-slate-700">{{ form.btl_mapping.label }}</label>
                         {{ form.btl_mapping }}
                     </div>
-                    <div class="sm:col-span-1 flex items-end">
-                        <label class="inline-flex items-center text-sm font-medium text-red-600">
-                            {{ form.DELETE }}
-                            <span class="ml-2">Delete</span>
-                        </label>
+                    <div class="sm:col-span-12 mt-2">
+                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ form.text.label }}</label>
+                        {{ form.text }}
                     </div>
                 </div>
-                {{ form.order.as_hidden }}
             </div>
             {% endfor %}
-        </div>
-        
-        <div class="mt-4">
-            <button type="button" id="add-question" class="inline-flex items-center rounded border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2:bg-surface-600">
-                + Add Question
-            </button>
         </div>
     </div>
 
@@ -97,37 +106,4 @@
     </div>
 </form>
 
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const container = document.getElementById('questions-container');
-        const addButton = document.getElementById('add-question');
-        const totalForms = document.getElementById('id_questions-TOTAL_FORMS');
-        
-        addButton.addEventListener('click', function() {
-            const forms = container.querySelectorAll('.question-form');
-            const formCount = forms.length;
-            const newForm = forms[0].cloneNode(true);
-            
-            // Update input names and ids
-            newForm.innerHTML = newForm.innerHTML.replace(/-0-/g, `-${formCount}-`);
-            newForm.innerHTML = newForm.innerHTML.replace(/_0_/g, `_${formCount}_`);
-            
-            // Clear values
-            newForm.querySelectorAll('input:not([type="hidden"]), textarea, select').forEach(input => {
-                input.value = '';
-                if(input.type === 'checkbox') input.checked = false;
-            });
-            
-            // Auto increment order
-            const orderInput = newForm.querySelector('input[name$="-order"]');
-            if (orderInput) orderInput.value = formCount * 10;
-            
-            container.appendChild(newForm);
-            totalForms.value = formCount + 1;
-        });
-    });
-</script>
 {% endblock %}

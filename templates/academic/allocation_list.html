@@ -48,11 +48,11 @@
                         </svg>
                     </div>
                     <input type="text" name="q" value="{{ search_query }}" placeholder="Search subject code, class, faculty..."
-                           class="block w-full pl-10 rounded-xl border-slate-300 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                           class="block w-full pl-10 rounded-xl border-slate-300 shadow-sm transition-colors focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                 </div>
             </div>
             <div>
-                <select name="semester" class="block w-full rounded-xl border-slate-300 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <select name="semester" class="block w-full rounded-xl border-slate-300 shadow-sm transition-colors focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                     <option value="">All Semesters</option>
                     {% for sem in semesters %}
                     <option value="{{ sem.id }}" {% if current_semester == sem.id|stringformat:"s" %}selected{% endif %}>{{ sem.name }}</option>
@@ -60,7 +60,7 @@
                 </select>
             </div>
             <div>
-                <select name="class_name" class="block w-full rounded-xl border-slate-300 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
+                <select name="class_name" class="block w-full rounded-xl border-slate-300 shadow-sm transition-colors focus:border-brand-500 focus:ring-brand-500 sm:text-sm">
                     <option value="">All Classes</option>
                     {% for cls in classes %}
                     <option value="{{ cls }}" {% if current_class == cls %}selected{% endif %}>{{ cls }}</option>

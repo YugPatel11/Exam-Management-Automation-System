@@ -111,12 +111,26 @@ def subject_coordinator_dashboard(request):
 
     # Group by semester
     exam_subjects = {}
+    internal_qp_subjects = []
+    
+    from apps.academic.models import MarksSubComponent
+    
     for c in coordinated:
-        if c.semester not in exam_subjects:
-            exam_subjects[c.semester] = []
+        sem = c.semester
+        if sem not in exam_subjects:
+            exam_subjects[sem] = []
         # Ensure distinct subjects are added
-        if c.semester_subject.subject not in exam_subjects[c.semester]:
-            exam_subjects[c.semester].append(c.semester_subject.subject)
+        if c.semester_subject.subject not in exam_subjects[sem]:
+            exam_subjects[sem].append(c.semester_subject.subject)
+            
+        # Check for Internal 1 or Internal 2 sub-components
+        has_internals = MarksSubComponent.objects.filter(
+            marks_component__semester_subject=c.semester_subject,
+            name__in=['Internal 1', 'Internal 2']
+        ).exists()
+        
+        if has_internals and c.semester_subject.subject not in internal_qp_subjects:
+            internal_qp_subjects.append(c.semester_subject.subject)
 
     # Question paper stats
     from apps.question_papers.models import QuestionPaper
@@ -127,6 +141,7 @@ def subject_coordinator_dashboard(request):
         'page_title': 'Subject Coordinator Dashboard',
         'breadcrumbs': [{'label': 'Dashboard', 'url': None}],
         'exam_subjects': exam_subjects,
+        'internal_qp_subjects': internal_qp_subjects,
         'qp_count': qp_count,
         'qp_submitted': qp_submitted,
         'total_coordinated': coordinated.count(),

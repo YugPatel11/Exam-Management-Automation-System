@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load exam_tags %}
+
+{% block title %}Preview Question Paper{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-semibold text-slate-900">Preview Question Paper</h1>
+        <p class="mt-1 text-sm text-slate-500">Review the generated paper before submitting.</p>
+    </div>
+    <div class="flex items-center gap-3">
+        <a href="{% url 'question_papers:edit' paper.pk %}" class="inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+            Edit
+        </a>
+        <form method="post" action="{% url 'question_papers:submit' paper.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="inline-flex items-center rounded-md border border-transparent bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700">
+                Submit for Approval
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="bg-white shadow-md rounded-xl p-8 max-w-4xl mx-auto border border-slate-200">
+    <!-- Render Template Header -->
+    <div class="mb-8 border-b pb-6">
+        {% if rendered_header %}
+            {% autoescape off %}
+            {{ rendered_header }}
+            {% endautoescape %}
+        {% else %}
+            <div class="text-center">
+                <h1 class="text-2xl font-bold">Standard Template</h1>
+                <h2 class="text-lg">{{ paper.subject.code }} - {{ paper.subject.name }}</h2>
+                <p>Date: {{ paper.date }} | Total Marks: {{ paper.total_marks }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Questions -->
+    <div class="space-y-6">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b-2 border-slate-800">
+                    <th class="w-12 py-2 font-bold">Q.No</th>
+                    <th class="py-2 font-bold">Question</th>
+                    <th class="w-16 py-2 font-bold text-center">Marks</th>
+                    <th class="w-16 py-2 font-bold text-center">CO</th>
+                    <th class="w-16 py-2 font-bold text-center">BTL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for q in questions %}
+                <tr class="border-b border-slate-200">
+                    <td class="py-4 align-top font-semibold">{{ q.question_number }}</td>
+                    <td class="py-4 align-top prose max-w-none">
+                        {% autoescape off %}
+                        {{ q.text }}
+                        {% endautoescape %}
+                    </td>
+                    <td class="py-4 align-top text-center">[{{ q.marks }}]</td>
+                    <td class="py-4 align-top text-center text-slate-500 text-sm">{{ q.co_mapping }}</td>
+                    <td class="py-4 align-top text-center text-slate-500 text-sm">{{ q.btl_mapping }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="py-4 text-center text-slate-500">No questions found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

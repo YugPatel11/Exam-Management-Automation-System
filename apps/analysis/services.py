@@ -289,3 +289,138 @@ class AnalysisService:
 
 
 analysis_service = AnalysisService
+
+class StudentMarksAnalyticsService:
+    @staticmethod
+    def get_student_marks_analytics(user, filters):
+        from django.db.models import Q
+        from apps.marks.models import StudentMark
+        from apps.academic.models import FacultyTeachingAssignment
+
+        qs = StudentMark.objects.filter(task__status='locked')
+
+        if not user.is_admin_role and not user.is_exam_coordinator:
+            if user.is_subject_coordinator:
+                assigned_subjects = FacultyTeachingAssignment.objects.filter(
+                    faculty__user=user, is_coordinator=True
+                ).values_list('semester_subject__subject_id', flat=True)
+                
+                qs = qs.filter(
+                    Q(task__subject_id__in=assigned_subjects) | 
+                    Q(task__faculty=user)
+                )
+            else:
+                qs = qs.filter(task__faculty=user)
+
+        exam_id = filters.get('exam_id')
+        subject_id = filters.get('subject_id')
+        division_id = filters.get('division_id')
+        exam_type = filters.get('exam_type')
+        marks_gt = filters.get('marks_gt')
+
+        if exam_id:
+            qs = qs.filter(task__exam_id=exam_id)
+        if subject_id:
+            qs = qs.filter(task__subject_id=subject_id)
+        if division_id:
+            qs = qs.filter(task__division_id=division_id)
+        if exam_type:
+            if exam_type == 'CE Marks':
+                qs = qs.filter(task__exam__exam_type__icontains='CE')
+            else:
+                qs = qs.filter(Q(task__sub_component__name=exam_type) | Q(task__exam__exam_type=exam_type, task__sub_component__isnull=True))
+
+        highest_marks = 0
+        lowest_marks = float('inf')
+        total_students = 0
+        
+        # We need a list to hold all marks for the distribution chart
+        all_marks = []
+
+        if exam_type == 'CE Marks':
+            # Group by student and apply CE formula: ((Internal 1 + Internal 2) / 2) + FE
+            student_data = {}
+            for mark in qs:
+                s_id = mark.student_id
+                if s_id not in student_data:
+                    student_data[s_id] = {'internals': [], 'fe': 0}
+                    
+                total = float(mark.total_marks)
+                if mark.task.sub_component:
+                    sc_name = mark.task.sub_component.name.lower()
+                    if 'internal' in sc_name or 'exam' in sc_name or 'theory' in sc_name:
+                        student_data[s_id]['internals'].append(total)
+                    else:
+                        student_data[s_id]['fe'] += total
+                else:
+                    # If it's a parent task or doesn't have sub components, just add to fe
+                    student_data[s_id]['fe'] += total
+            
+            for s_id, data in student_data.items():
+                internals = data['internals']
+                fe = data['fe']
+                
+                if len(internals) >= 2:
+                    calc_total = sum(internals) / len(internals) + fe
+                elif len(internals) == 1:
+                    calc_total = internals[0] + fe
+                else:
+                    calc_total = fe
+                    
+                if marks_gt and calc_total < float(marks_gt):
+                    continue
+                    
+                all_marks.append(calc_total)
+                if calc_total > highest_marks:
+                    highest_marks = calc_total
+                if calc_total < lowest_marks:
+                    lowest_marks = calc_total
+                total_students += 1
+
+        else:
+            for mark in qs:
+                total = float(mark.total_marks)
+                
+                # Apply Marks Filter (>=)
+                if marks_gt and total < float(marks_gt):
+                    continue
+                    
+                all_marks.append(total)
+                if total > highest_marks:
+                    highest_marks = total
+                if total < lowest_marks:
+                    lowest_marks = total
+                
+                total_students += 1
+
+        if lowest_marks == float('inf'):
+            lowest_marks = 0
+            
+        # Create Marks Distribution Bar Chart Data
+        # We will create bins like 0-10, 11-20... up to max rounded up to nearest 10
+        distribution = {}
+        if total_students > 0:
+            max_bin = int((highest_marks // 10) * 10 + 10)
+            # Initialize bins
+            for i in range(0, max_bin, 10):
+                range_label = f"{i}-{i+9}"
+                distribution[range_label] = 0
+                
+            for m in all_marks:
+                bin_start = int(m // 10) * 10
+                range_label = f"{bin_start}-{bin_start+9}"
+                if range_label in distribution:
+                    distribution[range_label] += 1
+                else:
+                    distribution[range_label] = 1
+        
+        dist_labels = list(distribution.keys())
+        dist_data = list(distribution.values())
+
+        return {
+            'highest_marks': highest_marks,
+            'lowest_marks': lowest_marks,
+            'total_students': total_students,
+            'dist_labels': dist_labels,
+            'dist_data': dist_data,
+        }

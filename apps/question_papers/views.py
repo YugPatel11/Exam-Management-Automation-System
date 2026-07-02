@@ -7,11 +7,29 @@ from django.views.generic import ListView, CreateView, UpdateView, DetailView, V
 from django.urls import reverse_lazy, reverse
 from django.db import transaction
 
-from apps.core.mixins import SubjectCoordinatorRequiredMixin
-from apps.question_papers.models import QuestionPaper
-from apps.question_papers.forms import QuestionPaperForm, QuestionFormSet
+from apps.core.mixins import SubjectCoordinatorRequiredMixin, ExamCoordinatorRequiredMixin
+from apps.question_papers.models import QuestionPaper, QuestionPaperTemplate
+from apps.question_papers.forms import QuestionPaperForm, QuestionFormSet, QuestionPaperTemplateForm
 from apps.question_papers.services import question_paper_service
 from apps.core.models_audit import TextContent
+
+
+class QuestionPaperTemplateUpdateView(ExamCoordinatorRequiredMixin, UpdateView):
+    """
+    Manage the global Question Paper Template.
+    """
+    model = QuestionPaperTemplate
+    form_class = QuestionPaperTemplateForm
+    template_name = 'question_papers/template_upload.html'
+    success_url = reverse_lazy('dashboard:home')
+    
+    def get_object(self, queryset=None):
+        template, created = QuestionPaperTemplate.objects.get_or_create(is_active=True, defaults={'name': 'Standard Template'})
+        return template
+
+    def form_valid(self, form):
+        messages.success(self.request, "Question Paper Template updated successfully.")
+        return super().form_valid(form)
 
 
 class QuestionPaperListView(SubjectCoordinatorRequiredMixin, ListView):
@@ -147,6 +165,62 @@ class QuestionPaperSubmitView(SubjectCoordinatorRequiredMixin, View):
         
         messages.success(request, f"Question Paper for {paper.subject.code} submitted successfully.")
         return redirect('question_papers:detail', pk=paper.pk)
+
+
+class QuestionPaperPreviewView(SubjectCoordinatorRequiredMixin, DetailView):
+    """
+    Preview the generated question paper inside the template format.
+    """
+    model = QuestionPaper
+    template_name = 'question_papers/preview.html'
+    context_object_name = 'paper'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['questions'] = self.object.questions.all().order_by('order', 'created_at')
+        template = QuestionPaperTemplate.objects.filter(is_active=True).first()
+        if template and template.header_html:
+            html = template.header_html
+            html = html.replace('{{ subject_code }}', self.object.subject.code)
+            html = html.replace('{{ subject_name }}', self.object.subject.name)
+            html = html.replace('{{ date }}', str(self.object.date) if self.object.date else '___')
+            html = html.replace('{{ marks }}', str(self.object.total_marks))
+            context['rendered_header'] = html
+        return context
+
+
+class QuestionPaperLockView(ExamCoordinatorRequiredMixin, View):
+    """
+    Exam Coordinator locks the verified question paper.
+    """
+    def post(self, request, pk):
+        paper = get_object_or_404(QuestionPaper, pk=pk)
+        paper.status = 'approved'
+        paper.save()
+        messages.success(request, f"Question Paper for {paper.subject.code} has been locked.")
+        return redirect('question_papers:list')
+
+
+class QuestionPaperPrintView(ExamCoordinatorRequiredMixin, DetailView):
+    """
+    Print the locked question paper directly from the browser.
+    """
+    model = QuestionPaper
+    template_name = 'question_papers/print.html'
+    context_object_name = 'paper'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['questions'] = self.object.questions.all().order_by('order', 'created_at')
+        template = QuestionPaperTemplate.objects.filter(is_active=True).first()
+        if template and template.header_html:
+            html = template.header_html
+            html = html.replace('{{ subject_code }}', self.object.subject.code)
+            html = html.replace('{{ subject_name }}', self.object.subject.name)
+            html = html.replace('{{ date }}', str(self.object.date) if self.object.date else '___')
+            html = html.replace('{{ marks }}', str(self.object.total_marks))
+            context['rendered_header'] = html
+        return context
 
 
 class QuestionPaperPdfView(SubjectCoordinatorRequiredMixin, View):

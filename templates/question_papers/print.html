@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Paper - {{ paper.subject.code }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* A4 Page Formatting */
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+        
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            color: black;
+            background-color: white;
+            margin: 0;
+            padding: 0;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
+        }
+        
+        /* Hide UI elements during print */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: none;
+            }
+        }
+        
+        /* General page layout */
+        .page {
+            max-width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            padding: 20mm;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        @media print {
+            .page {
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+        }
+
+        .prose p {
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+<!-- Action Bar (Not Printed) -->
+<div class="no-print bg-slate-900 text-white py-4 px-6 flex justify-between items-center fixed top-0 w-full z-50 shadow-lg">
+    <div>
+        <h1 class="text-lg font-bold">Print Question Paper</h1>
+        <p class="text-xs text-slate-300">Right-click and downloading is disabled for security.</p>
+    </div>
+    <div class="flex gap-4">
+        <a href="{% url 'question_papers:list' %}" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm font-medium transition-colors">
+            Close
+        </a>
+        <button onclick="window.print()" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded text-sm font-bold transition-colors shadow-lg">
+            Print Paper
+        </button>
+    </div>
+</div>
+
+<!-- Add padding for the fixed header so it doesn't overlap on screen -->
+<div class="no-print h-24"></div>
+
+<!-- A4 Page Container -->
+<div class="page">
+    <!-- Header -->
+    <div class="mb-6 border-b-2 border-black pb-4">
+        {% if rendered_header %}
+            {% autoescape off %}
+            {{ rendered_header }}
+            {% endautoescape %}
+        {% else %}
+            <div style="text-align: center;">
+                <h1 style="font-size: 24px; font-weight: bold; margin:0;">Standard Template</h1>
+                <h2 style="font-size: 18px; margin-top:5px; margin-bottom:5px;">{{ paper.subject.code }} - {{ paper.subject.name }}</h2>
+                <p style="margin: 0;">Date: {{ paper.date }} | Total Marks: {{ paper.total_marks }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Questions -->
+    <table style="width: 100%; text-align: left; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid black;">
+                <th style="width: 10%; padding: 8px 0; font-weight: bold;">Q.No</th>
+                <th style="width: 60%; padding: 8px 0; font-weight: bold;">Question</th>
+                <th style="width: 10%; padding: 8px 0; font-weight: bold; text-align: center;">Marks</th>
+                <th style="width: 10%; padding: 8px 0; font-weight: bold; text-align: center;">CO</th>
+                <th style="width: 10%; padding: 8px 0; font-weight: bold; text-align: center;">BTL</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for q in questions %}
+            <tr style="border-bottom: 1px solid #ccc;">
+                <td style="padding: 12px 0; vertical-align: top; font-weight: bold;">{{ q.question_number }}</td>
+                <td style="padding: 12px 0; vertical-align: top;" class="prose">
+                    {% autoescape off %}
+                    {{ q.text }}
+                    {% endautoescape %}
+                </td>
+                <td style="padding: 12px 0; vertical-align: top; text-align: center;">[{{ q.marks }}]</td>
+                <td style="padding: 12px 0; vertical-align: top; text-align: center; color: #555; font-size: 12px;">{{ q.co_mapping }}</td>
+                <td style="padding: 12px 0; vertical-align: top; text-align: center; color: #555; font-size: 12px;">{{ q.btl_mapping }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 20px 0; text-align: center; color: #777;">No questions available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Prevent common download/save shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+S, Cmd+S
+        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+            e.preventDefault();
+            alert('Saving is disabled.');
+        }
+        // Ctrl+P, Cmd+P triggers the custom print which is allowed but intercepted if needed
+    });
+
+    // Disable dragging
+    document.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+    });
+</script>
+
+</body>
+</html>

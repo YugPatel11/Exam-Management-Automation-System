@@ -5,7 +5,7 @@
             <!-- Left: Logo & Links -->
             <div class="flex">
                 <div class="flex-shrink-0 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-lg shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300-brand-500/20">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-bold text-xl shadow-sm">
                         E
                     </div>
                     <span class="text-xl font-bold text-slate-900 tracking-tight hidden sm:block">{{ app_name }}</span>
@@ -88,6 +88,10 @@
                         Marks Entry
                     </a>
                     {% endif %}
+                    
+                    <a href="{% url 'analysis:student_marks' %}" class="inline-flex items-center px-3 py-2 my-auto text-sm font-medium rounded-md transition-colors hover:bg-slate-100:bg-slate-800 {% active_nav_group '/analysis/student-marks/' %}">
+                        Student Analytics
+                    </a>
                 </div>
             </div>
 
@@ -174,6 +178,8 @@
             {% if user.is_faculty_role %}
             <a href="{% url 'marks:task_list' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Marks Entry</a>
             {% endif %}
+            
+            <a href="{% url 'analysis:student_marks' %}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-50:bg-slate-800">Student Analytics</a>
         </div>
     </div>
 </nav>

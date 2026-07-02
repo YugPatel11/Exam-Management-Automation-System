@@ -195,3 +195,116 @@ class BTLAnalysisView(RoleRequiredMixin, View):
             'chart_marks': json.dumps(marks),
         }
         return render(request, 'analysis/btl.html', context)
+
+class StudentMarksAnalyticsView(RoleRequiredMixin, View):
+    """
+    Student Marks Analytics Module with role-based access.
+    Displays highest marks, lowest marks, and pass/fail analysis.
+    """
+    allowed_roles = ['admin', 'exam_coordinator', 'subject_coordinator', 'faculty']
+    
+    def get(self, request):
+        from apps.marks.models import StudentMark
+        from apps.academic.models import FacultyTeachingAssignment
+        from django.db.models import Q
+        from apps.analysis.services import StudentMarksAnalyticsService
+
+        user = request.user
+        
+        # Base query for dropdown options based on role
+        qs = StudentMark.objects.filter(task__status='locked')
+
+        if not user.is_admin_role and not user.is_exam_coordinator:
+            if user.is_subject_coordinator:
+                assigned_subjects = FacultyTeachingAssignment.objects.filter(
+                    faculty__user=user, is_coordinator=True
+                ).values_list('semester_subject__subject_id', flat=True)
+                
+                qs = qs.filter(
+                    Q(task__subject_id__in=assigned_subjects) | 
+                    Q(task__faculty=user)
+                )
+            else:
+                qs = qs.filter(task__faculty=user)
+
+        # Get unique options for filters
+        exams = []
+        subjects = []
+        divisions = []
+        exam_types = []
+        
+        # Use a single database hit to get distinct combinations
+        filter_data = qs.values(
+            'task__exam__id', 'task__exam__name',
+            'task__subject__id', 'task__subject__code', 'task__subject__name',
+            'task__division__id', 'task__division__name',
+            'task__sub_component__name', 'task__exam__exam_type'
+        ).distinct()
+        
+        exam_set = set()
+        subject_set = set()
+        division_set = set()
+        exam_types_set = set()
+        
+        has_ce = False
+        
+        for item in filter_data:
+            if item['task__exam__id'] and item['task__exam__id'] not in exam_set:
+                exams.append({'id': item['task__exam__id'], 'name': item['task__exam__name']})
+                exam_set.add(item['task__exam__id'])
+                
+            if item['task__subject__id'] and item['task__subject__id'] not in subject_set:
+                subjects.append({'id': item['task__subject__id'], 'name': f"{item['task__subject__code']} - {item['task__subject__name']}"})
+                subject_set.add(item['task__subject__id'])
+                
+            if item['task__division__id'] and item['task__division__id'] not in division_set:
+                divisions.append({'id': item['task__division__id'], 'name': item['task__division__name']})
+                division_set.add(item['task__division__id'])
+                
+            sub_comp_name = item.get('task__sub_component__name')
+            exam_type = item.get('task__exam__exam_type')
+            display_name = sub_comp_name if sub_comp_name else exam_type
+            if display_name and display_name not in exam_types_set:
+                exam_types.append({'name': display_name})
+                exam_types_set.add(display_name)
+                
+            if exam_type and 'CE' in exam_type:
+                has_ce = True
+
+        if has_ce and 'CE Marks' not in exam_types_set:
+            exam_types.append({'name': 'CE Marks'})
+            exam_types_set.add('CE Marks')
+
+        # Selected filters
+        filters = {
+            'exam_id': request.GET.get('exam'),
+            'subject_id': request.GET.get('subject'),
+            'division_id': request.GET.get('division'),
+            'exam_type': request.GET.get('exam_type'),
+            'marks_gt': request.GET.get('marks_gt'),
+        }
+
+        has_locked_marks = qs.exists()
+        
+        if has_locked_marks:
+            # Get analytics data
+            analytics_data = StudentMarksAnalyticsService.get_student_marks_analytics(user, filters)
+        else:
+            analytics_data = None
+        
+        context = {
+            'has_locked_marks': has_locked_marks,
+            'analytics_data': analytics_data,
+            'exams': exams,
+            'subjects': subjects,
+            'divisions': divisions,
+            'exam_types': sorted(exam_types, key=lambda x: x['name']),
+            'selected_exam': filters['exam_id'],
+            'selected_subject': filters['subject_id'],
+            'selected_division': filters['division_id'],
+            'selected_exam_type': filters['exam_type'],
+            'selected_marks_gt': filters['marks_gt'],
+        }
+        
+        return render(request, 'analysis/student_marks.html', context)
+
