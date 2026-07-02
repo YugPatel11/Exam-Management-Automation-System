@@ -134,8 +134,9 @@ def subject_coordinator_dashboard(request):
 
     # Question paper stats
     from apps.question_papers.models import QuestionPaper
-    qp_count = QuestionPaper.objects.filter(created_by=request.user).count()
-    qp_submitted = QuestionPaper.objects.filter(created_by=request.user, status='submitted').count()
+    my_question_papers = QuestionPaper.objects.filter(created_by=request.user).select_related('subject', 'program').order_by('-created_at')
+    qp_count = my_question_papers.count()
+    qp_submitted = my_question_papers.filter(status='submitted').count()
 
     context = {
         'page_title': 'Subject Coordinator Dashboard',
@@ -144,6 +145,7 @@ def subject_coordinator_dashboard(request):
         'internal_qp_subjects': internal_qp_subjects,
         'qp_count': qp_count,
         'qp_submitted': qp_submitted,
+        'my_question_papers': my_question_papers,
         'total_coordinated': coordinated.count(),
     }
     return render(request, 'dashboard/subject_coordinator.html', context)

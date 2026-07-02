@@ -58,6 +58,55 @@
     </div>
     {% endif %}
 
+    <!-- My Question Papers -->
+    <div class="bg-white rounded-xl shadow-md shadow-slate-200/50 border border-slate-200 mt-6">
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-base font-semibold text-slate-900">My Generated Question Papers</h3>
+        </div>
+        <div class="p-0">
+            {% if my_question_papers %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead class="bg-slate-50 text-slate-500 font-medium">
+                        <tr>
+                            <th class="px-6 py-3">Subject</th>
+                            <th class="px-6 py-3">Component</th>
+                            <th class="px-6 py-3">Date Created</th>
+                            <th class="px-6 py-3">Status</th>
+                            <th class="px-6 py-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for paper in my_question_papers %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4 font-medium text-slate-900">{{ paper.subject.code }}</td>
+                            <td class="px-6 py-4 text-slate-600">{{ paper.assessment_component }}</td>
+                            <td class="px-6 py-4 text-slate-600">{{ paper.created_at|date:"d M Y" }}</td>
+                            <td class="px-6 py-4">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    {% if paper.status == 'draft' %}bg-slate-100 text-slate-800
+                                    {% elif paper.status == 'submitted' %}bg-blue-100 text-blue-800
+                                    {% elif paper.status == 'approved' %}bg-green-100 text-green-800
+                                    {% endif %}">
+                                    {{ paper.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <a href="{% url 'question_papers:detail' paper.pk %}" class="text-brand-600 hover:text-brand-800 font-medium">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-6 text-center text-slate-500">
+                You haven't generated any question papers yet.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
     <!-- Assigned Subjects by Exam -->
     {% if exam_subjects %}
     <div class="space-y-4">

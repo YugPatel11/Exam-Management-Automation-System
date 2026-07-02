@@ -1,0 +1,150 @@
+/* paper_template.css */
+
+.a4-paper-container {
+    background-color: #f0f0f0;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.a4-paper {
+    background: white;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: black;
+}
+
+.a4-paper p {
+    margin: 0;
+    padding: 0;
+}
+
+.a4-paper strong {
+    font-weight: bold;
+}
+
+.a4-paper .header-section {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.a4-paper .details-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.a4-paper ul {
+    margin: 0;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.a4-paper table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.a4-paper th, .a4-paper td {
+    border: 1px solid black;
+    padding: 4px 8px;
+    vertical-align: top;
+}
+
+.a4-paper th {
+    text-align: center;
+    font-weight: bold;
+}
+
+.a4-paper .invisible-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.a4-paper .invisible-input:focus {
+    background: #fdfdfd;
+    box-shadow: 0 0 3px rgba(0,0,0,0.1);
+}
+
+.a4-paper select.invisible-input {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+.a4-paper textarea.invisible-input {
+    resize: none;
+    overflow: hidden;
+    line-height: inherit;
+}
+
+.a4-paper .inline-input-container {
+    display: inline-block;
+    border-bottom: 1px dashed #ccc;
+    min-width: 50px;
+}
+
+.a4-paper .inline-input-container input {
+    text-align: center;
+}
+
+/* Print styles */
+@media print {
+    @page {
+        size: A4;
+        margin: 20mm;
+    }
+    
+    body {
+        margin: 0;
+        padding: 0;
+        background: white;
+    }
+    
+    .a4-paper-container {
+        background: none;
+        padding: 0;
+    }
+    
+    .a4-paper {
+        width: auto;
+        min-height: auto;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+    }
+    
+    .no-print {
+        display: none !important;
+    }
+    
+    .a4-paper table {
+        page-break-inside: auto;
+    }
+    
+    .a4-paper tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+    
+    /* Remove dotted lines for print */
+    .a4-paper .inline-input-container {
+        border-bottom: none;
+    }
+}

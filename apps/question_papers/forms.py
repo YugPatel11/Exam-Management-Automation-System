@@ -21,17 +21,31 @@ class QuestionPaperTemplateForm(forms.ModelForm):
 class QuestionPaperForm(forms.ModelForm):
     class Meta:
         model = QuestionPaper
-        fields = ['exam', 'subject', 'program', 'semester', 'assessment_component', 'date', 'start_time', 'end_time']
+        fields = ['exam', 'subject', 'program', 'semester', 'assessment_component', 'date', 'start_time', 'end_time', 'instructions']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'start_time': forms.TimeInput(attrs={'type': 'time'}),
             'end_time': forms.TimeInput(attrs={'type': 'time'}),
+            'instructions': forms.Textarea(attrs={'rows': 3, 'class': 'invisible-input auto-resize'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm'})
+        for field_name, field in self.fields.items():
+            if field_name not in ['instructions', 'exam', 'program']:
+                field.widget.attrs.update({'class': 'invisible-input text-center'})
+                
+        # Auto-create B.Tech program and hide field so user doesn't need to select it
+        try:
+            from apps.master_data.models import Program
+            btech_program, created = Program.objects.get_or_create(
+                code="B.Tech", 
+                defaults={"name": "Bachelor of Technology"}
+            )
+            self.fields['program'].initial = btech_program
+            self.fields['program'].widget = forms.HiddenInput()
+        except Exception:
+            pass
 
 
 class QuestionForm(forms.ModelForm):
@@ -39,15 +53,16 @@ class QuestionForm(forms.ModelForm):
         model = Question
         fields = ['question_number', 'text', 'marks', 'co_mapping', 'btl_mapping', 'order']
         widgets = {
-            'text': forms.Textarea(attrs={'class': 'tinymce'}),
-            'marks': forms.NumberInput(attrs={'readonly': 'readonly'}),
+            'text': forms.Textarea(attrs={'class': 'invisible-input auto-resize', 'rows': 2, 'placeholder': 'Enter question text...'}),
+            'question_number': forms.TextInput(attrs={'class': 'invisible-input text-center'}),
+            'marks': forms.NumberInput(attrs={'class': 'invisible-input text-center', 'readonly': 'readonly'}),
+            'co_mapping': forms.Select(attrs={'class': 'invisible-input text-center'}),
+            'btl_mapping': forms.Select(attrs={'class': 'invisible-input text-center'}),
+            'order': forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in ['question_number', 'marks', 'co_mapping', 'btl_mapping', 'order']:
-            self.fields[field].widget.attrs.update({'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-500 focus:ring-brand-500 sm:text-sm'})
-        
         # Hardcode initial value if adding
         if not self.instance.pk:
             self.fields['marks'].initial = 5

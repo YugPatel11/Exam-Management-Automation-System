@@ -1,15 +1,20 @@
 {% extends 'base.html' %}
-{% load exam_tags %}
+{% load static %}
 
 {% block title %}Preview Question Paper{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/paper_template.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex items-center justify-between no-print">
     <div>
         <h1 class="text-2xl font-semibold text-slate-900">Preview Question Paper</h1>
-        <p class="mt-1 text-sm text-slate-500">Review the generated paper before submitting.</p>
+        <p class="mt-1 text-sm text-slate-500">Review the generated paper exactly as it will print.</p>
     </div>
     <div class="flex items-center gap-3">
+        {% if paper.status == 'draft' %}
         <a href="{% url 'question_papers:edit' paper.pk %}" class="inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
             Edit
         </a>
@@ -19,56 +24,80 @@
                 Submit for Approval
             </button>
         </form>
+        {% elif paper.status == 'approved' %}
+        <a href="{% url 'question_papers:print' paper.pk %}" class="inline-flex items-center rounded-md border border-transparent bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700" target="_blank">
+            Print
+        </a>
+        {% endif %}
     </div>
 </div>
 
-<div class="bg-white shadow-md rounded-xl p-8 max-w-4xl mx-auto border border-slate-200">
-    <!-- Render Template Header -->
-    <div class="mb-8 border-b pb-6">
-        {% if rendered_header %}
-            {% autoescape off %}
-            {{ rendered_header }}
-            {% endautoescape %}
-        {% else %}
-            <div class="text-center">
-                <h1 class="text-2xl font-bold">Standard Template</h1>
-                <h2 class="text-lg">{{ paper.subject.code }} - {{ paper.subject.name }}</h2>
-                <p>Date: {{ paper.date }} | Total Marks: {{ paper.total_marks }}</p>
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- Questions -->
-    <div class="space-y-6">
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="border-b-2 border-slate-800">
-                    <th class="w-12 py-2 font-bold">Q.No</th>
-                    <th class="py-2 font-bold">Question</th>
-                    <th class="w-16 py-2 font-bold text-center">Marks</th>
-                    <th class="w-16 py-2 font-bold text-center">CO</th>
-                    <th class="w-16 py-2 font-bold text-center">BTL</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for q in questions %}
-                <tr class="border-b border-slate-200">
-                    <td class="py-4 align-top font-semibold">{{ q.question_number }}</td>
-                    <td class="py-4 align-top prose max-w-none">
-                        {% autoescape off %}
-                        {{ q.text }}
-                        {% endautoescape %}
-                    </td>
-                    <td class="py-4 align-top text-center">[{{ q.marks }}]</td>
-                    <td class="py-4 align-top text-center text-slate-500 text-sm">{{ q.co_mapping }}</td>
-                    <td class="py-4 align-top text-center text-slate-500 text-sm">{{ q.btl_mapping }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="py-4 text-center text-slate-500">No questions found.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+<div class="a4-paper-container">
+    <div class="a4-paper" style="font-family: 'Cambria', 'Times New Roman', serif; font-size: 15px; line-height: 1.4; padding: 50px 60px;">
+        
+        <p style="text-align: right; margin-bottom: 20px;">Enrolment Number: _________________</p>
+        
+        <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">
+            <p>P P SAVANI UNIVERSITY</p>
+            <p>P P SAVANI SCHOOL OF ENGINEERING</p>
+            <p style="color: red;">{{ paper.semester }}<sup>st/nd/rd/th</sup> Semester of B. Tech Examination ({{ paper.assessment_component }})</p>
+        </div>
+        
+        <div style="text-align: center; font-weight: bold; color: red; margin-bottom: 15px;">
+            <p>Subject: {{ paper.subject.name }} ({{ paper.subject.code }})</p>
+            <p>Branches: CE/IT/CV/ME/TE/CH</p>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; color: red; border-bottom: 1px solid black; padding-bottom: 5px; margin-bottom: 10px;">
+            <div>[Date: {{ paper.date|date:"d/m/Y, l" }}]</div>
+            <div>[Time: {{ paper.start_time|time:"h.i A" }} to {{ paper.end_time|time:"h.i A" }}]</div>
+            <div>[Total Marks: {{ paper.total_marks }}]</div>
+        </div>
+        
+        <p style="font-weight: bold; margin-top: 10px;">Instructions:</p>
+        <ul style="list-style-type: square; margin-left: 25px; margin-bottom: 20px; padding-left: 0;">
+            {% for line in paper.instructions.splitlines %}
+                {% if line.strip %}<li style="margin-bottom: 3px;">{{ line.strip }}</li>{% endif %}
+            {% endfor %}
+        </ul>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 1px solid black;">
+            <tr style="background-color: #d9d9d9;">
+                <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">Q. No.</th>
+                <th style="border: 1px solid black; padding: 6px; text-align: left; font-weight: bold;">Question</th>
+                <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">Marks</th>
+                <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">BTL</th>
+                <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">CO</th>
+            </tr>
+            {% for q in paper.questions.all|dictsort:"order" %}
+            <tr>
+                <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q.question_number }}</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">{{ q.text|linebreaksbr }}</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q.marks }}</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q.btl_mapping|default:"-" }}</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q.co_mapping|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="border: 1px solid black; padding: 15px; text-align: center; color: #666;">No questions added yet.</td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+        <p style="text-align: center; margin-bottom: 20px;">CO: Course Outcome Number &nbsp;&nbsp; BTL: Blooms Taxonomy Level</p>
+        
+        <p style="margin-bottom: 5px;">Level of Bloom's Revised Taxonomy in Assessment</p>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+            <tr>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">1: Remember</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">2: Understand</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">3: Apply</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">4: Analyze</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">5: Evaluate</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">6: Create</td>
+            </tr>
         </table>
     </div>
 </div>

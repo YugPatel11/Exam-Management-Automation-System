@@ -1,109 +1,206 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{% if object %}Edit{% else %}Create{% endif %} Question Paper{% endblock %}
 
 {% block extra_head %}
-<!-- TinyMCE -->
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<link rel="stylesheet" href="{% static 'css/paper_template.css' %}">
 <script>
-  tinymce.init({
-    selector: '.tinymce',
-    height: 150,
-    menubar: false,
-    plugins: [
-      'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
-      'searchreplace', 'visualblocks', 'code', 'fullscreen',
-      'table', 'help', 'wordcount'
-    ],
-    toolbar: 'undo redo | formatselect | ' +
-    'bold italic | alignleft aligncenter ' +
-    'alignright alignjustify | bullist numlist outdent indent | ' +
-    'removeformat | help',
-    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-  });
+    document.addEventListener("DOMContentLoaded", function() {
+        // Auto-resize textareas
+        const textareas = document.querySelectorAll('textarea.auto-resize');
+        textareas.forEach(textarea => {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        });
+    });
 </script>
 {% endblock %}
 
 {% block content %}
-<div class="mb-6 flex items-center justify-between">
+<!-- Top action bar (No Print) -->
+<div class="mb-6 flex items-center justify-between no-print">
     <div>
         <h1 class="text-2xl font-semibold text-slate-900">{% if object %}Edit{% else %}Create{% endif %} Question Paper</h1>
-        <p class="mt-1 text-sm text-slate-500">Define the question paper details and questions.</p>
+        <p class="mt-1 text-sm text-slate-500">Edit the template below. What you see is exactly how it will print.</p>
     </div>
-    <a href="{% url 'question_papers:list' %}" class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700:text-slate-300">
-        &larr; Back to List
-    </a>
-</div>
-
-<form method="post" class="space-y-8">
-    {% csrf_token %}
-
-    <!-- Paper Details -->
-    <div class="bg-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 rounded-xl p-6">
-        <h2 class="text-lg font-medium text-slate-900 mb-4">Paper Details</h2>
-        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2 lg:grid-cols-4">
-            {% for field in form %}
-            <div>
-                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-slate-700">
-                    {{ field.label }}
-                </label>
-                <div class="mt-1">
-                    {{ field }}
-                </div>
-                {% if field.errors %}
-                <p class="mt-2 text-sm text-red-600">{{ field.errors.0 }}</p>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Questions -->
-    <div class="bg-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 rounded-xl p-6">
-        <h2 class="text-lg font-medium text-slate-900 mb-4">Questions</h2>
-        {{ questions.management_form }}
-        
-        <div id="questions-container" class="space-y-6">
-            {% for form in questions %}
-            <div class="question-form border border-slate-200 rounded-xl p-4 relative">
-                {% for hidden in form.hidden_fields %}
-                    {{ hidden }}
-                {% endfor %}
-                
-                <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
-                    <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-slate-700">{{ form.question_number.label }}</label>
-                        {{ form.question_number }}
-                    </div>
-                    <div class="sm:col-span-1">
-                        <label class="block text-sm font-medium text-slate-700">{{ form.marks.label }}</label>
-                        {{ form.marks }}
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-slate-700">{{ form.co_mapping.label }}</label>
-                        {{ form.co_mapping }}
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-slate-700">{{ form.btl_mapping.label }}</label>
-                        {{ form.btl_mapping }}
-                    </div>
-                    <div class="sm:col-span-12 mt-2">
-                        <label class="block text-sm font-medium text-slate-700 mb-1">{{ form.text.label }}</label>
-                        {{ form.text }}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div class="flex justify-end gap-3">
-        <a href="{% url 'question_papers:list' %}" class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2:bg-surface-600">
+    <div class="flex gap-3">
+        <a href="{% url 'question_papers:list' %}" class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
             Cancel
         </a>
-        <button type="submit" class="inline-flex items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2">
+        <button type="submit" form="question-paper-form" class="inline-flex items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white hover:from-brand-700 hover:to-brand-600 shadow-md">
             Save Question Paper
         </button>
     </div>
-</form>
+</div>
 
+<form method="post" id="question-paper-form">
+    {% csrf_token %}
+    
+    {% if form.errors or questions.errors or questions.non_form_errors %}
+    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 no-print text-red-700">
+        <h3 class="font-bold mb-2">Please correct the following errors:</h3>
+        {% if form.errors %}
+            <ul class="list-disc pl-5">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% if questions.non_form_errors %}
+            <ul class="list-disc pl-5 mt-2">
+            {% for error in questions.non_form_errors %}
+                <li>Questions: {{ error }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% if questions.errors %}
+            <ul class="list-disc pl-5 mt-2">
+            {% for form_errors in questions.errors %}
+                {% for field, errors in form_errors.items %}
+                    {% for error in errors %}
+                        <li>Question error in {{ field }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Non-printable settings for required fields not in the template -->
+    {% if not object %}
+    <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 no-print flex gap-6">
+        <div>
+            <label class="block text-sm font-medium text-blue-900 mb-1">Select Exam</label>
+            {{ form.exam }}
+        </div>
+        {% if not form.program.field.widget.is_hidden %}
+        <div>
+            <label class="block text-sm font-medium text-blue-900 mb-1">Select Program</label>
+            {{ form.program }}
+        </div>
+        {% else %}
+        <div>
+            {{ form.program }}
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div style="display:none;">
+        {{ form.exam }}
+        {{ form.program }}
+    </div>
+    {% endif %}
+
+    <div class="a4-paper-container">
+        <div class="a4-paper" style="font-family: 'Cambria', 'Times New Roman', serif; font-size: 15px; line-height: 1.4; padding: 50px 60px;">
+            
+            <!-- Header -->
+            <p style="text-align: right; margin-bottom: 20px;">Enrolment Number: _________________</p>
+            
+            <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">
+                <p>P P SAVANI UNIVERSITY</p>
+                <p>P P SAVANI SCHOOL OF ENGINEERING</p>
+                <p style="color: red;">
+                    {% if object %}
+                        {{ object.semester }}<sup>st/nd/rd/th</sup> Semester of B. Tech Examination ({{ object.assessment_component }})
+                    {% else %}
+                        <span class="inline-input-container">{{ form.semester }}</span> Semester of B. Tech Examination 
+                        (<span class="inline-input-container">{{ form.assessment_component }}</span>)
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div style="text-align: center; font-weight: bold; color: red; margin-bottom: 15px;">
+                <p>Subject: 
+                    {% if object %}
+                        {{ object.subject.name }} ({{ object.subject.code }})
+                    {% else %}
+                        <span class="inline-input-container">{{ form.subject }}</span>
+                    {% endif %}
+                </p>
+                <p>Branches: CE/IT/CV/ME/TE/CH</p>
+            </div>
+            
+            <!-- Details Row -->
+            <div style="display: flex; justify-content: space-between; color: red; border-bottom: 1px solid black; padding-bottom: 5px; margin-bottom: 10px;">
+                <div>[Date: <span class="inline-input-container">{{ form.date }}</span>]</div>
+                <div>[Time: <span class="inline-input-container">{{ form.start_time }}</span> to <span class="inline-input-container">{{ form.end_time }}</span>]</div>
+                <div>[Total Marks: 
+                    {% if object %}
+                        {{ object.total_marks }}
+                    {% else %}
+                        30
+                    {% endif %}
+                ]</div>
+            </div>
+
+            <!-- Hidden required fields -->
+            <div style="display:none;">
+                {% if object %}
+                    {{ form.subject }}
+                    {{ form.semester }}
+                    {{ form.assessment_component }}
+                {% endif %}
+            </div>
+
+            <!-- Instructions -->
+            <p style="font-weight: bold; margin-top: 10px;">Instructions:</p>
+            <div class="instructions-text" style="margin-bottom: 20px;">
+                {{ form.instructions }}
+            </div>
+
+            <!-- Questions Table -->
+            {{ questions.management_form }}
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 1px solid black;">
+                <tr style="background-color: #d9d9d9;">
+                    <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">Q. No.</th>
+                    <th style="border: 1px solid black; padding: 6px; text-align: left; font-weight: bold;">Question</th>
+                    <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">Marks</th>
+                    <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">BTL</th>
+                    <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">CO</th>
+                </tr>
+                {% for q_form in questions %}
+                <tr>
+                    <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q_form.question_number }}</td>
+                    <td style="border: 1px solid black; padding: 6px; text-align: left;">{{ q_form.text }}</td>
+                    <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q_form.marks }}</td>
+                    <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q_form.btl_mapping }}</td>
+                    <td style="border: 1px solid black; padding: 6px; text-align: center;">
+                        {{ q_form.co_mapping }}
+                        {% for hidden in q_form.hidden_fields %}
+                            {{ hidden }}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            
+            <p style="text-align: center; margin-bottom: 20px;">CO: Course Outcome Number &nbsp;&nbsp; BTL: Blooms Taxonomy Level</p>
+            
+            <p style="margin-bottom: 5px;">Level of Bloom's Revised Taxonomy in Assessment</p>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+                <tr>
+                    <td style="border: 1px solid black; padding: 6px; text-align: left;">1: Remember</td>
+                    <td style="border: 1px solid black; padding: 6px; text-align: left;">2: Understand</td>
+                    <td style="border: 1px solid black; padding: 6px; text-align: left;">3: Apply</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid black; padding: 6px; text-align: left;">4: Analyze</td>
+                    <td style="border: 1px solid black; padding: 6px; text-align: left;">5: Evaluate</td>
+                    <td style="border: 1px solid black; padding: 6px; text-align: left;">6: Create</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</form>
 {% endblock %}

@@ -15,6 +15,13 @@
         <a href="{% url 'question_papers:edit' paper.pk %}" class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2:bg-surface-600">
             Edit
         </a>
+        {% endif %}
+        
+        <a href="{% url 'question_papers:preview' paper.pk %}" class="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:bg-slate-50">
+            Preview Layout
+        </a>
+
+        {% if paper.status == 'draft' %}
         <form action="{% url 'question_papers:submit' paper.pk %}" method="post" class="inline">
             {% csrf_token %}
             <button type="submit" class="inline-flex items-center justify-center rounded-md border border-transparent bg-gradient-to-r from-brand-600 to-brand-500 px-4 py-2 text-sm font-medium text-white shadow-md shadow-slate-200/50 hover:shadow-lg transition-all duration-300 hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5 hover:shadow-brand-500/30 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"

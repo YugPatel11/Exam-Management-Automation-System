@@ -69,6 +69,11 @@ class QuestionPaper(BaseModel):
     
     total_marks = models.PositiveIntegerField(default=0)
     
+    instructions = models.TextField(
+        default="All questions compulsory.\nUse of scientific calculator is allowed.\nDraw neat and clean drawings/figure & assume suitable data if necessary.",
+        verbose_name="Instructions"
+    )
+    
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     
     created_by = models.ForeignKey(

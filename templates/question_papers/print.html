@@ -1,147 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Question Paper - {{ paper.subject.code }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* A4 Page Formatting */
-        @page {
-            size: A4;
-            margin: 15mm;
-        }
-        
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            color: black;
-            background-color: white;
-            margin: 0;
-            padding: 0;
-            -webkit-user-select: none; /* Safari */
-            -ms-user-select: none; /* IE 10 and IE 11 */
-            user-select: none; /* Standard syntax */
-        }
-        
-        /* Hide UI elements during print */
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            body {
-                background: none;
-            }
-        }
-        
-        /* General page layout */
-        .page {
-            max-width: 210mm;
-            min-height: 297mm;
-            margin: 0 auto;
-            background: white;
-            padding: 20mm;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        @media print {
-            .page {
-                margin: 0;
-                padding: 0;
-                box-shadow: none;
-            }
-        }
+{% extends 'base.html' %}
+{% load static %}
 
-        .prose p {
-            margin-bottom: 0.5em;
-        }
-    </style>
-</head>
-<body oncontextmenu="return false;">
+{% block title %}Print Question Paper{% endblock %}
 
-<!-- Action Bar (Not Printed) -->
-<div class="no-print bg-slate-900 text-white py-4 px-6 flex justify-between items-center fixed top-0 w-full z-50 shadow-lg">
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/paper_template.css' %}">
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        window.print();
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex items-center justify-between no-print">
     <div>
-        <h1 class="text-lg font-bold">Print Question Paper</h1>
-        <p class="text-xs text-slate-300">Right-click and downloading is disabled for security.</p>
+        <h1 class="text-2xl font-semibold text-slate-900">Print Question Paper</h1>
+        <p class="mt-1 text-sm text-slate-500">The print dialog should open automatically. If not, click below.</p>
     </div>
-    <div class="flex gap-4">
-        <a href="{% url 'question_papers:list' %}" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm font-medium transition-colors">
-            Close
-        </a>
-        <button onclick="window.print()" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded text-sm font-bold transition-colors shadow-lg">
-            Print Paper
+    <div class="flex items-center gap-3">
+        <button onclick="window.print()" class="inline-flex items-center rounded-md border border-transparent bg-brand-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-700">
+            Print Now
         </button>
     </div>
 </div>
 
-<!-- Add padding for the fixed header so it doesn't overlap on screen -->
-<div class="no-print h-24"></div>
-
-<!-- A4 Page Container -->
-<div class="page">
-    <!-- Header -->
-    <div class="mb-6 border-b-2 border-black pb-4">
-        {% if rendered_header %}
-            {% autoescape off %}
-            {{ rendered_header }}
-            {% endautoescape %}
-        {% else %}
-            <div style="text-align: center;">
-                <h1 style="font-size: 24px; font-weight: bold; margin:0;">Standard Template</h1>
-                <h2 style="font-size: 18px; margin-top:5px; margin-bottom:5px;">{{ paper.subject.code }} - {{ paper.subject.name }}</h2>
-                <p style="margin: 0;">Date: {{ paper.date }} | Total Marks: {{ paper.total_marks }}</p>
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- Questions -->
-    <table style="width: 100%; text-align: left; border-collapse: collapse;">
-        <thead>
-            <tr style="border-bottom: 2px solid black;">
-                <th style="width: 10%; padding: 8px 0; font-weight: bold;">Q.No</th>
-                <th style="width: 60%; padding: 8px 0; font-weight: bold;">Question</th>
-                <th style="width: 10%; padding: 8px 0; font-weight: bold; text-align: center;">Marks</th>
-                <th style="width: 10%; padding: 8px 0; font-weight: bold; text-align: center;">CO</th>
-                <th style="width: 10%; padding: 8px 0; font-weight: bold; text-align: center;">BTL</th>
+<div class="a4-paper-container">
+    <div class="a4-paper" style="font-family: 'Cambria', 'Times New Roman', serif; font-size: 15px; line-height: 1.4; padding: 50px 60px;">
+        
+        <p style="text-align: right; margin-bottom: 20px;">Enrolment Number: _________________</p>
+        
+        <div style="text-align: center; font-weight: bold; margin-bottom: 15px;">
+            <p>P P SAVANI UNIVERSITY</p>
+            <p>P P SAVANI SCHOOL OF ENGINEERING</p>
+            <p style="color: red;">{{ paper.semester }}<sup>st/nd/rd/th</sup> Semester of B. Tech Examination ({{ paper.assessment_component }})</p>
+        </div>
+        
+        <div style="text-align: center; font-weight: bold; color: red; margin-bottom: 15px;">
+            <p>Subject: {{ paper.subject.name }} ({{ paper.subject.code }})</p>
+            <p>Branches: CE/IT/CV/ME/TE/CH</p>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; color: red; border-bottom: 1px solid black; padding-bottom: 5px; margin-bottom: 10px;">
+            <div>[Date: {{ paper.date|date:"d/m/Y, l" }}]</div>
+            <div>[Time: {{ paper.start_time|time:"h.i A" }} to {{ paper.end_time|time:"h.i A" }}]</div>
+            <div>[Total Marks: {{ paper.total_marks }}]</div>
+        </div>
+        
+        <p style="font-weight: bold; margin-top: 10px;">Instructions:</p>
+        <ul style="list-style-type: square; margin-left: 25px; margin-bottom: 20px; padding-left: 0;">
+            {% for line in paper.instructions.splitlines %}
+                {% if line.strip %}<li style="margin-bottom: 3px;">{{ line.strip }}</li>{% endif %}
+            {% endfor %}
+        </ul>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px; border: 1px solid black;">
+            <tr style="background-color: #d9d9d9;">
+                <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">Q. No.</th>
+                <th style="border: 1px solid black; padding: 6px; text-align: left; font-weight: bold;">Question</th>
+                <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">Marks</th>
+                <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">BTL</th>
+                <th style="border: 1px solid black; padding: 6px; text-align: center; font-weight: bold; width: 8%;">CO</th>
             </tr>
-        </thead>
-        <tbody>
-            {% for q in questions %}
-            <tr style="border-bottom: 1px solid #ccc;">
-                <td style="padding: 12px 0; vertical-align: top; font-weight: bold;">{{ q.question_number }}</td>
-                <td style="padding: 12px 0; vertical-align: top;" class="prose">
-                    {% autoescape off %}
-                    {{ q.text }}
-                    {% endautoescape %}
-                </td>
-                <td style="padding: 12px 0; vertical-align: top; text-align: center;">[{{ q.marks }}]</td>
-                <td style="padding: 12px 0; vertical-align: top; text-align: center; color: #555; font-size: 12px;">{{ q.co_mapping }}</td>
-                <td style="padding: 12px 0; vertical-align: top; text-align: center; color: #555; font-size: 12px;">{{ q.btl_mapping }}</td>
-            </tr>
-            {% empty %}
+            {% for q in paper.questions.all|dictsort:"order" %}
             <tr>
-                <td colspan="5" style="padding: 20px 0; text-align: center; color: #777;">No questions available.</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q.question_number }}</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">{{ q.text|linebreaksbr }}</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q.marks }}</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q.btl_mapping|default:"-" }}</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: center;">{{ q.co_mapping|default:"-" }}</td>
             </tr>
             {% endfor %}
-        </tbody>
-    </table>
+        </table>
+        
+        <p style="text-align: center; margin-bottom: 20px;">CO: Course Outcome Number &nbsp;&nbsp; BTL: Blooms Taxonomy Level</p>
+        
+        <p style="margin-bottom: 5px;">Level of Bloom's Revised Taxonomy in Assessment</p>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid black;">
+            <tr>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">1: Remember</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">2: Understand</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">3: Apply</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">4: Analyze</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">5: Evaluate</td>
+                <td style="border: 1px solid black; padding: 6px; text-align: left;">6: Create</td>
+            </tr>
+        </table>
+    </div>
 </div>
-
-<script>
-    // Prevent common download/save shortcuts
-    document.addEventListener('keydown', function(e) {
-        // Ctrl+S, Cmd+S
-        if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
-            e.preventDefault();
-            alert('Saving is disabled.');
-        }
-        // Ctrl+P, Cmd+P triggers the custom print which is allowed but intercepted if needed
-    });
-
-    // Disable dragging
-    document.addEventListener('dragstart', function(e) {
-        e.preventDefault();
-    });
-</script>
-
-</body>
-</html>
+{% endblock %}

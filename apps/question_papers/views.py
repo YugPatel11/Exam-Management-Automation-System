@@ -43,10 +43,12 @@ class QuestionPaperListView(SubjectCoordinatorRequiredMixin, ListView):
     def get_queryset(self):
         qs = QuestionPaper.objects.all().select_related('exam', 'subject', 'program')
         
-        # Admin and Exam Coordinator see all.
         # Subject Coordinator sees only papers for subjects they coordinate.
         if self.request.user.is_subject_coordinator:
-            coordinated_subjects = self.request.user.coordinated_subjects.values_list('subject_id', flat=True)
+            from apps.academic.models import FacultyTeachingAssignment
+            coordinated_subjects = FacultyTeachingAssignment.objects.filter(
+                faculty__user=self.request.user, is_coordinator=True
+            ).values_list('semester_subject__subject_id', flat=True)
             qs = qs.filter(subject_id__in=coordinated_subjects)
             
         return qs
